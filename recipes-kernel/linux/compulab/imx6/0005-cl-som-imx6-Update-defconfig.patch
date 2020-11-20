@@ -1,0 +1,63 @@
+From 06657eea7287a8455a706ad660d5f9e42de1c026 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 20 Nov 2020 20:16:08 +0200
+Subject: [PATCH] cl-som-imx6: Update defconfig
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/configs/cl-som-imx6_defconfig | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/configs/cl-som-imx6_defconfig b/arch/arm/configs/cl-som-imx6_defconfig
+index 9d8c81028da0..f6bc2b3139a6 100644
+--- a/arch/arm/configs/cl-som-imx6_defconfig
++++ b/arch/arm/configs/cl-som-imx6_defconfig
+@@ -31,6 +31,7 @@ CONFIG_SOC_IMX6SLL=y
+ CONFIG_SOC_IMX7ULP=y
+ CONFIG_SOC_VF610=y
+ # CONFIG_SWP_EMULATE is not set
++CONFIG_PCI=y
+ CONFIG_SMP=y
+ CONFIG_VMSPLIT_2G=y
+ CONFIG_ARM_PSCI=y
+@@ -315,6 +316,8 @@ CONFIG_SND_SOC_IMX_SPDIF=y
+ CONFIG_SND_SOC_IMX_MC13783=y
+ CONFIG_SND_SOC_IMX_SI476X=y
+ CONFIG_SND_SOC_IMX_HDMI=y
++CONFIG_SND_SOC_WM8731=y
++CONFIG_SND_SIMPLE_CARD=y
+ CONFIG_USB=y
+ CONFIG_USB_OTG_WHITELIST=y
+ CONFIG_USB_EHCI_HCD=y
+@@ -357,11 +360,9 @@ CONFIG_MMC=y
+ CONFIG_MMC_SDHCI=y
+ CONFIG_MMC_SDHCI_PLTFM=y
+ CONFIG_MMC_SDHCI_ESDHC_IMX=y
+-# CONFIG_MXC_GPU_VIV is not set
+ CONFIG_MXC_SIM=y
+ CONFIG_MXC_SIMv2=y
+ CONFIG_MXC_IPU=y
+-CONFIG_MXC_IPU_V3_PRE=y
+ CONFIG_MXC_MIPI_CSI2=y
+ CONFIG_MXC_HDMI_CEC=y
+ CONFIG_NEW_LEDS=y
+@@ -375,6 +376,7 @@ CONFIG_LEDS_TRIGGER_BACKLIGHT=y
+ CONFIG_LEDS_TRIGGER_GPIO=y
+ CONFIG_RTC_CLASS=y
+ CONFIG_RTC_INTF_DEV_UIE_EMUL=y
++CONFIG_RTC_DRV_ABX80X=y
+ CONFIG_RTC_DRV_MC13XXX=y
+ CONFIG_RTC_DRV_MXC=y
+ CONFIG_RTC_DRV_SNVS=y
+@@ -429,6 +431,8 @@ CONFIG_NLS_ASCII=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_NLS_ISO8859_15=m
+ CONFIG_NLS_UTF8=y
++CONFIG_DEBUG_INFO=y
++CONFIG_GDB_SCRIPTS=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ # CONFIG_SCHED_DEBUG is not set
+-- 
+2.11.0
+

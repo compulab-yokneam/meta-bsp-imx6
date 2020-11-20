@@ -1,0 +1,202 @@
+From ea00f0e49cbbb53a38338c09f7b7372693618f2f Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 20 Nov 2020 20:11:28 +0200
+Subject: [PATCH] cl-som-imx6: Update device tree files
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/Makefile                |  4 +++
+ arch/arm/boot/dts/compulab/imx6q-sbc-imx6-wvga.dts | 18 ++++++++++
+ arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts      |  8 +++++
+ arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi     | 41 +++++++++++++++++++---
+ arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi     |  1 -
+ .../arm/boot/dts/compulab/imx6qp-sbc-imx6-wvga.dts | 18 ++++++++++
+ 6 files changed, 85 insertions(+), 5 deletions(-)
+ create mode 100644 arch/arm/boot/dts/compulab/imx6q-sbc-imx6-wvga.dts
+ create mode 100644 arch/arm/boot/dts/compulab/imx6qp-sbc-imx6-wvga.dts
+
+diff --git a/arch/arm/boot/dts/compulab/Makefile b/arch/arm/boot/dts/compulab/Makefile
+index b10e45751d3f..51b2bc0f2859 100644
+--- a/arch/arm/boot/dts/compulab/Makefile
++++ b/arch/arm/boot/dts/compulab/Makefile
+@@ -1,7 +1,11 @@
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-cl-som-imx6.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-cl-som-imx6.dtb
++dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-imx6.dtb
++dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-sbc-imx6.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-imx6-hdmi.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-sbc-imx6-hdmi.dtb
++dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-imx6-wvga.dtb
++dtb-$(CONFIG_SOC_IMX6Q) += imx6qp-sbc-imx6-wvga.dtb
+ 
+ always         := $(dtb-y)
+ subdir-y       := $(dts-dirs)
+diff --git a/arch/arm/boot/dts/compulab/imx6q-sbc-imx6-wvga.dts b/arch/arm/boot/dts/compulab/imx6q-sbc-imx6-wvga.dts
+new file mode 100644
+index 000000000000..52452e751ede
+--- /dev/null
++++ b/arch/arm/boot/dts/compulab/imx6q-sbc-imx6-wvga.dts
+@@ -0,0 +1,18 @@
++/*
++* Copyright 2016 CompuLab Ltd.
++*
++* Author: Valentin Raevsky <valentin@compulab.co.il>
++*
++* The code contained herein is licensed under the GNU General Public
++* License. You may obtain a copy of the GNU General Public License
++* Version 2 or later at the following locations:
++*
++* http://www.opensource.org/licenses/gpl-license.html
++* http://www.gnu.org/copyleft/gpl.html
++*/
++
++#include "imx6q-sbc-imx6.dts"
++
++&mxcfb1 {
++	mode_str ="KD050C-WVGA";
++};
+diff --git a/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts b/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts
+index 71461f9cbde2..94de81ae14f0 100644
+--- a/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts
++++ b/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts
+@@ -21,3 +21,11 @@
+ 	model = "CompuLab SOM-iMX6 on SBC-FX6";
+ 	compatible = "compulab,som-imx6", "compulab,cm-fx6", "compulab,sbc-fx6", "fsl,imx6q";
+ };
++
++&pcie {
++	status = "okay";
++};
++
++&sata {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+index 4fd1e024ee25..057c1f16ecc2 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+@@ -88,6 +88,20 @@
+ 			regulator-max-microvolt = <3300000>;
+ 		};
+ 
++		swbst_reg: swbst {
++			regulator-min-microvolt = <5000000>;
++			regulator-max-microvolt = <5150000>;
++		};
++
++		reg_hdmi: regulator@5 {
++			compatible = "regulator-fixed";
++			reg = <5>;
++			regulator-name = "hdmi-5v-supply";
++			regulator-min-microvolt = <5000000>;
++			regulator-max-microvolt = <5000000>;
++			enable-active-high;
++			hdmi-5v-supply = <&swbst_reg>;
++		};
+ 	};
+ 
+ 	/* Murata -- define hook for BCMDHD driver.   */
+@@ -113,7 +127,7 @@
+ 
+ 	simple_sound: sound {
+ 		compatible = "simple-audio-card";
+-		simple-audio-card,name = "cm-fx6";
++		simple-audio-card,name = "cl-som-imx6";
+ 		simple-audio-card,widgets =
+ 			"Headphone", "Headphone Jack",
+ 			"Line", "Line Out",
+@@ -200,7 +214,7 @@
+ 		status = "disabled";
+ 	};
+ 
+-	ipu1di0_disp: ipu1@0 {
++	ipu1di0_disp: lcd@0 {
+ 		compatible = "fsl,lcd";
+ 		ipu_id = <0>;
+ 		disp_id = <0>;
+@@ -790,6 +804,18 @@
+ 	assigned-clock-rates = <0>;
+ };
+ 
++&dcic1 {
++	dcic_id = <0>;
++	dcic_mux = "dcic-hdmi";
++	status = "okay";
++};
++
++&dcic2 {
++	dcic_id = <1>;
++	dcic_mux = "dcic-lvds1";
++	status = "okay";
++};
++
+ &hdmi_core {
+ 	ipu_id = <0>;
+ 	disp_id = <1>;
+@@ -799,14 +825,14 @@
+ &hdmi_video {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_hdmi_hdcp>;
++	fsl,hdcp;
+         fsl,phy_reg_vlev = <0x0294>;
+         fsl,phy_reg_cksymtx = <0x800d>;
+-	fsl,hdcp;
++	HDMI-supply = <&reg_hdmi>;
+ 	status = "okay";
+ };
+ 
+ &hdmi_audio {
+-	depends = &simple_sound;
+ 	status = "okay";
+ };
+ 
+@@ -852,3 +878,10 @@
+ 		>;
+ 	};
+ };
++
++&clks {
++	assigned-clocks = <&clks IMX6QDL_CLK_LDB_DI0_SEL>,
++			  <&clks IMX6QDL_CLK_LDB_DI1_SEL>;
++	assigned-clock-parents = <&clks IMX6QDL_CLK_PLL2_PFD0_352M>,
++				 <&clks IMX6QDL_CLK_PLL2_PFD0_352M>;
++};
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi
+index b5fe85180529..9bb1bb3a7cfc 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi
+@@ -197,7 +197,6 @@
+ };
+ 
+ &mxcfb1 {
+-	mode_str ="KD050C-WVGA";
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6-wvga.dts b/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6-wvga.dts
+new file mode 100644
+index 000000000000..4cf1f728fa0f
+--- /dev/null
++++ b/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6-wvga.dts
+@@ -0,0 +1,18 @@
++/*
++* Copyright 2016 CompuLab Ltd.
++*
++* Author: Valentin Raevsky <valentin@compulab.co.il>
++*
++* The code contained herein is licensed under the GNU General Public
++* License. You may obtain a copy of the GNU General Public License
++* Version 2 or later at the following locations:
++*
++* http://www.opensource.org/licenses/gpl-license.html
++* http://www.gnu.org/copyleft/gpl.html
++*/
++
++#include "imx6qp-sbc-imx6.dts"
++
++&mxcfb1 {
++	mode_str ="KD050C-WVGA";
++};
+-- 
+2.11.0
+
