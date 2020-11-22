@@ -36,14 +36,20 @@ cd -
 ```
 
 ## Setup build environment
-
-* Initialize the build environment:
+* Initialize the build environment
+** Declare these environment variables:
+|===
+| Distro Name | `DISTRO` environment variable | `IMAGE` environment variable
+| fsl-imx-x11 | export DISTRO=fsl-imx-x11 | export IMAGE=compulab-image-xfce
+| | | export IMAGE=fsl-image-qt5-validation-imx
+| fsl-imx-fb | export DISTRO=fsl-imx-fb | export IMAGE=fsl-image-qt5-validation-imx
+|===
 ```
 source sources/meta-bsp-imx6/tools/setup-env -b build-${MACHINE}
 ```
 * Building the image:
 ```
-bitbake -k fsl-image-qt5-validation-imx
+bitbake -k ${IMAGE}
 ```
 
 ## Deployment
@@ -56,5 +62,5 @@ cd tmp/deploy/images/${MACHINE}
 
 * Deploy the image:
 ```
-bunzip -bc fsl-image-qt5-validation-imx-cl-som-imx6.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
+bunzip -bc ${IMAGE}-${MACHINE}.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
 ```
