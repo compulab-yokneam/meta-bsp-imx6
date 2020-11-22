@@ -4,6 +4,7 @@ LICENSE = "MIT"
 
 inherit core-image
 inherit distro_features_check
+require compulab-image-qt5.inc
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -40,18 +41,3 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-fsl-gstreamer1.0 \
     packagegroup-fsl-gstreamer1.0-full \
 "
-
-# Expand the CORE_IMAGE_EXTRA_INSTALL
-# with the custom package list
-CORE_IMAGE_EXTRA_INSTALL += " \
-"
-
-# Uncoment lines: 51, 52 it for 4G image
-# $(( $(( 4096 - 12 )) << 10 ))
-# IMAGE_ROOTFS_SIZE = "4194304"
-# IMAGE_OVERHEAD_FACTOR = "1.0"
-
-# Uncoment lines: 56, 57 it for 8G image
-# $(( $(( 8192 - 12 )) << 10 ))
-# IMAGE_ROOTFS_SIZE = "8376320"
-# IMAGE_OVERHEAD_FACTOR = "1.0"
