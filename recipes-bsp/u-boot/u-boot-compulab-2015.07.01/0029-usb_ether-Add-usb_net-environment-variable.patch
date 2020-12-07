@@ -1,0 +1,25 @@
+From 62b5296f3a4b2188369f4a8658fe03a6b9280014 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 2 Dec 2020 07:41:25 +0200
+Subject: [PATCH] usb_ether: Add usb_net environment variable
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ drivers/usb/eth/usb_ether.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/usb/eth/usb_ether.c b/drivers/usb/eth/usb_ether.c
+index c72b7e47c4..632d664b1a 100644
+--- a/drivers/usb/eth/usb_ether.c
++++ b/drivers/usb/eth/usb_ether.c
+@@ -104,6 +104,7 @@ static void probe_valid_drivers(struct usb_device *dev)
+ 			 * relies on it
+ 			 */
+ 			eth_register(eth);
++			setenv("usb_net" , eth->name);
+ 			if (eth_write_hwaddr(eth, "usbeth",
+ 					usb_max_eth_dev - 1))
+ 				puts("Warning: failed to set MAC address\n");
+-- 
+2.11.0
+

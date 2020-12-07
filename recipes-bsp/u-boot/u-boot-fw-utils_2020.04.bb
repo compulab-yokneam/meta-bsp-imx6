@@ -1,0 +1,46 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/compulab/imx6:${THISDIR}/${PN}:"
+
+LICENSE = "GPLv2+"
+LIC_FILES_CHKSUM = "file://Licenses/gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263"
+
+UBOOT_SRC = "git://source.codeaurora.org/external/imx/uboot-imx.git;protocol=https"
+SRCBRANCH = "imx_v2020.04_5.4.24_2.1.0"
+SRC_URI = "${UBOOT_SRC};branch=${SRCBRANCH}"
+SRCREV = "4979a99482f7e04a3c1f4fb55e3182395ee8f710"
+
+SRC_URI =+ "file://fw_env.config"
+
+S = "${WORKDIR}/git"
+
+RPROVIDES_${PN} += "u-boot-fw-utils"
+
+require compulab/imx6.inc
+
+do_compile () {
+	oe_runmake ${UBOOT_MACHINE}
+	oe_runmake envtools
+}
+
+do_install () {
+	install -d ${D}${base_sbindir}
+	install -d ${D}${sysconfdir}
+	install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_printenv
+	install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_setenv
+	#install -m 0644 ${S}/tools/env/fw_env.config ${D}${sysconfdir}/fw_env.config
+	install -m 0644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
+}
+
+do_install_class-cross () {
+	install -d ${D}${bindir_cross}
+	install -m 755 ${S}/tools/env/fw_printenv ${D}${bindir_cross}/fw_printenv
+	install -m 755 ${S}/tools/env/fw_printenv ${D}${bindir_cross}/fw_setenv
+}
+
+SYSROOT_DIRS_append_class-cross = " ${bindir_cross}"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+BBCLASSEXTEND = "cross"
+
+RPROVIDES_${PN} += "u-boot-fw-utils"
+
+COMPATIBLE_MACHINE = "cl-som-imx6"

@@ -1,0 +1,265 @@
+From f9f0fac14797b6dc58cfc6d7d343c82e7bc80973 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sat, 5 Dec 2020 22:07:02 +0200
+Subject: [PATCH] compulab: cl-som-imx6: Update board functions names
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cl-som-imx6/cl-som-imx6.c |  8 ++--
+ board/compulab/cl-som-imx6/common.c      |  4 +-
+ board/compulab/cl-som-imx6/common.h      |  4 +-
+ board/compulab/cl-som-imx6/spl.c         | 65 ++++++++++++++++----------------
+ 4 files changed, 40 insertions(+), 41 deletions(-)
+
+diff --git a/board/compulab/cl-som-imx6/cl-som-imx6.c b/board/compulab/cl-som-imx6/cl-som-imx6.c
+index 0a9552b438..e399b8f6bf 100644
+--- a/board/compulab/cl-som-imx6/cl-som-imx6.c
++++ b/board/compulab/cl-som-imx6/cl-som-imx6.c
+@@ -692,7 +692,7 @@ int board_mmc_init(bd_t *bis)
+ 	int i;
+ 
+ 	usdhc_wifi_mmc_init();
+-	cm_fx6_set_usdhc_iomux();
++	cl_som_imx6_set_usdhc_iomux();
+ 	for (i = 0; i < (CONFIG_SYS_FSL_USDHC_NUM - nand_enabled) ; i++) {
+ 		usdhc_cfg[i].sdhc_clk = mxc_get_clock(usdhc_clk[i]);
+ 		usdhc_cfg[i].max_bus_width = 4;
+@@ -707,7 +707,7 @@ int board_mmc_init(bd_t *bis)
+ #ifdef CONFIG_MXC_SPI
+ int setup_ecspi(void)
+ {
+-	cm_fx6_set_ecspi_iomux();
++	cl_som_imx6_set_ecspi_iomux();
+ 	return gpio_request(CM_FX6_ECSPI_BUS0_CS0, "ecspi_bus0_cs0");
+ }
+ #else
+@@ -823,7 +823,7 @@ int board_init(void)
+ 	if (IS_ENABLED(CONFIG_BLK)) {
+ 		int i;
+ 
+-		cm_fx6_set_usdhc_iomux();
++		cl_som_imx6_set_usdhc_iomux();
+ 		for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++)
+ 			enable_usdhc_clk(1, i);
+ 	}
+@@ -924,7 +924,7 @@ static struct mxc_serial_platdata mxc_serial_plat = {
+ 	.reg = (struct mxc_uart *)UART4_BASE,
+ };
+ 
+-U_BOOT_DEVICE(cm_fx6_serial) = {
++U_BOOT_DEVICE(cl_som_imx6_serial) = {
+ 	.name	= "serial_mxc",
+ 	.platdata = &mxc_serial_plat,
+ };
+diff --git a/board/compulab/cl-som-imx6/common.c b/board/compulab/cl-som-imx6/common.c
+index 8b38c21985..f4e0c4cba1 100644
+--- a/board/compulab/cl-som-imx6/common.c
++++ b/board/compulab/cl-som-imx6/common.c
+@@ -55,7 +55,7 @@ static iomux_v3_cfg_t const usdhc_pads[] = {
+ };
+ 
+ #define MMC_CD  IMX_GPIO_NR(7, 1)
+-void cm_fx6_set_usdhc_iomux(void)
++void cl_som_imx6_set_usdhc_iomux(void)
+ {
+ 	SETUP_IOMUX_PADS(usdhc_pads);
+ 	gpio_request(MMC_CD,"mmc_cd");
+@@ -96,7 +96,7 @@ static iomux_v3_cfg_t const ecspi_pads[] = {
+ 	IOMUX_PADS(PAD_EIM_EB2__GPIO2_IO30  | MUX_PAD_CTRL(ECSPI_PAD_CTRL)),
+ };
+ 
+-void cm_fx6_set_ecspi_iomux(void)
++void cl_som_imx6_set_ecspi_iomux(void)
+ {
+ 	SETUP_IOMUX_PADS(ecspi_pads);
+ }
+diff --git a/board/compulab/cl-som-imx6/common.h b/board/compulab/cl-som-imx6/common.h
+index 662619d877..a91ee48f4d 100644
+--- a/board/compulab/cl-som-imx6/common.h
++++ b/board/compulab/cl-som-imx6/common.h
+@@ -30,5 +30,5 @@
+ #define CM_FX6_SATA_PWLOSS_INT	IMX_GPIO_NR(6, 31)
+ 
+ 
+-void cm_fx6_set_usdhc_iomux(void);
+-void cm_fx6_set_ecspi_iomux(void);
++void cl_som_imx6_set_usdhc_iomux(void);
++void cl_som_imx6_set_ecspi_iomux(void);
+diff --git a/board/compulab/cl-som-imx6/spl.c b/board/compulab/cl-som-imx6/spl.c
+index 21d672f690..bad3596bf8 100644
+--- a/board/compulab/cl-som-imx6/spl.c
++++ b/board/compulab/cl-som-imx6/spl.c
+@@ -90,7 +90,7 @@ static struct mx6dq_iomux_grp_regs grp_iomux_q = { CM_FX6_GPR_IOMUX_CFG };
+ static struct mx6sdl_iomux_ddr_regs ddr_iomux_s = { CM_FX6_DDR_IOMUX_CFG };
+ static struct mx6sdl_iomux_grp_regs grp_iomux_s = { CM_FX6_GPR_IOMUX_CFG };
+ 
+-static struct mx6_mmdc_calibration cm_fx6_calib_s = {
++static struct mx6_mmdc_calibration cl_som_imx6_calib_s = {
+ 	.p0_mpwldectrl0	= 0x005B0061,
+ 	.p0_mpwldectrl1	= 0x004F0055,
+ 	.p0_mpdgctrl0	= 0x0314030C,
+@@ -99,7 +99,7 @@ static struct mx6_mmdc_calibration cm_fx6_calib_s = {
+ 	.p0_mpwrdlctl	= 0x36322C34,
+ };
+ 
+-static struct mx6_ddr_sysinfo cm_fx6_sysinfo_s = {
++static struct mx6_ddr_sysinfo cl_som_imx6_sysinfo_s = {
+ 	.cs1_mirror	= 1,
+ 	.cs_density	= 16,
+ 	.bi_on		= 1,
+@@ -112,7 +112,7 @@ static struct mx6_ddr_sysinfo cm_fx6_sysinfo_s = {
+ 	.sde_to_rst	= 0x10,
+ };
+ 
+-static struct mx6_ddr3_cfg cm_fx6_ddr3_cfg_s = {
++static struct mx6_ddr3_cfg cl_som_imx6_ddr3_cfg_s = {
+ 	.mem_speed	= 800,
+ 	.density	= 4,
+ 	.rowaddr	= 14,
+@@ -131,28 +131,28 @@ static void spl_mx6s_dram_init(enum ddr_config dram_config, bool reset)
+ 
+ 	switch (dram_config) {
+ 	case DDR_16BIT_256MB:
+-		cm_fx6_sysinfo_s.dsize = 0;
+-		cm_fx6_sysinfo_s.ncs = 1;
++		cl_som_imx6_sysinfo_s.dsize = 0;
++		cl_som_imx6_sysinfo_s.ncs = 1;
+ 		break;
+ 	case DDR_32BIT_512MB:
+-		cm_fx6_sysinfo_s.dsize = 1;
+-		cm_fx6_sysinfo_s.ncs = 1;
++		cl_som_imx6_sysinfo_s.dsize = 1;
++		cl_som_imx6_sysinfo_s.ncs = 1;
+ 		break;
+ 	case DDR_32BIT_1GB:
+-		cm_fx6_sysinfo_s.dsize = 1;
+-		cm_fx6_sysinfo_s.ncs = 2;
++		cl_som_imx6_sysinfo_s.dsize = 1;
++		cl_som_imx6_sysinfo_s.ncs = 2;
+ 		break;
+ 	default:
+ 		puts("Tried to setup invalid DDR configuration\n");
+ 		hang();
+ 	}
+ 
+-	mx6_dram_cfg(&cm_fx6_sysinfo_s, &cm_fx6_calib_s, &cm_fx6_ddr3_cfg_s);
++	mx6_dram_cfg(&cl_som_imx6_sysinfo_s, &cl_som_imx6_calib_s, &cl_som_imx6_ddr3_cfg_s);
+ 	udelay(100);
+ }
+ #endif
+ 
+-static struct mx6_ddr_sysinfo cm_fx6_sysinfo_q = {
++static struct mx6_ddr_sysinfo cl_som_imx6_sysinfo_q = {
+ 	.cs_density	= 16,
+ 	.cs1_mirror	= 1,
+ 	.bi_on		= 1,
+@@ -167,7 +167,7 @@ static struct mx6_ddr_sysinfo cm_fx6_sysinfo_q = {
+ 	.refr = 7,		/* 8 refresh commands per refresh cycle */
+ };
+ 
+-static struct mx6_ddr3_cfg cm_fx6_ddr3_cfg_q = {
++static struct mx6_ddr3_cfg cl_som_imx6_ddr3_cfg_q = {
+ 	.mem_speed	= 1066,
+ 	.density	= 4,
+ 	.rowaddr	= 14,
+@@ -196,28 +196,28 @@ static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
+ 	calibration.p0_mpwrdlctl = 0x40404040;
+ 	calibration.p1_mpwrdlctl = 0x40404040;
+ 
+-	cm_fx6_ddr3_cfg_q.rowaddr = 14;
++	cl_som_imx6_ddr3_cfg_q.rowaddr = 14;
+ 	switch (dram_config) {
+ 	case DDR_16BIT_256MB:
+-		cm_fx6_sysinfo_q.dsize = 0;
+-		cm_fx6_sysinfo_q.ncs = 1;
++		cl_som_imx6_sysinfo_q.dsize = 0;
++		cl_som_imx6_sysinfo_q.ncs = 1;
+ 		break;
+ 	case DDR_32BIT_512MB:
+-		cm_fx6_sysinfo_q.dsize = 1;
+-		cm_fx6_sysinfo_q.ncs = 1;
++		cl_som_imx6_sysinfo_q.dsize = 1;
++		cl_som_imx6_sysinfo_q.ncs = 1;
+ 		break;
+ 	case DDR_64BIT_1GB:
+-		cm_fx6_sysinfo_q.dsize = 2;
+-		cm_fx6_sysinfo_q.ncs = 1;
++		cl_som_imx6_sysinfo_q.dsize = 2;
++		cl_som_imx6_sysinfo_q.ncs = 1;
+ 		break;
+ 	case DDR_64BIT_2GB:
+-		cm_fx6_sysinfo_q.dsize = 2;
+-		cm_fx6_sysinfo_q.ncs = 2;
++		cl_som_imx6_sysinfo_q.dsize = 2;
++		cl_som_imx6_sysinfo_q.ncs = 2;
+ 		break;
+ 	case DDR_64BIT_4GB:
+-		cm_fx6_sysinfo_q.dsize = 2;
+-		cm_fx6_sysinfo_q.ncs = 2;
+-		cm_fx6_ddr3_cfg_q.rowaddr = 15;
++		cl_som_imx6_sysinfo_q.dsize = 2;
++		cl_som_imx6_sysinfo_q.ncs = 2;
++		cl_som_imx6_ddr3_cfg_q.rowaddr = 15;
+ 		break;
+ 	default:
+ 		puts("Tried to setup invalid DDR configuration\n");
+@@ -228,24 +228,23 @@ static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
+ 	calibration.p0_mpwrdlctl = 0x40404040;
+ 	calibration.p1_mpwrdlctl = 0x40404040;
+ 
+-	mx6_dram_cfg(&cm_fx6_sysinfo_q, &calibration, &cm_fx6_ddr3_cfg_q);
++	mx6_dram_cfg(&cl_som_imx6_sysinfo_q, &calibration, &cl_som_imx6_ddr3_cfg_q);
+ 
+-	errs = mmdc_do_write_level_calibration(&cm_fx6_sysinfo_q);
++	errs = mmdc_do_write_level_calibration(&cl_som_imx6_sysinfo_q);
+ 	if (errs) {
+ 		printf("error %d from write level calibration\n", errs);
+ 	} else {
+-		errs = mmdc_do_dqs_calibration(&cm_fx6_sysinfo_q);
++		errs = mmdc_do_dqs_calibration(&cl_som_imx6_sysinfo_q);
+ 		if (errs) {
+ 			printf("error %d from dqs calibration\n", errs);
+ 		} else {
+-			printf("completed successfully\n");
+-			mmdc_read_calibration(&cm_fx6_sysinfo_q, &calibration);
++			mmdc_read_calibration(&cl_som_imx6_sysinfo_q, &calibration);
+ 		}
+ 	}
+ 	udelay(100);
+ }
+ 
+-static int cm_fx6_spl_dram_init(void)
++static int spl_dram_init(void)
+ {
+ 	unsigned long bank1_size, bank2_size;
+ 
+@@ -325,7 +324,7 @@ static void setup_uart(void)
+ #ifdef CONFIG_SPL_SPI_SUPPORT
+ static void setup_ecspi(void)
+ {
+-	cm_fx6_set_ecspi_iomux();
++	cl_som_imx6_set_ecspi_iomux();
+ 	enable_spi_clk(1, 0);
+ }
+ #else
+@@ -362,7 +361,7 @@ void board_init_f(ulong dummy)
+ 	setup_ecspi();
+ 
+ 	gpio_direction_output(CM_FX6_GREEN_LED, 1);
+-	if (cm_fx6_spl_dram_init()) {
++	if (spl_dram_init()) {
+ 		puts("!!!ERROR!!! DRAM detection failed!!!\n");
+ 		hang();
+ 	}
+@@ -392,7 +391,7 @@ static struct fsl_esdhc_cfg usdhc_cfg = {
+ 
+ int board_mmc_init(bd_t *bis)
+ {
+-	cm_fx6_set_usdhc_iomux();
++	cl_som_imx6_set_usdhc_iomux();
+ 
+ 	usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
+ 
+-- 
+2.11.0
+

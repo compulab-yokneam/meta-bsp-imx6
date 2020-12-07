@@ -1,0 +1,62 @@
+From 20f835b3cd1017ff054c8c255f9265af5779e4b1 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 2 Dec 2020 07:43:34 +0200
+Subject: [PATCH] cm_fx6: Add ext_phy environment variable
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 7 +++++++
+ drivers/net/phy/phy.c          | 3 +++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index e8807ad5f9..ecfafdf88f 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -500,8 +500,14 @@ static int mx6_rgmii_rework(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++extern int phy_status;
+ int board_phy_config(struct phy_device *phydev)
+ {
++	if (phy_status) {
++        setenv("ext_phy" , "yes");
++        return 0;
++    }
++
+ 	mx6_rgmii_rework(phydev);
+ 
+ 	if (phydev->drv->config)
+@@ -893,6 +899,7 @@ int board_late_init(void)
+ #ifdef CONFIG_ATP_ENV
+ 	setenv("atp" , "yes");
+ #endif
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index c8d08e8f4f..388fae15b1 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -652,6 +652,7 @@ static struct phy_device *search_for_existing_phy(struct mii_dev *bus,
+ 	return NULL;
+ }
+ 
++int phy_status=0;
+ static struct phy_device *get_phy_device_by_mask(struct mii_dev *bus,
+ 		unsigned phy_mask, phy_interface_t interface)
+ {
+@@ -672,6 +673,8 @@ static struct phy_device *get_phy_device_by_mask(struct mii_dev *bus,
+ 			return phydev;
+ 	}
+ 	printf("Phy %d not found\n", ffs(phy_mask) - 1);
++	/* Quick and dirty */
++	phy_status = 1;
+ 	return phy_device_create(bus, ffs(phy_mask) - 1, 0xffffffff, interface);
+ }
+ 
+-- 
+2.11.0
+

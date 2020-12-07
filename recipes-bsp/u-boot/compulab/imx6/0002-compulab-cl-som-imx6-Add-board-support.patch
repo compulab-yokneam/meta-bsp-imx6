@@ -1,0 +1,2862 @@
+From b7956d52d63a6c99423ce4d1b15575c8e9af44d0 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 30 Nov 2020 08:39:22 +0200
+Subject: [PATCH] compulab: cl-som-imx6: Add board support
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/dts/Makefile                        |    3 +
+ arch/arm/dts/imx6q-cl-som-imx6.dts           |   21 +
+ arch/arm/dts/imx6qdl-cl-som-imx6-u-boot.dtsi |   43 ++
+ arch/arm/dts/imx6qdl-cl-som-imx6.dtsi        |  594 +++++++++++++++
+ arch/arm/dts/imx6qp-cl-som-imx6-u-boot.dtsi  |    6 +
+ arch/arm/dts/imx6qp-cl-som-imx6.dts          |  108 +++
+ arch/arm/mach-imx/mx6/Kconfig                |   11 +
+ board/compulab/cl-som-imx6/Kconfig           |   15 +
+ board/compulab/cl-som-imx6/MAINTAINERS       |    6 +
+ board/compulab/cl-som-imx6/Makefile          |   10 +
+ board/compulab/cl-som-imx6/cl-som-imx6.c     | 1011 ++++++++++++++++++++++++++
+ board/compulab/cl-som-imx6/common.c          |  108 +++
+ board/compulab/cl-som-imx6/common.h          |   34 +
+ board/compulab/cl-som-imx6/spl.c             |  388 ++++++++++
+ configs/cl-som-imx6_defconfig                |  117 +++
+ include/configs/cl-som-imx6.h                |  232 ++++++
+ 16 files changed, 2707 insertions(+)
+ create mode 100644 arch/arm/dts/imx6q-cl-som-imx6.dts
+ create mode 100644 arch/arm/dts/imx6qdl-cl-som-imx6-u-boot.dtsi
+ create mode 100644 arch/arm/dts/imx6qdl-cl-som-imx6.dtsi
+ create mode 100644 arch/arm/dts/imx6qp-cl-som-imx6-u-boot.dtsi
+ create mode 100644 arch/arm/dts/imx6qp-cl-som-imx6.dts
+ create mode 100644 board/compulab/cl-som-imx6/Kconfig
+ create mode 100644 board/compulab/cl-som-imx6/MAINTAINERS
+ create mode 100644 board/compulab/cl-som-imx6/Makefile
+ create mode 100644 board/compulab/cl-som-imx6/cl-som-imx6.c
+ create mode 100644 board/compulab/cl-som-imx6/common.c
+ create mode 100644 board/compulab/cl-som-imx6/common.h
+ create mode 100644 board/compulab/cl-som-imx6/spl.c
+ create mode 100644 configs/cl-som-imx6_defconfig
+ create mode 100644 include/configs/cl-som-imx6.h
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index cd506c2e7a..55104ee27e 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -987,6 +987,9 @@ dtb-$(CONFIG_TARGET_DURIAN) += phytium-durian.dtb
+ 
+ dtb-$(CONFIG_TARGET_PRESIDIO_ASIC) += ca-presidio-engboard.dtb
+ 
++dtb-$(CONFIG_TARGET_CL_SOM_IMX6) += imx6qp-cl-som-imx6.dtb
++dtb-$(CONFIG_TARGET_CM_FX6) += imx6q-cm-fx6
++
+ targets += $(dtb-y)
+ 
+ # Add any required device tree compiler flags here
+diff --git a/arch/arm/dts/imx6q-cl-som-imx6.dts b/arch/arm/dts/imx6q-cl-som-imx6.dts
+new file mode 100644
+index 0000000000..8a7dfea43c
+--- /dev/null
++++ b/arch/arm/dts/imx6q-cl-som-imx6.dts
+@@ -0,0 +1,21 @@
++/*
++ * Copyright 2016 CompuLab Ltd.
++ *
++ * Author: Valentin Raevsky <valentin@compulab.co.il>
++ *
++ * The code contained herein is licensed under the GNU General Public
++ * License. You may obtain a copy of the GNU General Public License
++ * Version 2 or later at the following locations:
++ *
++ * http://www.opensource.org/licenses/gpl-license.html
++ * http://www.gnu.org/copyleft/gpl.html
++ */
++
++/dts-v1/;
++#include "imx6q.dtsi"
++#include "imx6q-cm-fx6.dtsi"
++
++/ {
++	model = "CompuLab SOM-iMX6";
++	compatible = "compulab,som-imx6", "compulab,cm-fx6", "fsl,imx6q";
++};
+diff --git a/arch/arm/dts/imx6qdl-cl-som-imx6-u-boot.dtsi b/arch/arm/dts/imx6qdl-cl-som-imx6-u-boot.dtsi
+new file mode 100644
+index 0000000000..5e12d29a17
+--- /dev/null
++++ b/arch/arm/dts/imx6qdl-cl-som-imx6-u-boot.dtsi
+@@ -0,0 +1,43 @@
++/ {
++	aliases {
++		usb0 = &usbotg;
++		video0 = &ipu1;
++	};
++
++	soc {
++		u-boot,dm-spl;
++		u-boot,dm-pre-reloc;
++
++		aips-bus@2000000 {
++			u-boot,dm-spl;
++			spba-bus@2000000 {
++				u-boot,dm-spl;
++			};
++		};
++
++		aips-bus@2100000 {
++			u-boot,dm-spl;
++		};
++	};
++};
++
++&gpio1 {
++	u-boot,dm-spl;
++};
++
++&iomuxc {
++	u-boot,dm-spl;
++};
++
++&ipu1 {
++	u-boot,dm-pre-reloc;
++};
++
++&usdhc3 {
++	no-1-8-v;
++	u-boot,dm-spl;
++};
++
++&pinctrl_usdhc3 {
++	u-boot,dm-spl;
++};
+diff --git a/arch/arm/dts/imx6qdl-cl-som-imx6.dtsi b/arch/arm/dts/imx6qdl-cl-som-imx6.dtsi
+new file mode 100644
+index 0000000000..f1792f6bdf
+--- /dev/null
++++ b/arch/arm/dts/imx6qdl-cl-som-imx6.dtsi
+@@ -0,0 +1,594 @@
++/*
++ * Copyright 2013 CompuLab Ltd.
++ *
++ * Author: Valentin Raevsky <valentin@compulab.co.il>
++ *
++ * This file is dual-licensed: you can use it either under the terms
++ * of the GPL or the X11 license, at your option. Note that this dual
++ * licensing only applies to this file, and not this project as a
++ * whole.
++ *
++ *  a) This file is free software; you can redistribute it and/or
++ *     modify it under the terms of the GNU General Public License
++ *     version 2 as published by the Free Software Foundation.
++ *
++ *     This file is distributed in the hope that it will be useful,
++ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *     GNU General Public License for more details.
++ *
++ * Or, alternatively,
++ *
++ *  b) Permission is hereby granted, free of charge, to any person
++ *     obtaining a copy of this software and associated documentation
++ *     files (the "Software"), to deal in the Software without
++ *     restriction, including without limitation the rights to use,
++ *     copy, modify, merge, publish, distribute, sublicense, and/or
++ *     sell copies of the Software, and to permit persons to whom the
++ *     Software is furnished to do so, subject to the following
++ *     conditions:
++ *
++ *     The above copyright notice and this permission notice shall be
++ *     included in all copies or substantial portions of the Software.
++ *
++ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ *     OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	aliases {
++		mxcfb0 = &mxcfb1;
++		mxcfb1 = &mxcfb2;
++		mxcfb2 = &mxcfb3;
++		mxcfb3 = &mxcfb4;
++	};
++
++	chosen {
++		stdout-path = &uart4;
++	};
++
++	memory: memory {
++		reg = <0x10000000 0x80000000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		heartbeat-led {
++			label = "Heartbeat";
++			gpios = <&gpio2 31 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	awnh387_pwrseq: pwrseq {
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_pwrseq>;
++		compatible = "mmc-pwrseq-sd8787";
++		powerdown-gpios = <&gpio7 12 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio6 16 GPIO_ACTIVE_HIGH>;
++	};
++
++	reg_pcie_power_on_gpio: regulator-pcie-power-on-gpio {
++		compatible = "regulator-fixed";
++		regulator-name = "regulator-pcie-power-on-gpio";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&gpio2 24 GPIO_ACTIVE_LOW>;
++	};
++
++	reg_usb_h1_vbus: usb_h1_vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb_h1_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&gpio7 8 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	reg_usb_otg_vbus: usb_otg_vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb_otg_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpio = <&gpio3 22 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	hannstar_cabc {
++		compatible = "hannstar,cabc";
++	};
++
++	sound-hdmi {
++		compatible = "fsl,imx6q-audio-hdmi",
++			     "fsl,imx-audio-hdmi";
++		model = "imx-audio-hdmi";
++		hdmi-controller = <&hdmi_audio>;
++	};
++
++	mxcfb1: fb@0 {
++		compatible = "fsl,mxc_sdc_fb";
++		disp_dev = "ldb";
++		interface_pix_fmt = "RGB666";
++		default_bpp = <16>;
++		int_clk = <0>;
++		late_init = <0>;
++		status = "disabled";
++	};
++
++	mxcfb2: fb@1 {
++		compatible = "fsl,mxc_sdc_fb";
++		disp_dev = "hdmi";
++		interface_pix_fmt = "RGB24";
++		mode_str ="1920x1080M@60";
++		default_bpp = <24>;
++		int_clk = <0>;
++		late_init = <0>;
++		status = "disabled";
++	};
++
++	mxcfb3: fb@2 {
++		compatible = "fsl,mxc_sdc_fb";
++		disp_dev = "lcd";
++		interface_pix_fmt = "RGB565";
++		mode_str ="CLAA-WVGA";
++		default_bpp = <16>;
++		int_clk = <0>;
++		late_init = <0>;
++		status = "disabled";
++	};
++
++	mxcfb4: fb@3 {
++		compatible = "fsl,mxc_sdc_fb";
++		disp_dev = "ldb";
++		interface_pix_fmt = "RGB666";
++		default_bpp = <16>;
++		int_clk = <0>;
++		late_init = <0>;
++		status = "disabled";
++	};
++};
++
++&clks {
++	assigned-clocks = <&clks IMX6QDL_PLL4_BYPASS_SRC>,
++			  <&clks IMX6QDL_PLL4_BYPASS>,
++			  <&clks IMX6QDL_CLK_LDB_DI0_SEL>,
++			  <&clks IMX6QDL_CLK_LDB_DI1_SEL>,
++			  <&clks IMX6QDL_CLK_PLL4_POST_DIV>;
++	assigned-clock-parents = <&clks IMX6QDL_CLK_LVDS2_IN>,
++				 <&clks IMX6QDL_PLL4_BYPASS_SRC>,
++				 <&clks IMX6QDL_CLK_PLL2_PFD0_352M>,
++				 <&clks IMX6QDL_CLK_PLL2_PFD0_352M>;
++	assigned-clock-rates = <0>, <0>, <0>, <0>, <24576000>;
++};
++
++&dcic1 {
++	dcic_id = <0>;
++	dcic_mux = "dcic-hdmi";
++	status = "okay";
++};
++
++&dcic2 {
++	dcic_id = <1>;
++	dcic_mux = "dcic-lvds0";
++	status = "okay";
++};
++
++&hdmi_audio {
++	status = "okay";
++};
++
++&hdmi_core {
++	ipu_id = <0>;
++	disp_id = <1>;
++	status = "okay";
++};
++
++&hdmi_video {
++	fsl,phy_reg_vlev = <0x0294>;
++	fsl,phy_reg_cksymtx = <0x800d>;
++	status = "okay";
++};
++
++&ecspi1 {
++	cs-gpios = <&gpio2 30 0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ecspi1>;
++	status = "okay";
++
++	m25p80@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "st,m25p32", "jedec,spi-nor";
++		spi-max-frequency = <20000000>;
++		reg = <0>;
++	};
++};
++
++&fec {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_enet>;
++	phy-mode = "rgmii";
++	phy-reset-gpios = <&gpio2 19 GPIO_ACTIVE_LOW>;
++	fsl,magic-packet;
++	status = "okay";
++};
++
++&gpmi {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_gpmi_nand>;
++	status = "disabled";
++};
++
++&i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c1>;
++	status = "okay";
++	clock-frequency = <100000>;
++};
++
++&i2c2 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c2>;
++	status = "okay";
++	clock-frequency = <100000>;
++};
++
++&i2c3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c3>;
++	status = "okay";
++	clock-frequency = <100000>;
++
++	eeprom@50 {
++		compatible = "atmel,24c02";
++		reg = <0x50>;
++		pagesize = <16>;
++	};
++
++};
++
++&iomuxc {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_hog>;
++
++	imx6qdl-clsomimx6 {
++		pinctrl_hog: hoggrp {
++			fsl,pins = <
++				MX6QDL_PAD_NANDF_D0__GPIO2_IO00 0x80000000
++				MX6QDL_PAD_NANDF_D1__GPIO2_IO01 0x80000000
++				MX6QDL_PAD_NANDF_D2__GPIO2_IO02 0x80000000
++				MX6QDL_PAD_NANDF_D3__GPIO2_IO03 0x80000000
++				MX6QDL_PAD_GPIO_0__CCM_CLKO1    0x130b0
++				MX6QDL_PAD_ENET_TXD1__GPIO1_IO29 0x80000000
++				MX6QDL_PAD_EIM_D22__GPIO3_IO22  0x80000000
++				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25 0x80000000
++				MX6QDL_PAD_EIM_D26__GPIO3_IO26 0x80000000
++				MX6QDL_PAD_EIM_CS1__GPIO2_IO24 0x80000000
++				MX6QDL_PAD_ENET_RXD0__GPIO1_IO27 0x80000000
++				MX6QDL_PAD_EIM_A25__GPIO5_IO02 0x80000000
++				MX6QDL_PAD_EIM_D23__GPIO3_IO23 0x80000000
++				MX6QDL_PAD_EIM_EB3__GPIO2_IO31 0x80000000
++				MX6QDL_PAD_SD1_CMD__GPIO1_IO18 0x80000000
++				MX6QDL_PAD_EIM_D16__GPIO3_IO16 0x80000000
++				MX6QDL_PAD_SD3_RST__GPIO7_IO08	0x80000000
++				MX6QDL_PAD_GPIO_9__GPIO1_IO09 	0x80000000
++				MX6QDL_PAD_EIM_DA9__GPIO3_IO09 0x80000000
++				MX6QDL_PAD_NANDF_CS0__GPIO6_IO11 0x80000000
++				MX6QDL_PAD_NANDF_CS1__GPIO6_IO14 0x80000000
++				MX6QDL_PAD_NANDF_CS2__GPIO6_IO15 0x80000000
++				MX6QDL_PAD_NANDF_CS3__GPIO6_IO16 0x80000000
++				/* PHY_RST */
++				MX6QDL_PAD_EIM_A19__GPIO2_IO19 0x80000000
++			>;
++		};
++
++	pinctrl_ecspi1: ecspi1grp {
++		fsl,pins = <
++			MX6QDL_PAD_EIM_D16__ECSPI1_SCLK      0x100b1
++			MX6QDL_PAD_EIM_D17__ECSPI1_MISO      0x100b1
++			MX6QDL_PAD_EIM_D18__ECSPI1_MOSI      0x100b1
++			MX6QDL_PAD_EIM_EB2__GPIO2_IO30      0x100b1
++			MX6QDL_PAD_EIM_D19__GPIO3_IO19      0x100b1
++		>;
++	};
++
++	pinctrl_enet: enetgrp {
++		fsl,pins = <
++			MX6QDL_PAD_ENET_MDIO__ENET_MDIO		0x1b0b0
++			MX6QDL_PAD_ENET_MDC__ENET_MDC		0x1b0b0
++			MX6QDL_PAD_RGMII_TXC__RGMII_TXC		0x1b0b0
++			MX6QDL_PAD_RGMII_TD0__RGMII_TD0		0x1b0b0
++			MX6QDL_PAD_RGMII_TD1__RGMII_TD1		0x1b0b0
++			MX6QDL_PAD_RGMII_TD2__RGMII_TD2		0x1b0b0
++			MX6QDL_PAD_RGMII_TD3__RGMII_TD3		0x1b0b0
++			MX6QDL_PAD_RGMII_TX_CTL__RGMII_TX_CTL	0x1b0b0
++			MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK	0x1b0b0
++			MX6QDL_PAD_RGMII_RXC__RGMII_RXC		0x1b0b0
++			MX6QDL_PAD_RGMII_RD0__RGMII_RD0		0x1b0b0
++			MX6QDL_PAD_RGMII_RD1__RGMII_RD1		0x1b0b0
++			MX6QDL_PAD_RGMII_RD2__RGMII_RD2		0x1b0b0
++			MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x1b0b0
++			MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x1b0b0
++		>;
++	};
++
++	pinctrl_gpmi_nand: gpminandgrp {
++		fsl,pins = <
++			MX6QDL_PAD_NANDF_CLE__NAND_CLE		0xb0b1
++			MX6QDL_PAD_NANDF_ALE__NAND_ALE		0xb0b1
++			MX6QDL_PAD_NANDF_WP_B__NAND_WP_B	0xb0b1
++			MX6QDL_PAD_NANDF_RB0__NAND_READY_B	0xb000
++			MX6QDL_PAD_NANDF_CS0__NAND_CE0_B	0xb0b1
++			MX6QDL_PAD_NANDF_CS1__NAND_CE1_B	0xb0b1
++			MX6QDL_PAD_SD4_CMD__NAND_RE_B		0xb0b1
++			MX6QDL_PAD_SD4_CLK__NAND_WE_B		0xb0b1
++			MX6QDL_PAD_NANDF_D0__NAND_DATA00	0xb0b1
++			MX6QDL_PAD_NANDF_D1__NAND_DATA01	0xb0b1
++			MX6QDL_PAD_NANDF_D2__NAND_DATA02	0xb0b1
++			MX6QDL_PAD_NANDF_D3__NAND_DATA03	0xb0b1
++			MX6QDL_PAD_NANDF_D4__NAND_DATA04	0xb0b1
++			MX6QDL_PAD_NANDF_D5__NAND_DATA05	0xb0b1
++			MX6QDL_PAD_NANDF_D6__NAND_DATA06	0xb0b1
++			MX6QDL_PAD_NANDF_D7__NAND_DATA07	0xb0b1
++			MX6QDL_PAD_SD4_DAT0__NAND_DQS		0x00b1
++		>;
++	};
++
++	pinctrl_i2c1: i2c1grp {
++		fsl,pins = <
++			MX6QDL_PAD_EIM_D21__I2C1_SCL 0x4001b8b1
++			MX6QDL_PAD_EIM_D28__I2C1_SDA 0x4001b8b1
++		>;
++	};
++
++	pinctrl_i2c2: i2c2grp {
++		fsl,pins = <
++			MX6QDL_PAD_KEY_COL3__I2C2_SCL 0x4001b8b1
++			MX6QDL_PAD_KEY_ROW3__I2C2_SDA 0x4001b8b1
++		>;
++	};
++
++	pinctrl_i2c3: i2c3grp {
++		fsl,pins = <
++			MX6QDL_PAD_GPIO_3__I2C3_SCL	0x4001b8b1
++			MX6QDL_PAD_GPIO_6__I2C3_SDA	0x4001b8b1
++		>;
++	};
++
++	pinctrl_pcie: pciegrp {
++		fsl,pins = <
++			MX6QDL_PAD_ENET_RXD1__GPIO1_IO26	0x1b0b1
++			MX6QDL_PAD_EIM_CS1__GPIO2_IO24	0x1b0b1
++		>;
++	};
++
++	pinctrl_pwrseq: pwrseqgrp {
++		fsl,pins = <
++			MX6QDL_PAD_GPIO_17__GPIO7_IO12		0x1b0b0
++			MX6QDL_PAD_NANDF_CS3__GPIO6_IO16	0x1b0b0
++		>;
++	};
++
++	pinctrl_uart4: uart4grp {
++		fsl,pins = <
++			MX6QDL_PAD_KEY_COL0__UART4_TX_DATA	0x1b0b1
++			MX6QDL_PAD_KEY_ROW0__UART4_RX_DATA	0x1b0b1
++		>;
++	};
++
++	pinctrl_usbh1: usbh1grp {
++		fsl,pins = <
++			MX6QDL_PAD_SD3_RST__GPIO7_IO08	0x1b0b1
++		>;
++	};
++
++	pinctrl_usbotg: usbotggrp {
++		fsl,pins = <
++			MX6QDL_PAD_ENET_RX_ER__USB_OTG_ID	0x17059
++			MX6QDL_PAD_EIM_D22__GPIO3_IO22	0x130b0
++		>;
++	};
++
++	pinctrl_usdhc1: usdhc1grp {
++		fsl,pins = <
++			MX6QDL_PAD_SD1_CMD__SD1_CMD	0x17071
++			MX6QDL_PAD_SD1_CLK__SD1_CLK	0x10071
++			MX6QDL_PAD_SD1_DAT0__SD1_DATA0	0x17071
++			MX6QDL_PAD_SD1_DAT1__SD1_DATA1	0x17071
++			MX6QDL_PAD_SD1_DAT2__SD1_DATA2	0x17071
++			MX6QDL_PAD_SD1_DAT3__SD1_DATA3	0x17071
++		>;
++	};
++
++	pinctrl_usdhc3: usdhc3grp {
++		fsl,pins = <
++			MX6QDL_PAD_SD3_CMD__SD3_CMD		0x17059
++			MX6QDL_PAD_SD3_CLK__SD3_CLK		0x10059
++			MX6QDL_PAD_SD3_DAT0__SD3_DATA0		0x17059
++			MX6QDL_PAD_SD3_DAT1__SD3_DATA1		0x17059
++			MX6QDL_PAD_SD3_DAT2__SD3_DATA2		0x17059
++			MX6QDL_PAD_SD3_DAT3__SD3_DATA3		0x17059
++			MX6QDL_PAD_SD3_DAT4__GPIO7_IO01 0x80000000
++			MX6QDL_PAD_SD3_DAT5__GPIO7_IO00 0x80000000
++		>;
++	};
++
++	pinctrl_usdhc4: usdhc4grp {
++		fsl,pins = <
++			MX6QDL_PAD_SD4_CMD__SD4_CMD		0x17059
++			MX6QDL_PAD_SD4_CLK__SD4_CLK		0x10059
++			MX6QDL_PAD_SD4_DAT0__SD4_DATA0		0x17059
++			MX6QDL_PAD_SD4_DAT1__SD4_DATA1		0x17059
++			MX6QDL_PAD_SD4_DAT2__SD4_DATA2		0x17059
++			MX6QDL_PAD_SD4_DAT3__SD4_DATA3		0x17059
++			MX6QDL_PAD_SD4_DAT4__SD4_DATA4		0x17059
++			MX6QDL_PAD_SD4_DAT5__SD4_DATA5		0x17059
++			MX6QDL_PAD_SD4_DAT6__SD4_DATA6		0x17059
++			MX6QDL_PAD_SD4_DAT7__SD4_DATA7		0x17059
++		>;
++	};
++	};
++};
++
++&pcie {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_pcie>;
++	reset-gpio = <&gpio1 26 GPIO_ACTIVE_LOW>;
++	vpcie-supply = <&reg_pcie_power_on_gpio>;
++	status = "okay";
++};
++
++&sata {
++	status = "okay";
++};
++
++&snvs_poweroff {
++	status = "okay";
++};
++
++&uart4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart4>;
++	status = "okay";
++};
++
++&usbh1 {
++	vbus-supply = <&reg_usb_h1_vbus>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usbh1>;
++	status = "okay";
++};
++
++&usbotg {
++	vbus-supply = <&reg_usb_otg_vbus>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usbotg>;
++	dr_mode = "otg";
++	status = "okay";
++};
++
++/* The U-Boot: enable usdhc3 for mmc boot */
++&usdhc3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usdhc3>;
++	bus-width = <4>;
++	cd-gpios = <&gpio7 0 GPIO_ACTIVE_LOW>;
++	wp-gpios = <&gpio7 1 GPIO_ACTIVE_HIGH>;
++	no-1-8-v;
++	keep-power-in-suspend;
++	enable-sdio-wakeup;
++	status = "okay";
++};
++
++&usdhc4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usdhc4>;
++	bus-width = <8>;
++	non-removable;
++	keep-power-in-suspend;
++	enable-sdio-wakeup;
++	status = "okay";
++};
++
++&ldb {
++	status = "okay";
++
++	lvds-channel@0 {
++		fsl,data-mapping = "spwg";
++		fsl,data-width = <18>;
++		primary;
++		status = "okay";
++
++		display-timings {
++			native-mode = <&timing0>;
++			timing0: hsd100pxn1 {
++				clock-frequency = <65000000>;
++				hactive = <1024>;
++				vactive = <768>;
++				hback-porch = <220>;
++				hfront-porch = <40>;
++				vback-porch = <21>;
++				vfront-porch = <7>;
++				hsync-len = <60>;
++				vsync-len = <10>;
++			};
++		};
++	};
++
++	lvds-channel@1 {
++		fsl,data-mapping = "spwg";
++		fsl,data-width = <18>;
++		status = "okay";
++
++		display-timings {
++			native-mode = <&timing1>;
++			timing1: hsd100pxn1 {
++				clock-frequency = <65000000>;
++				hactive = <1024>;
++				vactive = <768>;
++				hback-porch = <220>;
++				hfront-porch = <40>;
++				vback-porch = <21>;
++				vfront-porch = <7>;
++				hsync-len = <60>;
++				vsync-len = <10>;
++			};
++		};
++	};
++};
++
++&ldb {
++	lvds-channel@0 {
++		crtc = "ipu2-di0";
++	};
++
++	lvds-channel@1 {
++		crtc = "ipu2-di1";
++	};
++};
++
++&mxcfb1 {
++	prefetch;
++	status = "okay";
++};
++
++&mxcfb2 {
++	prefetch;
++	status = "okay";
++};
++
++&pre1 {
++	status = "okay";
++};
++
++&pre2 {
++	status = "okay";
++};
++
++&pre3 {
++	status = "okay";
++};
++
++&pre4 {
++	status = "okay";
++};
++
++&prg1 {
++	memory-region = <&memory>;
++	status = "okay";
++};
++
++&prg2 {
++	memory-region = <&memory>;
++	status = "okay";
++};
+diff --git a/arch/arm/dts/imx6qp-cl-som-imx6-u-boot.dtsi b/arch/arm/dts/imx6qp-cl-som-imx6-u-boot.dtsi
+new file mode 100644
+index 0000000000..03605f0c95
+--- /dev/null
++++ b/arch/arm/dts/imx6qp-cl-som-imx6-u-boot.dtsi
+@@ -0,0 +1,6 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2019 NXP
++ */
++
++#include "imx6qdl-cl-som-imx6-u-boot.dtsi"
+diff --git a/arch/arm/dts/imx6qp-cl-som-imx6.dts b/arch/arm/dts/imx6qp-cl-som-imx6.dts
+new file mode 100644
+index 0000000000..69c3af2589
+--- /dev/null
++++ b/arch/arm/dts/imx6qp-cl-som-imx6.dts
+@@ -0,0 +1,108 @@
++/*
++ * Copyright 2013 CompuLab Ltd.
++ *
++ * Author: Valentin Raevsky <valentin@compulab.co.il>
++ *
++ * This file is dual-licensed: you can use it either under the terms
++ * of the GPL or the X11 license, at your option. Note that this dual
++ * licensing only applies to this file, and not this project as a
++ * whole.
++ *
++ *  a) This file is free software; you can redistribute it and/or
++ *     modify it under the terms of the GNU General Public License
++ *     version 2 as published by the Free Software Foundation.
++ *
++ *     This file is distributed in the hope that it will be useful,
++ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *     GNU General Public License for more details.
++ *
++ * Or, alternatively,
++ *
++ *  b) Permission is hereby granted, free of charge, to any person
++ *     obtaining a copy of this software and associated documentation
++ *     files (the "Software"), to deal in the Software without
++ *     restriction, including without limitation the rights to use,
++ *     copy, modify, merge, publish, distribute, sublicense, and/or
++ *     sell copies of the Software, and to permit persons to whom the
++ *     Software is furnished to do so, subject to the following
++ *     conditions:
++ *
++ *     The above copyright notice and this permission notice shall be
++ *     included in all copies or substantial portions of the Software.
++ *
++ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ *     OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++/dts-v1/;
++
++#include "imx6qp.dtsi"
++#include "imx6qdl-cl-som-imx6.dtsi"
++
++/ {
++	model = "CompuLab SOM-iMX6 QP";
++	compatible = "compulab,cl-som-imx6", "fsl,imx6qp";
++};
++
++&ldb {
++	lvds-channel@0 {
++		crtc = "ipu2-di0";
++	};
++
++	lvds-channel@1 {
++		crtc = "ipu2-di1";
++	};
++};
++
++&mxcfb1 {
++	prefetch;
++	status = "okay";
++};
++
++&mxcfb2 {
++	prefetch;
++	status = "okay";
++};
++
++&mxcfb3 {
++	prefetch;
++	status = "okay";
++};
++
++&mxcfb4 {
++	prefetch;
++	status = "okay";
++};
++
++&pre1 {
++	status = "okay";
++};
++
++&pre2 {
++	status = "okay";
++};
++
++&pre3 {
++	status = "okay";
++};
++
++&pre4 {
++	status = "okay";
++};
++
++&prg1 {
++	memory-region = <&memory>;
++	status = "okay";
++};
++
++&prg2 {
++	memory-region = <&memory>;
++	status = "okay";
++};
+diff --git a/arch/arm/mach-imx/mx6/Kconfig b/arch/arm/mach-imx/mx6/Kconfig
+index 505f48db20..486eea1afb 100644
+--- a/arch/arm/mach-imx/mx6/Kconfig
++++ b/arch/arm/mach-imx/mx6/Kconfig
+@@ -239,6 +239,16 @@ config TARGET_CM_FX6
+ 	select SUPPORT_SPL
+ 	imply CMD_DM
+ 
++config TARGET_CL_SOM_IMX6
++	bool "CL-SOM-IMX6"
++	select BOARD_LATE_INIT
++	select DM
++	select DM_GPIO
++	select DM_SERIAL
++	select MX6QP
++	select SUPPORT_SPL
++	imply CMD_DM
++
+ config TARGET_COLIBRI_IMX6
+ 	bool "Toradex Colibri iMX6 board"
+ 	select BOARD_LATE_INIT
+@@ -851,6 +861,7 @@ source "board/boundary/nitrogen6x/Kconfig"
+ source "board/bticino/mamoj/Kconfig"
+ source "board/ccv/xpress/Kconfig"
+ source "board/compulab/cm_fx6/Kconfig"
++source "board/compulab/cl-som-imx6/Kconfig"
+ source "board/congatec/cgtqmx6eval/Kconfig"
+ source "board/dhelectronics/dh_imx6/Kconfig"
+ source "board/el/el6x/Kconfig"
+diff --git a/board/compulab/cl-som-imx6/Kconfig b/board/compulab/cl-som-imx6/Kconfig
+new file mode 100644
+index 0000000000..707ade1355
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/Kconfig
+@@ -0,0 +1,15 @@
++if TARGET_CL_SOM_IMX6
++
++config SYS_BOARD
++	default "cl-som-imx6"
++
++config SYS_VENDOR
++	default "compulab"
++
++config SYS_SOC
++	default "mx6"
++
++config SYS_CONFIG_NAME
++	default "cl-som-imx6"
++
++endif
+diff --git a/board/compulab/cl-som-imx6/MAINTAINERS b/board/compulab/cl-som-imx6/MAINTAINERS
+new file mode 100644
+index 0000000000..c5e2e675e3
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/MAINTAINERS
+@@ -0,0 +1,6 @@
++CL_SOM_IMX6 BOARD
++M:	Valentin Raevsky <valentin@compulab.co.il>
++S:	Maintained
++F:	board/compulab/cl-som-imx6/
++F:	include/configs/cl-som-imx6.h
++F:	configs/cl-som-imx6_defconfig
+diff --git a/board/compulab/cl-som-imx6/Makefile b/board/compulab/cl-som-imx6/Makefile
+new file mode 100644
+index 0000000000..4188bc7a04
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# (C) Copyright 2014 CompuLab, Ltd. <www.compulab.co.il>
++#
++# Authors: Nikita Kiryanov <nikita@compulab.co.il>
++ifdef CONFIG_SPL_BUILD
++obj-y = common.o spl.o
++else
++obj-y = common.o cl-som-imx6.o
++endif
+diff --git a/board/compulab/cl-som-imx6/cl-som-imx6.c b/board/compulab/cl-som-imx6/cl-som-imx6.c
+new file mode 100644
+index 0000000000..0a9552b438
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/cl-som-imx6.c
+@@ -0,0 +1,1011 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Board functions for Compulab CM-FX6 board
++ *
++ * Copyright (C) 2014, Compulab Ltd - http://compulab.co.il/
++ *
++ * Author: Nikita Kiryanov <nikita@compulab.co.il>
++ */
++
++#include <common.h>
++#include <ahci.h>
++#include <dm.h>
++#include <dwc_ahsata.h>
++#include <env.h>
++#include <fsl_esdhc_imx.h>
++#include <init.h>
++#include <miiphy.h>
++#include <mtd_node.h>
++#include <netdev.h>
++#include <errno.h>
++#include <usb.h>
++#include <fdt_support.h>
++#include <sata.h>
++#include <splash.h>
++#include <asm/arch/crm_regs.h>
++#include <asm/arch/sys_proto.h>
++#include <asm/arch/iomux.h>
++#include <asm/arch/mxc_hdmi.h>
++#include <asm/mach-imx/mxc_i2c.h>
++#include <asm/mach-imx/sata.h>
++#include <asm/mach-imx/video.h>
++#include <asm/io.h>
++#include <asm/gpio.h>
++#include <dm/platform_data/serial_mxc.h>
++#include <dm/device-internal.h>
++#include <jffs2/load_kernel.h>
++#include "common.h"
++#include "../common/eeprom.h"
++#include "../common/common.h"
++
++DECLARE_GLOBAL_DATA_PTR;
++
++#ifdef CONFIG_SPLASH_SCREEN
++static struct splash_location splash_locations[] = {
++	{
++		.name = "sf",
++		.storage = SPLASH_STORAGE_SF,
++		.flags = SPLASH_STORAGE_RAW,
++		.offset = 0x100000,
++	},
++	{
++		.name = "mmc_fs",
++		.storage = SPLASH_STORAGE_MMC,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "2:1",
++	},
++	{
++		.name = "usb_fs",
++		.storage = SPLASH_STORAGE_USB,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "0:1",
++	},
++	{
++		.name = "sata_fs",
++		.storage = SPLASH_STORAGE_SATA,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "0:1",
++	},
++};
++
++int splash_screen_prepare(void)
++{
++	return splash_source_load(splash_locations,
++				  ARRAY_SIZE(splash_locations));
++}
++#endif
++
++#if defined(CONFIG_VIDEO_IPUV3)
++static void disable_lvds(struct display_info_t const *dev)
++{
++	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
++
++	clrbits_le32(&iomux->gpr[2],
++		     IOMUXC_GPR2_LVDS_CH0_MODE_MASK |
++		     IOMUXC_GPR2_LVDS_CH1_MODE_MASK);
++}
++
++static void enable_hdmi(struct display_info_t const *dev)
++{
++	disable_lvds(dev);
++	imx_enable_hdmi_phy();
++}
++
++struct display_info_t const _displays[] = {{
++	.bus	= -1,
++	.addr	= 0,
++	.pixfmt	= IPU_PIX_FMT_RGB24,
++	.enable	= enable_hdmi,
++	.mode	= {
++		.name           = "HDMI",
++		.refresh        = 60,
++		.xres           = 1024,
++		.yres           = 768,
++		.pixclock       = 40385,
++		.left_margin    = 220,
++		.right_margin   = 40,
++		.upper_margin   = 21,
++		.lower_margin   = 7,
++		.hsync_len      = 60,
++		.vsync_len      = 10,
++		.sync           = FB_SYNC_EXT,
++		.vmode          = FB_VMODE_NONINTERLACED,
++	}
++}};
++struct display_info_t const displays[] = {{
++	.bus	= -1,
++	.addr	= 0,
++	.pixfmt	= IPU_PIX_FMT_RGB24,
++	.detect	= NULL,
++	.enable	= NULL,
++	.mode	= {
++		.name           = "WVGA",
++		.refresh        = 57,
++		.xres           = 800,
++		.yres           = 480,
++		.pixclock       = 37037,
++		.left_margin    = 40,
++		.right_margin   = 60,
++		.upper_margin   = 10,
++		.lower_margin   = 10,
++		.hsync_len      = 20,
++		.vsync_len      = 10,
++		.sync           = FB_SYNC_EXT,
++		.vmode          = FB_VMODE_NONINTERLACED,
++} }, {
++	.bus	= -1,
++	.addr	= 0,
++	.pixfmt	= IPU_PIX_FMT_RGB24,
++	.detect	= NULL,
++	.enable	= enable_hdmi,
++	.mode	= {
++		.name           = "HDMI",
++		.refresh        = 60,
++		.xres           = 1024,
++		.yres           = 768,
++		.pixclock       = 15385,
++		.left_margin    = 220,
++		.right_margin   = 40,
++		.upper_margin   = 21,
++		.lower_margin   = 7,
++		.hsync_len      = 60,
++		.vsync_len      = 10,
++		.sync           = FB_SYNC_EXT,
++		.vmode          = FB_VMODE_NONINTERLACED,
++} } };
++size_t display_count = ARRAY_SIZE(displays);
++
++static void setup_display(void)
++{
++	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
++	int reg;
++
++	enable_ipu_clock();
++	imx_setup_hdmi();
++
++	/* Turn on LDB_DI0 and LDB_DI1 clocks */
++	reg = readl(&mxc_ccm->CCGR3);
++	reg |= MXC_CCM_CCGR3_LDB_DI0_MASK | MXC_CCM_CCGR3_LDB_DI1_MASK;
++	writel(reg, &mxc_ccm->CCGR3);
++
++	/* Set LDB_DI0 and LDB_DI1 clk select to 3b'011 */
++	reg = readl(&mxc_ccm->cs2cdr);
++	reg &= ~(MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_MASK |
++		 MXC_CCM_CS2CDR_LDB_DI1_CLK_SEL_MASK);
++	reg |= (3 << MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET) |
++	       (3 << MXC_CCM_CS2CDR_LDB_DI1_CLK_SEL_OFFSET);
++	writel(reg, &mxc_ccm->cs2cdr);
++
++	reg = readl(&mxc_ccm->cscmr2);
++	reg |= MXC_CCM_CSCMR2_LDB_DI0_IPU_DIV | MXC_CCM_CSCMR2_LDB_DI1_IPU_DIV;
++	writel(reg, &mxc_ccm->cscmr2);
++
++	reg = readl(&mxc_ccm->chsccdr);
++	reg |= (CHSCCDR_CLK_SEL_LDB_DI0
++		<< MXC_CCM_CHSCCDR_IPU1_DI0_CLK_SEL_OFFSET);
++	reg |= (CHSCCDR_CLK_SEL_LDB_DI0 <<
++		MXC_CCM_CHSCCDR_IPU1_DI1_CLK_SEL_OFFSET);
++	writel(reg, &mxc_ccm->chsccdr);
++
++	reg = IOMUXC_GPR2_DI1_VS_POLARITY_ACTIVE_LOW |
++	      IOMUXC_GPR2_DI0_VS_POLARITY_ACTIVE_LOW |
++	      IOMUXC_GPR2_BIT_MAPPING_CH1_SPWG |
++	      IOMUXC_GPR2_DATA_WIDTH_CH1_18BIT |
++	      IOMUXC_GPR2_BIT_MAPPING_CH0_SPWG |
++	      IOMUXC_GPR2_DATA_WIDTH_CH0_18BIT |
++	      IOMUXC_GPR2_LVDS_CH0_MODE_ENABLED_DI0 |
++	      IOMUXC_GPR2_LVDS_CH1_MODE_DISABLED;
++	writel(reg, &iomux->gpr[2]);
++
++	reg = readl(&iomux->gpr[3]);
++	reg &= ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK |
++		 IOMUXC_GPR3_HDMI_MUX_CTL_MASK);
++	reg |= (IOMUXC_GPR3_MUX_SRC_IPU1_DI0 <<
++		IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET) |
++	       (IOMUXC_GPR3_MUX_SRC_IPU1_DI0 <<
++		IOMUXC_GPR3_HDMI_MUX_CTL_OFFSET);
++	writel(reg, &iomux->gpr[3]);
++}
++#endif /* CONFIG_VIDEO_IPUV3 */
++
++#ifdef CONFIG_DWC_AHSATA
++static int issd_gpios[] = {
++	/* The order of the GPIOs in the array is important! */
++	CM_FX6_SATA_LDO_EN,
++	CM_FX6_SATA_PHY_SLP,
++	CM_FX6_SATA_NRSTDLY,
++	CM_FX6_SATA_PWREN,
++	CM_FX6_SATA_NSTANDBY1,
++	CM_FX6_SATA_NSTANDBY2,
++};
++
++static void sata_power(int on)
++{
++	int i;
++
++	if (!on) { /* tell the iSSD that the power will be removed */
++		gpio_direction_output(CM_FX6_SATA_PWLOSS_INT, 1);
++		mdelay(10);
++	}
++
++	for (i = 0; i < ARRAY_SIZE(issd_gpios); i++) {
++		gpio_direction_output(issd_gpios[i], on);
++		udelay(100);
++	}
++
++	if (!on) /* for compatibility lower the power loss interrupt */
++		gpio_direction_output(CM_FX6_SATA_PWLOSS_INT, 0);
++}
++
++static iomux_v3_cfg_t const sata_pads[] = {
++	/* SATA PWR */
++	IOMUX_PADS(PAD_ENET_TX_EN__GPIO1_IO28 | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_A22__GPIO2_IO16    | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D20__GPIO3_IO20    | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_A25__GPIO5_IO02    | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	/* SATA CTRL */
++	IOMUX_PADS(PAD_ENET_TXD0__GPIO1_IO30  | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D23__GPIO3_IO23    | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D29__GPIO3_IO29    | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_A23__GPIO6_IO06    | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_BCLK__GPIO6_IO31   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++static int setup_issd(void)
++{
++	int ret, i;
++
++	SETUP_IOMUX_PADS(sata_pads);
++
++	for (i = 0; i < ARRAY_SIZE(issd_gpios); i++) {
++		ret = gpio_request(issd_gpios[i], "sata");
++		if (ret)
++			return ret;
++	}
++
++	ret = gpio_request(CM_FX6_SATA_PWLOSS_INT, "sata_pwloss_int");
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++#define CM_FX6_SATA_INIT_RETRIES	10
++
++#else
++static int setup_issd(void) { return 0; }
++#endif
++
++#ifdef CONFIG_SYS_I2C_MXC
++#define I2C_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
++			PAD_CTL_DSE_40ohm | PAD_CTL_HYS | \
++			PAD_CTL_ODE | PAD_CTL_SRE_FAST)
++
++#define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
++
++static struct i2c_pads_info i2c_pad_info0 = {
++	.scl = {
++		 .i2c_mode = MX6_PAD_EIM_D21__I2C1_SCL | PC,
++		 .gpio_mode = MX6_PAD_EIM_D21__GPIO3_IO21 | PC,
++		 .gp = IMX_GPIO_NR(3, 21)
++	},
++	.sda = {
++		 .i2c_mode = MX6_PAD_EIM_D28__I2C1_SDA | PC,
++		 .gpio_mode = MX6_PAD_EIM_D28__GPIO3_IO28 | PC,
++		 .gp = IMX_GPIO_NR(3, 28)
++	}
++};
++
++static struct i2c_pads_info i2c_pad_info1 = {
++	.scl = {
++		 .i2c_mode = MX6_PAD_KEY_COL3__I2C2_SCL | PC,
++		 .gpio_mode = MX6_PAD_KEY_COL3__GPIO4_IO12 | PC,
++		 .gp = IMX_GPIO_NR(4, 12)
++	},
++	.sda = {
++		 .i2c_mode = MX6_PAD_KEY_ROW3__I2C2_SDA | PC,
++		 .gpio_mode = MX6_PAD_KEY_ROW3__GPIO4_IO13 | PC,
++		 .gp = IMX_GPIO_NR(4, 13)
++	}
++};
++
++static struct i2c_pads_info i2c_pad_info2 = {
++	.scl = {
++		 .i2c_mode = MX6_PAD_GPIO_3__I2C3_SCL | PC,
++		 .gpio_mode = MX6_PAD_GPIO_3__GPIO1_IO03 | PC,
++		 .gp = IMX_GPIO_NR(1, 3)
++	},
++	.sda = {
++		 .i2c_mode = MX6_PAD_GPIO_6__I2C3_SDA | PC,
++		 .gpio_mode = MX6_PAD_GPIO_6__GPIO1_IO06 | PC,
++		 .gp = IMX_GPIO_NR(1, 6)
++	}
++};
++
++static int board_setup_i2c(void)
++{
++	int ret = 0;
++
++	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0);
++	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
++	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
++
++	return ret;
++}
++#else
++static int board_setup_i2c(void) { return 0; }
++#endif
++
++#ifdef CONFIG_USB_EHCI_MX6
++#define WEAK_PULLDOWN	(PAD_CTL_PUS_100K_DOWN |		\
++			PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm |	\
++			PAD_CTL_HYS | PAD_CTL_SRE_SLOW)
++#define MX6_USBNC_BASEADDR	0x2184800
++#define USBNC_USB_H1_PWR_POL	(1 << 9)
++
++static int setup_usb_host(void)
++{
++	int err;
++
++	err = gpio_request(CM_FX6_USB_HUB_RST, "usb hub rst");
++	if (err)
++		return err;
++
++	SETUP_IOMUX_PAD(PAD_GPIO_0__USB_H1_PWR | MUX_PAD_CTRL(NO_PAD_CTRL));
++	SETUP_IOMUX_PAD(PAD_SD3_RST__GPIO7_IO08 | MUX_PAD_CTRL(NO_PAD_CTRL));
++
++	return 0;
++}
++
++static int setup_usb_otg(void)
++{
++	int err;
++	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
++
++	err = gpio_request(SB_FX6_USB_OTG_PWR, "usb-pwr");
++	if (err) {
++		printf("USB OTG pwr gpio request failed: %d\n", err);
++		return err;
++	}
++
++	SETUP_IOMUX_PAD(PAD_EIM_D22__GPIO3_IO22 | MUX_PAD_CTRL(NO_PAD_CTRL));
++	SETUP_IOMUX_PAD(PAD_ENET_RX_ER__USB_OTG_ID |
++						MUX_PAD_CTRL(WEAK_PULLDOWN));
++	clrbits_le32(&iomux->gpr[1], IOMUXC_GPR1_OTG_ID_MASK);
++	/* disable ext. charger detect, or it'll affect signal quality at dp. */
++	return gpio_direction_output(SB_FX6_USB_OTG_PWR, 0);
++}
++
++int board_usb_phy_mode(int port)
++{
++	return USB_INIT_HOST;
++}
++
++int board_ehci_hcd_init(int port)
++{
++	int ret;
++	u32 *usbnc_usb_uh1_ctrl = (u32 *)(MX6_USBNC_BASEADDR + 4);
++
++	/* Only 1 host controller in use. port 0 is OTG & needs no attention */
++	if (port != 1)
++		return 0;
++
++	/* Set PWR polarity to match power switch's enable polarity */
++	setbits_le32(usbnc_usb_uh1_ctrl, USBNC_USB_H1_PWR_POL);
++	ret = gpio_direction_output(CM_FX6_USB_HUB_RST, 0);
++	if (ret)
++		return ret;
++
++	udelay(10);
++	ret = gpio_direction_output(CM_FX6_USB_HUB_RST, 1);
++	if (ret)
++		return ret;
++
++	mdelay(1);
++
++	return 0;
++}
++
++int board_ehci_power(int port, int on)
++{
++	if (port == 0)
++		return gpio_direction_output(SB_FX6_USB_OTG_PWR, on);
++
++	return 0;
++}
++#else
++static int setup_usb_otg(void) { return 0; }
++static int setup_usb_host(void) { return 0; }
++#endif
++
++#ifdef CONFIG_FEC_MXC
++#define ENET_PAD_CTRL_22K	(PAD_CTL_PUS_22K_UP | PAD_CTL_SPEED_MED | \
++				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
++
++#define ENET_PAD_CTRL		(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
++				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
++
++static int mx6_rgmii_rework(struct phy_device *phydev)
++{
++	unsigned short val;
++
++	/* Ar8031 phy SmartEEE feature cause link status generates glitch,
++	 * which cause ethernet link down/up issue, so disable SmartEEE
++	 */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xd, 0x3);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xe, 0x805d);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xd, 0x4003);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0xe);
++	val &= ~(0x1 << 8);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xe, val);
++
++	/* To enable AR8031 ouput a 125MHz clk from CLK_25M */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xd, 0x7);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xe, 0x8016);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xd, 0x4007);
++
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0xe);
++	val &= 0xffe3;
++	val |= 0x18;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0xe, val);
++
++	/* introduce tx clock delay */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1d, 0x5);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1e);
++	val |= 0x0100;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, val);
++
++	/* introduce rx clock delay */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1d, 0x0);
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1e);
++	val |= 0x08000;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, val);
++
++	return 0;
++}
++
++static void cm_eth_init(void);
++int board_phy_config(struct phy_device *phydev)
++{
++	cm_eth_init();
++
++	mx6_rgmii_rework(phydev);
++
++	if (phydev->drv->config)
++		return phydev->drv->config(phydev);
++
++	return 0;
++}
++
++static iomux_v3_cfg_t const heartbeat_pads[] = {
++	IOMUX_PADS(PAD_EIM_EB3__GPIO2_IO31 | MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++void hb_led(void) {
++	SETUP_IOMUX_PADS(heartbeat_pads);
++
++	gpio_request(IMX_GPIO_NR(2, 31),"heart beat");
++	gpio_direction_output(IMX_GPIO_NR(2, 31), 1);
++
++};
++
++static iomux_v3_cfg_t const enet_pads[] = {
++	IOMUX_PADS(PAD_ENET_REF_CLK__ENET_TX_CLK  |
++						MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_ENET_MDIO__ENET_MDIO | MUX_PAD_CTRL(ENET_PAD_CTRL_22K)),
++	IOMUX_PADS(PAD_ENET_MDC__ENET_MDC   | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++
++	IOMUX_PADS(PAD_RGMII_TX_CTL__RGMII_TX_CTL |
++						MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_TXC__RGMII_TXC | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_TD0__RGMII_TD0 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_TD1__RGMII_TD1 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_TD2__RGMII_TD2 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_TD3__RGMII_TD3 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++
++	IOMUX_PADS(PAD_RGMII_RXC__RGMII_RXC | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_RD0__RGMII_RD0 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_RD1__RGMII_RD1 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_RD2__RGMII_RD2 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_RD3__RGMII_RD3 | MUX_PAD_CTRL(ENET_PAD_CTRL)),
++	IOMUX_PADS(PAD_RGMII_RX_CTL__RGMII_RX_CTL |
++						MUX_PAD_CTRL(ENET_PAD_CTRL)),
++
++	IOMUX_PADS(PAD_EIM_A19__GPIO2_IO19 | MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++static int handle_mac_address(char *env_var, uint eeprom_bus)
++{
++	unsigned char enetaddr[6];
++	int rc;
++
++	rc = eth_env_get_enetaddr(env_var, enetaddr);
++	if (rc)
++		return 0;
++
++	rc = cl_eeprom_read_mac_addr(enetaddr, eeprom_bus);
++	if (rc)
++		return rc;
++
++	if (!is_valid_ethaddr(enetaddr))
++		return -1;
++
++	return eth_env_set_enetaddr(env_var, enetaddr);
++}
++
++#define SB_FX6_I2C_EEPROM_BUS	0
++#define NO_MAC_ADDR		"No MAC address found for %s\n"
++static void cm_eth_init(void)
++{
++	if (handle_mac_address("ethaddr", CONFIG_SYS_I2C_EEPROM_BUS))
++		printf(NO_MAC_ADDR, "primary NIC");
++
++	gpio_request(IMX_GPIO_NR(1, 2),"i2cmux-switch");
++	gpio_direction_output(IMX_GPIO_NR(1, 2), 0);
++
++	if (handle_mac_address("eth1addr", SB_FX6_I2C_EEPROM_BUS))
++		printf(NO_MAC_ADDR, "secondary NIC");
++
++	SETUP_IOMUX_PADS(enet_pads);
++
++	gpio_request(PHY_ENET_NRST, "enet_nrst");
++	/* phy reset */
++	gpio_direction_output(PHY_ENET_NRST, 0);
++	udelay(1000);
++	gpio_set_value(PHY_ENET_NRST, 1);
++	udelay(1000);
++}
++
++static void setup_fec(void)
++{
++	int ret;
++
++	if (is_mx6dqp()) {
++		/*
++		 * select ENET MAC0 TX clock from PLL
++		 */
++		imx_iomux_set_gpr_register(5, 9, 1, 1);
++	} else {
++		imx_iomux_set_gpr_register(1, 21, 1, 1);
++	}
++
++	ret = enable_fec_anatop_clock(0, ENET_125MHZ);
++	if (ret)
++		printf("Error fec anatop clock settings!\n");
++
++}
++
++int board_eth_init(bd_t *bis)
++{
++	return cpu_eth_init(bis);
++}
++#endif
++
++#ifndef CONFIG_SPL_BUILD
++static int nand_enabled = 0;
++#endif
++
++#ifdef CONFIG_NAND_MXS
++static iomux_v3_cfg_t const nand_pads[] = {
++	IOMUX_PADS(PAD_NANDF_CLE__NAND_CLE     | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_ALE__NAND_ALE     | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_CS0__NAND_CE0_B   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_RB0__NAND_READY_B | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D0__NAND_DATA00   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D1__NAND_DATA01   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D2__NAND_DATA02   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D3__NAND_DATA03   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D4__NAND_DATA04   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D5__NAND_DATA05   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D6__NAND_DATA06   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_D7__NAND_DATA07   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_CMD__NAND_RE_B      | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_CLK__NAND_WE_B      | MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_NANDF_WP_B__NAND_WP_B   | MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++#define NAND_ENABLE    IMX_GPIO_NR(6, 9)
++static iomux_v3_cfg_t const nand_enable_pads[] = {
++	IOMUX_PADS(PAD_NANDF_WP_B__GPIO6_IO09  | MUX_PAD_CTRL(PAD_CTL_PUS_100K_DOWN)),
++};
++
++static void get_nand_enable_state(void) {
++	imx_iomux_v3_setup_multiple_pads(
++	       nand_enable_pads, ARRAY_SIZE(nand_enable_pads));
++	gpio_request(NAND_ENABLE,"NAND_ENABLE");
++	gpio_direction_input(NAND_ENABLE);
++	mdelay(1);
++	nand_enabled = gpio_get_value(NAND_ENABLE);
++	gpio_free(NAND_ENABLE);
++}
++
++static void setup_gpmi_nand(void)
++{
++	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++	get_nand_enable_state();
++
++	SETUP_IOMUX_PADS(nand_pads);
++	/* Enable clock roots */
++	enable_usdhc_clk(1, 3);
++	enable_usdhc_clk(1, 4);
++
++	setup_gpmi_io_clk(MXC_CCM_CS2CDR_ENFC_CLK_PODF(0xf) |
++			  MXC_CCM_CS2CDR_ENFC_CLK_PRED(1)   |
++			  MXC_CCM_CS2CDR_ENFC_CLK_SEL(0));
++
++	/* enable apbh clock gating */
++	setbits_le32(&mxc_ccm->CCGR0, MXC_CCM_CCGR0_APBHDMA_MASK);
++}
++
++static void setup_gpmi_nand_(void)
++{
++	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++
++	get_nand_enable_state();
++	/* config gpmi nand iomux */
++	SETUP_IOMUX_PADS(nand_pads);
++
++	setup_gpmi_io_clk((MXC_CCM_CS2CDR_ENFC_CLK_PODF(0) |
++			MXC_CCM_CS2CDR_ENFC_CLK_PRED(3) |
++			MXC_CCM_CS2CDR_ENFC_CLK_SEL(3)));
++
++	/* enable apbh clock gating */
++	setbits_le32(&mxc_ccm->CCGR0, MXC_CCM_CCGR0_APBHDMA_MASK);
++}
++#else
++static void setup_gpmi_nand(void) {}
++#endif
++
++#ifdef CONFIG_FSL_ESDHC
++static struct fsl_esdhc_cfg usdhc_cfg[CONFIG_SYS_FSL_USDHC_NUM] = {
++	{USDHC1_BASE_ADDR},
++	{USDHC2_BASE_ADDR},
++	{USDHC3_BASE_ADDR},
++	{USDHC4_BASE_ADDR},
++};
++
++static enum mxc_clock usdhc_clk[CONFIG_SYS_FSL_USDHC_NUM] = {
++	MXC_ESDHC_CLK,
++	MXC_ESDHC2_CLK,
++	MXC_ESDHC3_CLK,
++	MXC_ESDHC4_CLK,
++};
++
++static iomux_v3_cfg_t const usdhc_wifi_pads[] = {
++	IOMUX_PADS(PAD_NANDF_CS3__GPIO6_IO16	| MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_DA1__GPIO3_IO01	| MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++static void usdhc_wifi_mmc_init(void) {
++
++	SETUP_IOMUX_PADS(usdhc_wifi_pads);
++
++	gpio_request(IMX_GPIO_NR(6, 16),"6_16");
++	gpio_request(IMX_GPIO_NR(3, 1),"3_01");
++
++	gpio_direction_output(IMX_GPIO_NR(6, 16), 1);
++	gpio_direction_output(IMX_GPIO_NR(3, 1), 1);
++}
++
++int board_mmc_init(bd_t *bis)
++{
++	int i;
++
++	usdhc_wifi_mmc_init();
++	cm_fx6_set_usdhc_iomux();
++	for (i = 0; i < (CONFIG_SYS_FSL_USDHC_NUM - nand_enabled) ; i++) {
++		usdhc_cfg[i].sdhc_clk = mxc_get_clock(usdhc_clk[i]);
++		usdhc_cfg[i].max_bus_width = 4;
++		fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
++		enable_usdhc_clk(1, i);
++	}
++
++	return 0;
++}
++#endif
++
++#ifdef CONFIG_MXC_SPI
++int setup_ecspi(void)
++{
++	cm_fx6_set_ecspi_iomux();
++	return gpio_request(CM_FX6_ECSPI_BUS0_CS0, "ecspi_bus0_cs0");
++}
++#else
++int setup_ecspi(void) { return 0; }
++#endif
++
++#ifdef CONFIG_OF_BOARD_SETUP
++#define USDHC3_PATH	"/soc/aips-bus@02100000/usdhc@02198000/"
++
++static const struct node_info nodes[] = {
++	/*
++	 * Both entries target the same flash chip. The st,m25p compatible
++	 * is used in the vendor device trees, while upstream uses (the
++	 * documented) jedec,spi-nor compatible.
++	 */
++	{ "st,m25p",	MTD_DEV_TYPE_NOR,	},
++	{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR,	},
++};
++
++int ft_board_setup(void *blob, bd_t *bd)
++{
++	u32 baseboard_rev;
++	int nodeoffset;
++	uint8_t enetaddr[6];
++	char baseboard_name[16];
++	int err;
++
++	fdt_shrink_to_minimum(blob, 0); /* Make room for new properties */
++
++	/* MAC addr */
++	if (eth_env_get_enetaddr("ethaddr", enetaddr)) {
++		fdt_find_and_setprop(blob,
++				     "/soc/aips-bus@02100000/ethernet@02188000",
++				     "local-mac-address", enetaddr, 6, 1);
++	}
++
++	if (eth_env_get_enetaddr("eth1addr", enetaddr)) {
++		fdt_find_and_setprop(blob, "/eth@pcie", "local-mac-address",
++				     enetaddr, 6, 1);
++	}
++
++	fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
++
++	baseboard_rev = cl_eeprom_get_board_rev(0);
++	err = cl_eeprom_get_product_name((uchar *)baseboard_name, 0);
++	if (err || baseboard_rev == 0)
++		return 0; /* Assume not an early revision SB-FX6m baseboard */
++
++	if (!strncmp("SB-FX6m", baseboard_name, 7) && baseboard_rev <= 120) {
++		nodeoffset = fdt_path_offset(blob, USDHC3_PATH);
++		fdt_delprop(blob, nodeoffset, "cd-gpios");
++		fdt_find_and_setprop(blob, USDHC3_PATH, "broken-cd",
++				     NULL, 0, 1);
++		fdt_find_and_setprop(blob, USDHC3_PATH, "keep-power-in-suspend",
++				     NULL, 0, 1);
++	}
++
++	return 0;
++}
++#endif
++
++#define CPU_TYPE "cpu_type"
++static int board_cpu_type(void)
++{
++	switch (get_cpu_type()) {
++		case MXC_CPU_MX6SOLO:
++			return env_set(CPU_TYPE, "MX6SOLO");
++		case MXC_CPU_MX6D:
++			return env_set(CPU_TYPE, "MX6D");
++		case MXC_CPU_MX6Q:
++			return env_set(CPU_TYPE, "MX6Q");
++		case MXC_CPU_MX6DP:
++			return env_set(CPU_TYPE, "MX6DP");
++		case MXC_CPU_MX6QP:
++			return env_set(CPU_TYPE, "MX6QP");
++		default:
++			return env_set(CPU_TYPE, "unknown");
++	}
++	return -1;
++}
++
++int board_init(void)
++{
++	int ret;
++
++	hb_led();
++
++	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
++	setup_gpmi_nand();
++
++	ret = setup_usb_otg();
++	if (ret)
++		printf("Warning: USB OTG setup failed: %d\n", ret);
++
++	ret = setup_usb_host();
++	if (ret)
++		printf("Warning: USB host setup failed: %d\n", ret);
++
++	/*
++	 * cm-fx6 may have iSSD not assembled and in this case it has
++	 * bypasses for a (m)SATA socket on the baseboard. The socketed
++	 * device is not controlled by those GPIOs. So just print a warning
++	 * if the setup fails.
++	 */
++	ret = setup_issd();
++	if (ret)
++		printf("Warning: iSSD setup failed: %d\n", ret);
++
++	setup_display();
++
++	/* This should be done in the MMC driver when MX6 has a clock driver */
++#ifdef CONFIG_FSL_ESDHC_IMX
++	if (IS_ENABLED(CONFIG_BLK)) {
++		int i;
++
++		cm_fx6_set_usdhc_iomux();
++		for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++)
++			enable_usdhc_clk(1, i);
++	}
++#endif
++
++	setup_fec();
++
++	return 0;
++}
++
++int board_late_init(void)
++{
++	board_cpu_type();
++
++#ifdef CONFIG_ATP_ENV
++	env_set("atp" , "yes");
++#endif
++	return 0;
++}
++
++int checkboard(void)
++{
++	puts("Board: "CONFIG_BOARD_NAME"\n");
++	return 0;
++}
++
++int misc_init_r(void)
++{
++	cl_print_pcb_info();
++
++	return 0;
++}
++
++#ifdef CONFIG_COMPULAB_BANK_LAYOUT
++int dram_init_banksize(void)
++{
++	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
++	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
++
++	switch (gd->ram_size) {
++	case 0x10000000: /* DDR_16BIT_256MB */
++		gd->bd->bi_dram[0].size = 0x10000000;
++		gd->bd->bi_dram[1].size = 0;
++		break;
++	case 0x20000000: /* DDR_32BIT_512MB */
++		gd->bd->bi_dram[0].size = 0x20000000;
++		gd->bd->bi_dram[1].size = 0;
++		break;
++	case 0x40000000:
++		if (is_cpu_type(MXC_CPU_MX6SOLO)) { /* DDR_32BIT_1GB */
++			gd->bd->bi_dram[0].size = 0x20000000;
++			gd->bd->bi_dram[1].size = 0x20000000;
++		} else { /* DDR_64BIT_1GB */
++			gd->bd->bi_dram[0].size = 0x40000000;
++			gd->bd->bi_dram[1].size = 0;
++		}
++		break;
++	case 0x80000000: /* DDR_64BIT_2GB */
++		gd->bd->bi_dram[0].size = 0x40000000;
++		gd->bd->bi_dram[1].size = 0x40000000;
++		break;
++	case 0xEFF00000: /* DDR_64BIT_4GB */
++		gd->bd->bi_dram[0].size = 0x70000000;
++		gd->bd->bi_dram[1].size = 0x7FF00000;
++		break;
++	}
++
++	return 0;
++}
++#endif
++
++int dram_init(void)
++{
++	gd->ram_size = imx_ddr_size();
++	switch (gd->ram_size) {
++	case 0x10000000:
++	case 0x20000000:
++	case 0x40000000:
++	case 0x80000000:
++		break;
++	case 0xF0000000:
++		gd->ram_size -= 0x100000;
++		break;
++	default:
++		printf("ERROR: Unsupported DRAM size 0x%lx\n", gd->ram_size);
++		return -1;
++	}
++
++	return 0;
++}
++
++u32 get_board_rev(void)
++{
++	return cl_eeprom_get_board_rev(CONFIG_SYS_I2C_EEPROM_BUS);
++}
++
++static struct mxc_serial_platdata mxc_serial_plat = {
++	.reg = (struct mxc_uart *)UART4_BASE,
++};
++
++U_BOOT_DEVICE(cm_fx6_serial) = {
++	.name	= "serial_mxc",
++	.platdata = &mxc_serial_plat,
++};
++
++#if CONFIG_IS_ENABLED(AHCI)
++static int sata_imx_probe(struct udevice *dev)
++{
++	int i, err;
++
++	/* Make sure this gpio has logical 0 value */
++	gpio_direction_output(CM_FX6_SATA_PWLOSS_INT, 0);
++	udelay(100);
++	sata_power(1);
++
++	for (i = 0; i < CM_FX6_SATA_INIT_RETRIES; i++) {
++		err = setup_sata();
++		if (err) {
++			printf("SATA setup failed: %d\n", err);
++			return err;
++		}
++
++		udelay(100);
++
++		err = dwc_ahsata_probe(dev);
++		if (!err)
++			break;
++
++		/* There is no device on the SATA port */
++		if (sata_dm_port_status(0, 0) == 0)
++			break;
++
++		/* There's a device, but link not established. Retry */
++		device_remove(dev, DM_REMOVE_NORMAL);
++	}
++
++	return 0;
++}
++
++static int sata_imx_remove(struct udevice *dev)
++{
++	sata_power(0);
++	mdelay(250);
++
++	return 0;
++}
++
++struct ahci_ops sata_imx_ops = {
++	.port_status = dwc_ahsata_port_status,
++	.reset	= dwc_ahsata_bus_reset,
++	.scan	= dwc_ahsata_scan,
++};
++
++static const struct udevice_id sata_imx_ids[] = {
++	{ .compatible = "fsl,imx6q-ahci" },
++	{ }
++};
++
++U_BOOT_DRIVER(sata_imx) = {
++	.name		= "dwc_ahci",
++	.id		= UCLASS_AHCI,
++	.of_match	= sata_imx_ids,
++	.ops		= &sata_imx_ops,
++	.probe		= sata_imx_probe,
++	.remove		= sata_imx_remove,  /* reset bus to stop it */
++};
++#endif /* AHCI */
++
++#ifdef CONFIG_SPL_LOAD_FIT
++int board_fit_config_name_match(const char *name)
++{
++	if (is_mx6dq()) {
++		if (!strcmp(name, "imx6q-cl-som-imx6"))
++			return 0;
++	} else if (is_mx6dqp()) {
++		if (!strcmp(name, "imx6qp-cl-som-imx6"))
++			return 0;
++	} else if (is_mx6dl()) {
++		if (!strcmp(name, "imx6dl-cl-som-imx6"))
++			return 0;
++	}
++
++	return 0;
++}
++#endif
+diff --git a/board/compulab/cl-som-imx6/common.c b/board/compulab/cl-som-imx6/common.c
+new file mode 100644
+index 0000000000..8b38c21985
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/common.c
+@@ -0,0 +1,108 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Code used by both U-Boot and SPL for Compulab CM-FX6
++ *
++ * Copyright (C) 2014, Compulab Ltd - http://compulab.co.il/
++ *
++ * Author: Nikita Kiryanov <nikita@compulab.co.il>
++ */
++
++#include <common.h>
++#include <asm/arch/sys_proto.h>
++#include <asm/gpio.h>
++#include <asm/mach-imx/spi.h>
++#include <fsl_esdhc_imx.h>
++#include "common.h"
++
++#ifdef CONFIG_FSL_ESDHC_IMX
++#define USDHC_PAD_CTRL (PAD_CTL_PUS_47K_UP |			\
++	PAD_CTL_SPEED_LOW | PAD_CTL_DSE_80ohm |			\
++	PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
++
++static iomux_v3_cfg_t const usdhc_pads[] = {
++	IOMUX_PADS(PAD_SD1_CLK__SD1_CLK    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD1_CMD__SD1_CMD    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD1_DAT0__SD1_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD1_DAT1__SD1_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD1_DAT2__SD1_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD1_DAT3__SD1_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++
++	IOMUX_PADS(PAD_SD2_CLK__SD2_CLK    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD2_CMD__SD2_CMD    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD2_DAT0__SD2_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD2_DAT1__SD2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD2_DAT2__SD2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD2_DAT3__SD2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++
++	IOMUX_PADS(PAD_SD3_CLK__SD3_CLK    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD3_CMD__SD3_CMD    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD3_DAT0__SD3_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD3_DAT1__SD3_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD3_DAT2__SD3_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD3_DAT3__SD3_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD3_DAT4__GPIO7_IO01 | MUX_PAD_CTRL(PAD_CTL_PUS_100K_DOWN)),
++
++	IOMUX_PADS(PAD_SD4_CLK__SD4_CLK    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_CMD__SD4_CMD    | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT0__SD4_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT1__SD4_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT2__SD4_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT3__SD4_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT4__SD4_DATA4 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT5__SD4_DATA5 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT6__SD4_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++	IOMUX_PADS(PAD_SD4_DAT7__SD4_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
++};
++
++#define MMC_CD  IMX_GPIO_NR(7, 1)
++void cm_fx6_set_usdhc_iomux(void)
++{
++	SETUP_IOMUX_PADS(usdhc_pads);
++	gpio_request(MMC_CD,"mmc_cd");
++	gpio_direction_input(MMC_CD);
++}
++
++/* CINS bit doesn't work, so always try to access the MMC card */
++int board_mmc_getcd(struct mmc *mmc)
++{
++    struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
++    int ret = 0;
++
++    switch (cfg->esdhc_base) {
++    case USDHC1_BASE_ADDR:
++    case USDHC2_BASE_ADDR:
++    default:
++        ret = 0;
++        break;
++    case USDHC3_BASE_ADDR:
++        ret = !gpio_get_value(MMC_CD);
++        break;
++    case USDHC4_BASE_ADDR:
++        ret = 1;
++        break;
++    }
++    return ret;
++}
++#endif
++
++#ifdef CONFIG_MXC_SPI
++#define ECSPI_PAD_CTRL (PAD_CTL_SRE_FAST | PAD_CTL_SPEED_MED | \
++		PAD_CTL_PUS_100K_DOWN | PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
++
++static iomux_v3_cfg_t const ecspi_pads[] = {
++	IOMUX_PADS(PAD_EIM_D16__ECSPI1_SCLK | MUX_PAD_CTRL(ECSPI_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D17__ECSPI1_MISO | MUX_PAD_CTRL(ECSPI_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D18__ECSPI1_MOSI | MUX_PAD_CTRL(ECSPI_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_EB2__GPIO2_IO30  | MUX_PAD_CTRL(ECSPI_PAD_CTRL)),
++};
++
++void cm_fx6_set_ecspi_iomux(void)
++{
++	SETUP_IOMUX_PADS(ecspi_pads);
++}
++
++int board_spi_cs_gpio(unsigned bus, unsigned cs)
++{
++	return (bus == 0 && cs == 0) ? (CM_FX6_ECSPI_BUS0_CS0) : -1;
++}
++#endif
+diff --git a/board/compulab/cl-som-imx6/common.h b/board/compulab/cl-som-imx6/common.h
+new file mode 100644
+index 0000000000..662619d877
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/common.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2014, Compulab Ltd - http://compulab.co.il/
++ *
++ * Author: Nikita Kiryanov <nikita@compulab.co.il>
++ */
++
++#include <asm/arch/mx6-pins.h>
++#include <asm/arch/clock.h>
++
++#define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP |	\
++			PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm |	\
++			PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
++
++#define CM_FX6_ECSPI_BUS0_CS0	IMX_GPIO_NR(2, 30)
++#define CM_FX6_GREEN_LED	IMX_GPIO_NR(2, 31)
++#define CM_FX6_USB_HUB_RST	IMX_GPIO_NR(7, 8)
++#define SB_FX6_USB_OTG_PWR	IMX_GPIO_NR(3, 22)
++#define PHY_ENET_NRST	IMX_GPIO_NR(2, 19)
++#define CM_FX6_USB_HUB_RST	IMX_GPIO_NR(7, 8)
++#define SB_FX6_USB_OTG_PWR	IMX_GPIO_NR(3, 22)
++#define CM_FX6_SATA_PWREN	IMX_GPIO_NR(1, 28)
++#define CM_FX6_SATA_VDDC_CTRL	IMX_GPIO_NR(1, 30)
++#define CM_FX6_SATA_LDO_EN	IMX_GPIO_NR(2, 16)
++#define CM_FX6_SATA_NSTANDBY1	IMX_GPIO_NR(3, 20)
++#define CM_FX6_SATA_PHY_SLP	IMX_GPIO_NR(3, 23)
++#define CM_FX6_SATA_STBY_REQ	IMX_GPIO_NR(3, 29)
++#define CM_FX6_SATA_NSTANDBY2	IMX_GPIO_NR(5, 2)
++#define CM_FX6_SATA_NRSTDLY	IMX_GPIO_NR(6, 6)
++#define CM_FX6_SATA_PWLOSS_INT	IMX_GPIO_NR(6, 31)
++
++
++void cm_fx6_set_usdhc_iomux(void);
++void cm_fx6_set_ecspi_iomux(void);
+diff --git a/board/compulab/cl-som-imx6/spl.c b/board/compulab/cl-som-imx6/spl.c
+new file mode 100644
+index 0000000000..9fdc518426
+--- /dev/null
++++ b/board/compulab/cl-som-imx6/spl.c
+@@ -0,0 +1,388 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * SPL specific code for Compulab CM-FX6 board
++ *
++ * Copyright (C) 2014, Compulab Ltd - http://compulab.co.il/
++ *
++ * Author: Nikita Kiryanov <nikita@compulab.co.il>
++ */
++
++#include <common.h>
++#include <clock_legacy.h>
++#include <hang.h>
++#include <init.h>
++#include <spl.h>
++#include <asm/io.h>
++#include <asm/gpio.h>
++#include <asm/arch/mx6-ddr.h>
++#include <asm/arch/clock.h>
++#include <asm/arch/sys_proto.h>
++#include <asm/arch/crm_regs.h>
++#include <asm/mach-imx/iomux-v3.h>
++#include <fsl_esdhc_imx.h>
++#include "common.h"
++
++enum ddr_config {
++	DDR_16BIT_256MB,
++	DDR_32BIT_512MB,
++	DDR_32BIT_1GB,
++	DDR_64BIT_1GB,
++	DDR_64BIT_2GB,
++	DDR_64BIT_4GB,
++	DDR_UNKNOWN,
++};
++
++/*
++ * Below DRAM_RESET[DDR_SEL] = 0 which is incorrect according to
++ * Freescale QRM, but this is exactly the value used by the automatic
++ * calibration script and it works also in all our tests, so we leave
++ * it as is at this point.
++ */
++#define CM_FX6_DDR_IOMUX_CFG \
++	.dram_sdqs0	= 0x00000038, \
++	.dram_sdqs1	= 0x00000038, \
++	.dram_sdqs2	= 0x00000038, \
++	.dram_sdqs3	= 0x00000038, \
++	.dram_sdqs4	= 0x00000038, \
++	.dram_sdqs5	= 0x00000038, \
++	.dram_sdqs6	= 0x00000038, \
++	.dram_sdqs7	= 0x00000038, \
++	.dram_dqm0	= 0x00000038, \
++	.dram_dqm1	= 0x00000038, \
++	.dram_dqm2	= 0x00000038, \
++	.dram_dqm3	= 0x00000038, \
++	.dram_dqm4	= 0x00000038, \
++	.dram_dqm5	= 0x00000038, \
++	.dram_dqm6	= 0x00000038, \
++	.dram_dqm7	= 0x00000038, \
++	.dram_cas	= 0x00000038, \
++	.dram_ras	= 0x00000038, \
++	.dram_sdclk_0	= 0x00000038, \
++	.dram_sdclk_1	= 0x00000038, \
++	.dram_sdcke0	= 0x00003000, \
++	.dram_sdcke1	= 0x00003000, \
++	.dram_reset	= 0x00000038, \
++	.dram_sdba2	= 0x00000000, \
++	.dram_sdodt0	= 0x00000038, \
++	.dram_sdodt1	= 0x00000038,
++
++#define CM_FX6_GPR_IOMUX_CFG \
++	.grp_b0ds	= 0x00000038, \
++	.grp_b1ds	= 0x00000038, \
++	.grp_b2ds	= 0x00000038, \
++	.grp_b3ds	= 0x00000038, \
++	.grp_b4ds	= 0x00000038, \
++	.grp_b5ds	= 0x00000038, \
++	.grp_b6ds	= 0x00000038, \
++	.grp_b7ds	= 0x00000038, \
++	.grp_addds	= 0x00000038, \
++	.grp_ddrmode_ctl = 0x00020000, \
++	.grp_ddrpke	= 0x00000000, \
++	.grp_ddrmode	= 0x00020000, \
++	.grp_ctlds	= 0x00000038, \
++	.grp_ddr_type	= 0x000C0000,
++
++static struct mx6sdl_iomux_ddr_regs ddr_iomux_s = { CM_FX6_DDR_IOMUX_CFG };
++static struct mx6sdl_iomux_grp_regs grp_iomux_s = { CM_FX6_GPR_IOMUX_CFG };
++static struct mx6dq_iomux_ddr_regs ddr_iomux_q = { CM_FX6_DDR_IOMUX_CFG };
++static struct mx6dq_iomux_grp_regs grp_iomux_q = { CM_FX6_GPR_IOMUX_CFG };
++
++static struct mx6_mmdc_calibration cm_fx6_calib_s = {
++	.p0_mpwldectrl0	= 0x005B0061,
++	.p0_mpwldectrl1	= 0x004F0055,
++	.p0_mpdgctrl0	= 0x0314030C,
++	.p0_mpdgctrl1	= 0x025C0268,
++	.p0_mprddlctl	= 0x42464646,
++	.p0_mpwrdlctl	= 0x36322C34,
++};
++
++static struct mx6_ddr_sysinfo cm_fx6_sysinfo_s = {
++	.cs1_mirror	= 1,
++	.cs_density	= 16,
++	.bi_on		= 1,
++	.rtt_nom	= 1,
++	.rtt_wr		= 0,
++	.ralat		= 5,
++	.walat		= 1,
++	.mif3_mode	= 3,
++	.rst_to_cke	= 0x23,
++	.sde_to_rst	= 0x10,
++};
++
++static struct mx6_ddr3_cfg cm_fx6_ddr3_cfg_s = {
++	.mem_speed	= 800,
++	.density	= 4,
++	.rowaddr	= 14,
++	.coladdr	= 10,
++	.pagesz		= 2,
++	.trcd		= 1800,
++	.trcmin		= 5200,
++	.trasmin	= 3600,
++	.SRT		= 0,
++};
++
++static void spl_mx6s_dram_init(enum ddr_config dram_config, bool reset)
++{
++	if (reset)
++		((struct mmdc_p_regs *)MX6_MMDC_P0_MDCTL)->mdmisc = 2;
++
++	switch (dram_config) {
++	case DDR_16BIT_256MB:
++		cm_fx6_sysinfo_s.dsize = 0;
++		cm_fx6_sysinfo_s.ncs = 1;
++		break;
++	case DDR_32BIT_512MB:
++		cm_fx6_sysinfo_s.dsize = 1;
++		cm_fx6_sysinfo_s.ncs = 1;
++		break;
++	case DDR_32BIT_1GB:
++		cm_fx6_sysinfo_s.dsize = 1;
++		cm_fx6_sysinfo_s.ncs = 2;
++		break;
++	default:
++		puts("Tried to setup invalid DDR configuration\n");
++		hang();
++	}
++
++	mx6_dram_cfg(&cm_fx6_sysinfo_s, &cm_fx6_calib_s, &cm_fx6_ddr3_cfg_s);
++	udelay(100);
++}
++
++static struct mx6_mmdc_calibration cm_fx6_calib_q = {
++	.p0_mpwldectrl0	= 0x00630068,
++	.p0_mpwldectrl1	= 0x0068005D,
++	.p0_mpdgctrl0	= 0x04140428,
++	.p0_mpdgctrl1	= 0x037C037C,
++	.p0_mprddlctl	= 0x3C30303A,
++	.p0_mpwrdlctl	= 0x3A344038,
++	.p1_mpwldectrl0	= 0x0035004C,
++	.p1_mpwldectrl1	= 0x00170026,
++	.p1_mpdgctrl0	= 0x0374037C,
++	.p1_mpdgctrl1	= 0x0350032C,
++	.p1_mprddlctl	= 0x30322A3C,
++	.p1_mpwrdlctl	= 0x48304A3E,
++};
++
++static struct mx6_ddr_sysinfo cm_fx6_sysinfo_q = {
++	.cs_density	= 16,
++	.cs1_mirror	= 1,
++	.bi_on		= 1,
++	.rtt_nom	= 1,
++	.rtt_wr		= 0,
++	.ralat		= 5,
++	.walat		= 1,
++	.mif3_mode	= 3,
++	.rst_to_cke	= 0x23,
++	.sde_to_rst	= 0x10,
++	.refsel = 1,		/* Refresh cycles at 32KHz */
++	.refr = 7,		/* 8 refresh commands per refresh cycle */
++};
++
++static struct mx6_ddr3_cfg cm_fx6_ddr3_cfg_q = {
++	.mem_speed	= 1066,
++	.density	= 4,
++	.rowaddr	= 14,
++	.coladdr	= 10,
++	.pagesz		= 2,
++	.trcd		= 1324,
++	.trcmin		= 59500,
++	.trasmin	= 9750,
++	.SRT		= 0,
++};
++
++static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
++{
++	if (reset)
++		((struct mmdc_p_regs *)MX6_MMDC_P0_MDCTL)->mdmisc = 2;
++
++	cm_fx6_ddr3_cfg_q.rowaddr = 14;
++	switch (dram_config) {
++	case DDR_16BIT_256MB:
++		cm_fx6_sysinfo_q.dsize = 0;
++		cm_fx6_sysinfo_q.ncs = 1;
++		break;
++	case DDR_32BIT_512MB:
++		cm_fx6_sysinfo_q.dsize = 1;
++		cm_fx6_sysinfo_q.ncs = 1;
++		break;
++	case DDR_64BIT_1GB:
++		cm_fx6_sysinfo_q.dsize = 2;
++		cm_fx6_sysinfo_q.ncs = 1;
++		break;
++	case DDR_64BIT_2GB:
++		cm_fx6_sysinfo_q.dsize = 2;
++		cm_fx6_sysinfo_q.ncs = 2;
++		break;
++	case DDR_64BIT_4GB:
++		cm_fx6_sysinfo_q.dsize = 2;
++		cm_fx6_sysinfo_q.ncs = 2;
++		cm_fx6_ddr3_cfg_q.rowaddr = 15;
++		break;
++	default:
++		puts("Tried to setup invalid DDR configuration\n");
++		hang();
++	}
++
++	mx6_dram_cfg(&cm_fx6_sysinfo_q, &cm_fx6_calib_q, &cm_fx6_ddr3_cfg_q);
++	udelay(100);
++}
++
++static int cm_fx6_spl_dram_init(void)
++{
++	unsigned long bank1_size, bank2_size;
++
++	switch (get_cpu_type()) {
++#if defined(CONFIG_MX6SL)
++	case MXC_CPU_MX6SOLO:
++		mx6sdl_dram_iocfg(64, &ddr_iomux_s, &grp_iomux_s);
++
++		spl_mx6s_dram_init(DDR_32BIT_1GB, false);
++		bank1_size = get_ram_size((long int *)PHYS_SDRAM_1, 0x80000000);
++		bank2_size = get_ram_size((long int *)PHYS_SDRAM_2, 0x80000000);
++		if (bank1_size == 0x20000000) {
++			if (bank2_size == 0x20000000)
++				return 0;
++
++			spl_mx6s_dram_init(DDR_32BIT_512MB, true);
++			return 0;
++		}
++
++		spl_mx6s_dram_init(DDR_16BIT_256MB, true);
++		bank1_size = get_ram_size((long int *)PHYS_SDRAM_1, 0x80000000);
++		if (bank1_size == 0x10000000)
++			return 0;
++
++		break;
++#endif
++	case MXC_CPU_MX6D:
++	case MXC_CPU_MX6Q:
++	case MXC_CPU_MX6QP:
++		mx6dq_dram_iocfg(64, &ddr_iomux_q, &grp_iomux_q);
++
++		spl_mx6q_dram_init(DDR_64BIT_4GB, false);
++		bank1_size = get_ram_size((long int *)PHYS_SDRAM_1, 0x80000000);
++		if (bank1_size == 0x80000000)
++			return 0;
++
++		if (bank1_size == 0x40000000) {
++			bank2_size = get_ram_size((long int *)PHYS_SDRAM_2,
++								0x80000000);
++			if (bank2_size == 0x40000000) {
++				/* Don't do a full reset here */
++				spl_mx6q_dram_init(DDR_64BIT_2GB, false);
++			} else {
++				spl_mx6q_dram_init(DDR_64BIT_1GB, true);
++			}
++
++			return 0;
++		}
++
++		spl_mx6q_dram_init(DDR_32BIT_512MB, true);
++		bank1_size = get_ram_size((long int *)PHYS_SDRAM_1, 0x80000000);
++		if (bank1_size == 0x20000000)
++			return 0;
++
++		spl_mx6q_dram_init(DDR_16BIT_256MB, true);
++		bank1_size = get_ram_size((long int *)PHYS_SDRAM_1, 0x80000000);
++		if (bank1_size == 0x10000000)
++			return 0;
++
++		break;
++	}
++
++	return -1;
++}
++
++static iomux_v3_cfg_t const uart4_pads[] = {
++	IOMUX_PADS(PAD_KEY_COL0__UART4_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
++	IOMUX_PADS(PAD_KEY_ROW0__UART4_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
++};
++
++static void setup_uart(void)
++{
++	SETUP_IOMUX_PADS(uart4_pads);
++	enable_uart_clk(1);
++}
++
++#ifdef CONFIG_SPL_SPI_SUPPORT
++static void setup_ecspi(void)
++{
++	cm_fx6_set_ecspi_iomux();
++	enable_spi_clk(1, 0);
++}
++#else
++static void setup_ecspi(void) { }
++#endif
++
++static void ccgr_init(void)
++{
++	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++
++	writel(0x00C03F3F, &ccm->CCGR0);
++	writel(0x0030FC03, &ccm->CCGR1);
++	writel(0x0FFFC000, &ccm->CCGR2);
++	writel(0x3FF00000, &ccm->CCGR3);
++	writel(0xFFFFF300, &ccm->CCGR4);
++	writel(0x0F0000F3, &ccm->CCGR5);
++	writel(0x00000FFF, &ccm->CCGR6);
++}
++
++void board_init_f(ulong dummy)
++{
++	arch_cpu_init();
++
++	ccgr_init();
++
++	gpr_init();
++
++	timer_init();
++
++	setup_uart();
++
++	preloader_console_init();
++
++	setup_ecspi();
++
++	gpio_direction_output(CM_FX6_GREEN_LED, 1);
++	if (cm_fx6_spl_dram_init()) {
++		puts("!!!ERROR!!! DRAM detection failed!!!\n");
++		hang();
++	}
++
++	memset(__bss_start, 0, __bss_end - __bss_start);
++	board_init_r(NULL, 0);
++}
++
++void board_boot_order(u32 *spl_boot_list)
++{
++	spl_boot_list[0] = spl_boot_device();
++	switch (spl_boot_list[0]) {
++	case BOOT_DEVICE_SPI:
++		spl_boot_list[1] = BOOT_DEVICE_MMC1;
++		break;
++	case BOOT_DEVICE_MMC1:
++		spl_boot_list[1] = BOOT_DEVICE_SPI;
++		break;
++	}
++}
++
++#ifdef CONFIG_SPL_MMC_SUPPORT
++static struct fsl_esdhc_cfg usdhc_cfg = {
++	.esdhc_base = USDHC3_BASE_ADDR,
++	.max_bus_width = 4,
++};
++
++int board_mmc_init(bd_t *bis)
++{
++	cm_fx6_set_usdhc_iomux();
++
++	usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
++
++	return fsl_esdhc_initialize(bis, &usdhc_cfg);
++}
++#endif
++
++int board_fit_config_name_match(const char *name)
++{
++	return 0;
++}
+diff --git a/configs/cl-som-imx6_defconfig b/configs/cl-som-imx6_defconfig
+new file mode 100644
+index 0000000000..62ded98ada
+--- /dev/null
++++ b/configs/cl-som-imx6_defconfig
+@@ -0,0 +1,117 @@
++CONFIG_ARM=y
++CONFIG_ARCH_MX6=y
++CONFIG_SYS_TEXT_BASE=0x17800000
++CONFIG_SPL_GPIO_SUPPORT=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++# CONFIG_LDO_BYPASS_CHECK is not set
++CONFIG_TARGET_CL_SOM_IMX6=y
++CONFIG_ENV_SIZE=0x2000
++CONFIG_ENV_SECT_SIZE=0x10000
++CONFIG_ENV_OFFSET=0xC0000
++CONFIG_SPL_MMC_SUPPORT=y
++CONFIG_SPL_SERIAL_SUPPORT=y
++CONFIG_NR_DRAM_BANKS=2
++CONFIG_SPL=y
++CONFIG_SPL_SPI_FLASH_SUPPORT=y
++CONFIG_SPL_SPI_SUPPORT=y
++# CONFIG_CMD_BMODE is not set
++CONFIG_SMBIOS_PRODUCT_NAME=""
++CONFIG_AHCI=y
++CONFIG_SPL_TEXT_BASE=0x00908000
++CONFIG_DISTRO_DEFAULTS=y
++CONFIG_FIT=y
++CONFIG_SPL_FIT_PRINT=y
++CONFIG_SPL_LOAD_FIT=y
++CONFIG_OF_BOARD_SETUP=y
++CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=arch/arm/mach-imx/spl_sd.cfg"
++CONFIG_BOOTDELAY=3
++CONFIG_BOOTCOMMAND="run findfdt; run distro_bootcmd; run legacy_bootcmd"
++CONFIG_USE_PREBOOT=y
++CONFIG_MISC_INIT_R=y
++CONFIG_BOUNCE_BUFFER=y
++CONFIG_SPL_SEPARATE_BSS=y
++CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x80
++CONFIG_SPL_FIT_IMAGE_TINY=y
++CONFIG_SPL_I2C_SUPPORT=y
++CONFIG_SPL_SPI_LOAD=y
++CONFIG_SYS_SPI_U_BOOT_OFFS=0x10000
++CONFIG_SPL_WATCHDOG_SUPPORT=y
++CONFIG_SYS_PROMPT="CL-SOM-iMX6 > "
++# CONFIG_CMD_XIMG is not set
++CONFIG_CMD_SPL=y
++CONFIG_CMD_SPL_WRITE_SIZE=0x20000
++CONFIG_CMD_GREPENV=y
++CONFIG_CMD_EEPROM=y
++CONFIG_CMD_EEPROM_LAYOUT=y
++CONFIG_EEPROM_LAYOUT_HELP_STRING="v2, v3"
++CONFIG_CMD_MEMINFO=y
++# CONFIG_CMD_FLASH is not set
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_I2C=y
++# CONFIG_CMD_LOADB is not set
++# CONFIG_CMD_LOADS is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_SATA=y
++CONFIG_CMD_USB=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EXT4_WRITE=y
++CONFIG_CMD_MTDPARTS=y
++CONFIG_MTDIDS_DEFAULT="nor0=spi0.0"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=spi0.0:768k(uboot),256k(uboot-environment),-(reserved)"
++CONFIG_OF_CONTROL=y
++CONFIG_DEFAULT_DEVICE_TREE="imx6qp-cl-som-imx6"
++CONFIG_ENV_IS_IN_SPI_FLASH=y
++CONFIG_SYS_RELOC_GD_ENV_ADDR=y
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++# CONFIG_DM_DEVICE_REMOVE is not set
++CONFIG_DWC_AHSATA=y
++# CONFIG_DWC_AHSATA_AHCI is not set
++CONFIG_APBH_DMA=y
++CONFIG_APBH_DMA_BURST=y
++CONFIG_APBH_DMA_BURST8=y
++CONFIG_DM_I2C=y
++CONFIG_DM_KEYBOARD=y
++CONFIG_DM_MMC=y
++CONFIG_FSL_USDHC=y
++CONFIG_MTD=y
++CONFIG_MTD_RAW_NAND=y
++CONFIG_DM_SPI_FLASH=y
++CONFIG_SF_DEFAULT_MODE=0
++CONFIG_SF_DEFAULT_SPEED=25000000
++CONFIG_SPI_FLASH_ATMEL=y
++CONFIG_SPI_FLASH_EON=y
++CONFIG_SPI_FLASH_GIGADEVICE=y
++CONFIG_SPI_FLASH_MACRONIX=y
++CONFIG_SPI_FLASH_SPANSION=y
++CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_SPI_FLASH_SST=y
++CONFIG_SPI_FLASH_WINBOND=y
++CONFIG_SPI_FLASH_MTD=y
++CONFIG_PHYLIB=y
++CONFIG_DM_ETH=y
++CONFIG_FEC_MXC=y
++CONFIG_RGMII=y
++CONFIG_MII=y
++CONFIG_PINCTRL=y
++CONFIG_PINCTRL_IMX6=y
++CONFIG_DM_PMIC=y
++CONFIG_DM_REGULATOR=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_MXC_SPI=y
++CONFIG_USB=y
++CONFIG_DM_USB=y
++CONFIG_USB_KEYBOARD=y
++CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE=y
++CONFIG_USB_HOST_ETHER=y
++CONFIG_USB_ETHER_ASIX=y
++CONFIG_USB_ETHER_ASIX88179=y
++CONFIG_DM_VIDEO=y
++# CONFIG_VIDEO_BPP8 is not set
++# CONFIG_VIDEO_BPP32 is not set
++CONFIG_SYS_WHITE_ON_BLACK=y
++CONFIG_VIDEO_IPUV3=y
++CONFIG_FDT_FIXUP_PARTITIONS=y
++CONFIG_SMBIOS_MANUFACTURER=""
+diff --git a/include/configs/cl-som-imx6.h b/include/configs/cl-som-imx6.h
+new file mode 100644
+index 0000000000..def498ea39
+--- /dev/null
++++ b/include/configs/cl-som-imx6.h
+@@ -0,0 +1,232 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Config file for Compulab CM-FX6 board
++ *
++ * Copyright (C) 2014, Compulab Ltd - http://compulab.co.il/
++ *
++ * Author: Nikita Kiryanov <nikita@compulab.co.il>
++ */
++
++#ifndef __CONFIG_CL_SOM_IMX6_H
++#define __CONFIG_CL_SOM_IMX6_H
++
++#include "mx6_common.h"
++
++/* Machine config */
++#define CONFIG_SYS_LITTLE_ENDIAN
++#define CONFIG_MACH_TYPE		4273
++
++/* MMC */
++#define CONFIG_SYS_FSL_USDHC_NUM	3
++#define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
++
++/* RAM */
++#define PHYS_SDRAM_1			MMDC0_ARB_BASE_ADDR
++#define PHYS_SDRAM_2			MMDC1_ARB_BASE_ADDR
++#define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
++#define CONFIG_SYS_MEMTEST_START	0x10000000
++#define CONFIG_SYS_MEMTEST_END		0x10010000
++#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
++#define CONFIG_SYS_INIT_RAM_SIZE	IRAM_SIZE
++#define CONFIG_SYS_INIT_SP_OFFSET \
++	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
++#define CONFIG_SYS_INIT_SP_ADDR \
++	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
++
++/* Serial console */
++#define CONFIG_MXC_UART
++#define CONFIG_MXC_UART_BASE		UART4_BASE
++#define CONFIG_SYS_BAUDRATE_TABLE	{9600, 19200, 38400, 57600, 115200}
++
++/* Dsiable IMX_SEC_INIT */
++#ifdef CONFIG_IMX_SEC_INIT
++#undef CONFIG_IMX_SEC_INIT
++#endif
++
++/* Environment */
++
++#ifndef CONFIG_SPL_BUILD
++#define CONFIG_EXTRA_ENV_SETTINGS \
++	"fdt_high=0xffffffff\0" \
++	"initrd_high=0xffffffff\0" \
++	"fdt_addr_r=0x18000000\0" \
++	"ramdisk_addr_r=0x13000000\0" \
++	"kernel_addr_r=" __stringify(CONFIG_LOADADDR) "\0" \
++	"pxefile_addr_r=" __stringify(CONFIG_LOADADDR) "\0" \
++	"scriptaddr=" __stringify(CONFIG_LOADADDR) "\0" \
++	"fdtfile=undefined\0" \
++	"stdin=serial,usbkbd\0" \
++	"stdout=serial,vga\0" \
++	"stderr=serial,vga\0" \
++	"panel=HDMI\0" \
++	"autoload=no\0" \
++	"splashimage=0x28000000\0" \
++	"uImage=uImage\0" \
++	"zImage=zImage\0" \
++	"kernel=zImage\0" \
++	"dtb=imx6qp-cl-som-imx6.dtb\0" \
++	"console=ttymxc3,115200\0" \
++	"ethprime=FEC0\0" \
++	"video_hdmi=mxcfb0:dev=hdmi,1920x1080M-32@50,if=RGB32\0" \
++	"video_dvi=mxcfb0:dev=dvi,1280x800M-32@50,if=RGB32\0" \
++	"doboot=bootm ${kernel_addr_r}\0" \
++	"doloadfdt=false\0" \
++	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
++	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
++	"setboottypez=setenv kernel ${zImage};" \
++		"setenv doboot bootz ${kernel_addr_r} - ${fdt_addr_r};" \
++		"setenv doloadfdt true;\0" \
++	"setboottypem=setenv kernel ${uImage};" \
++		"setenv doboot bootm ${kernel_addr_r};" \
++		"setenv doloadfdt false;\0"\
++	"mmcroot=/dev/mmcblk0p2 rw rootwait\0" \
++	"sataroot=/dev/sda2 rw rootwait\0" \
++	"nandroot=/dev/mtdblock4 rw\0" \
++	"nandrootfstype=ubifs\0" \
++	"mmcargs=setenv bootargs console=${console} root=${mmcroot} " \
++		"${video} ${extrabootargs}\0" \
++	"sataargs=setenv bootargs console=${console} root=${sataroot} " \
++		"${video} ${extrabootargs}\0" \
++	"nandargs=setenv bootargs console=${console} " \
++		"root=${nandroot} " \
++		"rootfstype=${nandrootfstype} " \
++		"${video} ${extrabootargs}\0" \
++	"nandboot=if run nandloadkernel; then " \
++			"run nandloadfdt;" \
++			"run setboottypem;" \
++			"run storagebootcmd;" \
++			"run setboottypez;" \
++			"run storagebootcmd;" \
++		"fi;\0" \
++	"run_eboot=echo Starting EBOOT ...; "\
++		"mmc dev 2 && " \
++		"mmc rescan && mmc read 10042000 a 400 && go 10042000\0" \
++	"loadkernel=load ${storagetype} ${storagedev} ${kernel_addr_r} ${kernel};\0"\
++	"loadfdt=load ${storagetype} ${storagedev} ${fdt_addr_r} ${dtb};\0" \
++	"nandloadkernel=nand read ${kernel_addr_r} 0 780000;\0" \
++	"nandloadfdt=nand read ${fdt_addr_r} 780000 80000;\0" \
++	"setupmmcboot=setenv storagetype mmc; setenv storagedev 2;\0" \
++	"setupsataboot=setenv storagetype sata; setenv storagedev 0;\0" \
++	"setupnandboot=setenv storagetype nand;\0" \
++	"storagebootcmd=echo Booting from ${storagetype} ...;" \
++			"run ${storagetype}args; run doboot;\0" \
++	"trybootk=if run loadkernel; then " \
++		"if ${doloadfdt}; then " \
++			"run loadfdt;" \
++		"fi;" \
++		"run storagebootcmd;" \
++		"fi;\0" \
++	"trybootsmz=" \
++		"run setboottypem;" \
++		"run trybootk;" \
++		"run setboottypez;" \
++		"run trybootk;\0" \
++	"legacy_bootcmd=" \
++		"run setupmmcboot;" \
++		"mmc dev ${storagedev};" \
++		"if mmc rescan; then " \
++			"run trybootsmz;" \
++		"fi;" \
++		"run setupsataboot;" \
++		"if sata init; then " \
++			"run trybootsmz;" \
++		"fi;" \
++		"run setupnandboot;" \
++		"run nandboot;\0" \
++	"findfdt="\
++		"if test $board_name = Utilite && test $board_rev = MX6Q ; then " \
++			"setenv fdtfile imx6q-utilite-pro.dtb; fi; " \
++		"if test $fdtfile = undefined; then " \
++			"echo WARNING: Could not determine dtb to use; fi; \0" \
++	BOOTENV
++
++#define BOOT_TARGET_DEVICES(func) \
++	func(USB, usb, 0) \
++	func(MMC, mmc, 2) \
++	func(SATA, sata, 0)
++
++#include <config_distro_bootcmd.h>
++#else
++#define CONFIG_EXTRA_ENV_SETTINGS
++#endif
++
++/* NAND */
++#ifndef CONFIG_SPL_BUILD
++#define CONFIG_SYS_NAND_BASE		0x40000000
++#define CONFIG_SYS_NAND_MAX_CHIPS	1
++#define CONFIG_SYS_MAX_NAND_DEVICE	1
++#define CONFIG_SYS_NAND_ONFI_DETECTION
++/* APBH DMA is required for NAND support */
++#endif
++
++/* SPI Flash Configs */
++#if defined(CONFIG_SPL_BUILD)
++#undef CONFIG_DM_SPI
++#undef CONFIG_DM_SPI_FLASH
++#undef CONFIG_SPI_FLASH_MTD
++#endif
++
++/* Ethernet */
++#define CONFIG_FEC_MXC_PHYADDR		0
++#define CONFIG_FEC_XCV_TYPE		RGMII
++#define IMX_FEC_BASE			ENET_BASE_ADDR
++#define CONFIG_PHY_ATHEROS
++#define CONFIG_ETHPRIME			"FEC0"
++#define CONFIG_ARP_TIMEOUT		200UL
++#define CONFIG_NET_RETRY_COUNT		5
++
++/* USB */
++#define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
++#define CONFIG_MXC_USB_FLAGS		0
++#define CONFIG_USB_MAX_CONTROLLER_COUNT	2
++#define CONFIG_EHCI_HCD_INIT_AFTER_RESET	/* For OTG port */
++
++/* I2C */
++#define CONFIG_SYS_I2C_MXC
++#define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */
++#define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
++#define CONFIG_SYS_I2C_MXC_I2C3		/* enable I2C bus 3 */
++#define CONFIG_SYS_I2C_SPEED		100000
++#define CONFIG_SYS_MXC_I2C3_SPEED	400000
++
++#define CONFIG_SYS_I2C_EEPROM_ADDR	0x50
++#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	1
++#define CONFIG_SYS_I2C_EEPROM_BUS	2
++
++/* SATA */
++#define CONFIG_SYS_SATA_MAX_DEVICE	1
++#define CONFIG_LBA48
++#define CONFIG_DWC_AHSATA_PORT_ID	0
++#define CONFIG_DWC_AHSATA_BASE_ADDR	SATA_ARB_BASE_ADDR
++
++/* Boot */
++#define CONFIG_SYS_BOOTMAPSZ	        (8 << 20)
++#define CONFIG_SERIAL_TAG
++
++/* misc */
++#define CONFIG_SYS_MALLOC_LEN			(10 * 1024 * 1024)
++
++/* SPL */
++#include "imx6_spl.h"
++
++/* Display */
++#define CONFIG_IMX_HDMI
++#define CONFIG_IMX_VIDEO_SKIP
++
++#define CONFIG_SPLASH_SCREEN
++#define CONFIG_SPLASH_SOURCE
++#define CONFIG_CMD_BMP
++
++#define CONFIG_VIDEO_LOGO
++#define CONFIG_VIDEO_BMP_LOGO
++
++/* EEPROM */
++#define CONFIG_ENV_EEPROM_IS_ON_I2C
++#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN		1
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS	4
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	5
++#define CONFIG_SYS_EEPROM_SIZE			256
++
++#define CONFIG_BOARD_NAME       "CL-SOM-iMX6"
++
++#endif	/* __CONFIG_CL_SOM_IMX6_H */
+-- 
+2.11.0
+

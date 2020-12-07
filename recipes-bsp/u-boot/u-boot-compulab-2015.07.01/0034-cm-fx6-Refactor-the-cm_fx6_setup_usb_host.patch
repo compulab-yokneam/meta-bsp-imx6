@@ -1,0 +1,57 @@
+From 47f85950b6949b1d2fc1f567a37b1a48e10e3ec5 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 3 Dec 2020 12:39:44 +0200
+Subject: [PATCH] cm-fx6: Refactor the cm_fx6_setup_usb_host()
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 7 ++++++-
+ board/compulab/cm_fx6/common.h | 3 +--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 2b06a0578f..26d2a6398b 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -383,12 +383,17 @@ static int cm_fx6_setup_usb_host(void)
+ {
+ 	int err;
+ 
++	SETUP_IOMUX_PAD(PAD_SD3_RST__GPIO7_IO08 | MUX_PAD_CTRL(NO_PAD_CTRL));
+ 	err = gpio_request(CM_FX6_USB_HUB_RST, "usb hub rst");
+ 	if (err)
+ 		return err;
+ 
+ 	SETUP_IOMUX_PAD(PAD_GPIO_0__USB_H1_PWR | MUX_PAD_CTRL(NO_PAD_CTRL));
+-	SETUP_IOMUX_PAD(PAD_SD3_RST__GPIO7_IO08 | MUX_PAD_CTRL(NO_PAD_CTRL));
++	err = gpio_request(CM_FX6_USB_HB1_PWR, "usb h1 pwr");
++	if (err)
++		return err;
++
++	gpio_direction_output(CM_FX6_USB_HB1_PWR, 1);
+ 
+ 	return 0;
+ }
+diff --git a/board/compulab/cm_fx6/common.h b/board/compulab/cm_fx6/common.h
+index 9e30bfc821..97b193575d 100644
+--- a/board/compulab/cm_fx6/common.h
++++ b/board/compulab/cm_fx6/common.h
+@@ -16,14 +16,13 @@
+ #define CM_FX6_ECSPI_BUS0_CS0	IMX_GPIO_NR(2, 30)
+ #define CM_FX6_GREEN_LED	IMX_GPIO_NR(2, 31)
+ #define CM_FX6_USB_HUB_RST	IMX_GPIO_NR(7, 8)
++#define CM_FX6_USB_HB1_PWR	IMX_GPIO_NR(1, 0)
+ #define SB_FX6_USB_OTG_PWR	IMX_GPIO_NR(3, 22)
+ #ifdef CL_SOM_IMX6
+ #define PHY_ENET_NRST	IMX_GPIO_NR(2, 19)
+ #else
+ #define PHY_ENET_NRST	IMX_GPIO_NR(2, 8)
+ #endif
+-#define CM_FX6_USB_HUB_RST	IMX_GPIO_NR(7, 8)
+-#define SB_FX6_USB_OTG_PWR	IMX_GPIO_NR(3, 22)
+ #define CM_FX6_SATA_PWREN	IMX_GPIO_NR(1, 28)
+ #define CM_FX6_SATA_VDDC_CTRL	IMX_GPIO_NR(1, 30)
+ #define CM_FX6_SATA_LDO_EN	IMX_GPIO_NR(2, 16)
+-- 
+2.11.0
+

@@ -1,0 +1,25 @@
+From f1830f72072d8451ed6d04fe56230727d4190d94 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 7 Dec 2020 07:27:13 +0200
+Subject: [PATCH] cl-som-imx6: defconfig: Enable CONFIG_CMD_MEMTEST
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ configs/cl-som-imx6_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/cl-som-imx6_defconfig b/configs/cl-som-imx6_defconfig
+index 14ce1c0bac..19a121a5aa 100644
+--- a/configs/cl-som-imx6_defconfig
++++ b/configs/cl-som-imx6_defconfig
+@@ -47,6 +47,7 @@ CONFIG_CMD_EEPROM=y
+ CONFIG_CMD_EEPROM_LAYOUT=y
+ CONFIG_EEPROM_LAYOUT_HELP_STRING="v2, v3"
+ CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_MEMTEST=y
+ # CONFIG_CMD_FLASH is not set
+ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_I2C=y
+-- 
+2.11.0
+

@@ -1,0 +1,63 @@
+From 08ad07f316504d5d7cf53ac78015de0b5228c2f0 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sat, 5 Dec 2020 22:17:17 +0200
+Subject: [PATCH] compulab: cl-som-imx6: Add spl_mx6qp_noc_init()
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cl-som-imx6/spl.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/board/compulab/cl-som-imx6/spl.c b/board/compulab/cl-som-imx6/spl.c
+index bad3596bf8..6195b9ce18 100644
+--- a/board/compulab/cl-som-imx6/spl.c
++++ b/board/compulab/cl-som-imx6/spl.c
+@@ -183,6 +183,34 @@ int mmdc_do_dqs_calibration(struct mx6_ddr_sysinfo const *sysinfo);
+ void mmdc_read_calibration(struct mx6_ddr_sysinfo const *sysinfo,
+                            struct mx6_mmdc_calibration *calib);
+ 
++#define MX6DQP_NOC_SCHED_BASE	0x00bb0000
++struct mx6dqp_noc_sched_regs {
++	u32 coreid;
++	u32 revid;
++	u32 ddrconf;
++	u32 ddrtiming;
++	u32 ddrmode;
++	u32 rlat;
++	u32 res1[4];
++	u32 ipu1;
++	u32 ipu2;
++	u32 res2[2];
++	u32 activate;
++	u32 res3[16];
++};
++
++static void spl_mx6qp_noc_init(void) {
++	/* NoC DDR configuration register set 0x00BB0000 0x00BB003F */
++	volatile struct mx6dqp_noc_sched_regs *noc_sched;
++	noc_sched = (struct mx6dqp_noc_sched_regs *)MX6DQP_NOC_SCHED_BASE;
++	noc_sched->ddrconf = 0x00000000;
++	noc_sched->ddrtiming = 0x2891E41A;
++	noc_sched->activate = 0x00000564;
++	noc_sched->rlat = 0x00000040;
++	noc_sched->ipu1 = 0x00000020;
++	noc_sched->ipu2 = 0x00000020;
++}
++
+ static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
+ {
+ 	int errs;
+@@ -228,6 +256,10 @@ static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
+ 	calibration.p0_mpwrdlctl = 0x40404040;
+ 	calibration.p1_mpwrdlctl = 0x40404040;
+ 
++
++	if (get_cpu_type() == MXC_CPU_MX6QP)
++		spl_mx6qp_noc_init();
++
+ 	mx6_dram_cfg(&cl_som_imx6_sysinfo_q, &calibration, &cl_som_imx6_ddr3_cfg_q);
+ 
+ 	errs = mmdc_do_write_level_calibration(&cl_som_imx6_sysinfo_q);
+-- 
+2.11.0
+

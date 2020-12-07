@@ -1,0 +1,31 @@
+From 8d1a87745ed0d31d5c75a6532afce58d96ab9593 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 1 Dec 2020 16:51:02 +0200
+Subject: [PATCH] cm_fx6: Enable USB NetWork
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ include/configs/cm_fx6.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/configs/cm_fx6.h b/include/configs/cm_fx6.h
+index 64741608da..151bd1a722 100644
+--- a/include/configs/cm_fx6.h
++++ b/include/configs/cm_fx6.h
+@@ -225,6 +225,13 @@
+ #define CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE
+ #define CONFIG_SYS_STDIO_DEREGISTER
+ 
++/* USB Networking options */
++#define CONFIG_USB_HOST_ETHER
++#define CONFIG_USB_ETHER_SMSC95XX
++#define CONFIG_USB_ETHER_RNDIS
++#define CONFIG_USB_ETHER_ASIX
++#define CONFIG_USB_ETHER_MCS7830
++
+ /* I2C */
+ #define CONFIG_CMD_I2C
+ #define CONFIG_SYS_I2C
+-- 
+2.11.0
+

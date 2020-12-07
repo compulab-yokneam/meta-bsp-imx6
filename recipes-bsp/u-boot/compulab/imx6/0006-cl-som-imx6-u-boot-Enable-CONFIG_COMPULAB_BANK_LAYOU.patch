@@ -1,0 +1,25 @@
+From f11854ef71f601db03a40477460b2749b35160d3 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 7 Dec 2020 07:24:22 +0200
+Subject: [PATCH] cl-som-imx6: u-boot: Enable CONFIG_COMPULAB_BANK_LAYOUT
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cl-som-imx6/cl-som-imx6.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/board/compulab/cl-som-imx6/cl-som-imx6.c b/board/compulab/cl-som-imx6/cl-som-imx6.c
+index e399b8f6bf..f3b5c2d264 100644
+--- a/board/compulab/cl-som-imx6/cl-som-imx6.c
++++ b/board/compulab/cl-som-imx6/cl-som-imx6.c
+@@ -857,6 +857,7 @@ int misc_init_r(void)
+ 	return 0;
+ }
+ 
++#define CONFIG_COMPULAB_BANK_LAYOUT
+ #ifdef CONFIG_COMPULAB_BANK_LAYOUT
+ int dram_init_banksize(void)
+ {
+-- 
+2.11.0
+
