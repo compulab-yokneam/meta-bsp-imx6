@@ -1,0 +1,56 @@
+From 1a480f6828a3569984207db0ba18e500a84c10a5 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sun, 6 Dec 2020 16:46:48 +0200
+Subject: [PATCH] cl-som-imx8: dts: Fix cma location
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+index 057c1f16ecc2..406787e81889 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+@@ -12,13 +12,27 @@
+  */
+ #include <dt-bindings/sound/fsl-imx-audmux.h>
+ 
+-#define MX6QDL_GPR1	0x04 0x04 0x000 0x0 0x0
+-
+ / {
+-	memory: memory {
++	memory: memory@10000000 {
++		device_type = "memory";
+ 		reg = <0x10000000 0x20000000>;
+ 	};
+ 
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		/* global autoconfigured region for contiguous allocations */
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			alloc-ranges = <0x10000000 0x10000000>;
++			size = <0x14000000>;
++			linux,cma-default;
++		};
++	};
++
+ 	leds {
+ 		compatible = "gpio-leds";
+ 		heartbeat-led {
+@@ -245,7 +259,6 @@
+ 	hog {
+ 		pinctrl_hog: hoggrp {
+ 			fsl,pins = <
+-				MX6QDL_GPR1 0x48400005
+ 				/* SATA PWR */
+ 				MX6QDL_PAD_ENET_TX_EN__GPIO1_IO28 0x80000000
+ 				MX6QDL_PAD_EIM_A22__GPIO2_IO16 0x80000000
+-- 
+2.11.0
+

@@ -1,0 +1,366 @@
+From 7fccbce87de0c9b641fadb6f7714b19120ca1c22 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sun, 6 Dec 2020 16:39:34 +0200
+Subject: [PATCH] cl-som-imx6: dts: Remove imx6qdl-sb-fx6x.dtsi
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts     |   1 -
+ arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi    | 152 +++++++++++++++++-----
+ arch/arm/boot/dts/compulab/imx6qdl-sb-fx6x.dtsi   | 116 -----------------
+ arch/arm/boot/dts/compulab/imx6qp-cl-som-imx6.dts |   1 -
+ arch/arm/boot/dts/compulab/imx6qp-sbc-imx6.dts    |   2 -
+ 5 files changed, 122 insertions(+), 150 deletions(-)
+ delete mode 100644 arch/arm/boot/dts/compulab/imx6qdl-sb-fx6x.dtsi
+
+diff --git a/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts b/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts
+index 94de81ae14f0..ea6d9c17f800 100644
+--- a/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts
++++ b/arch/arm/boot/dts/compulab/imx6q-sbc-imx6.dts
+@@ -14,7 +14,6 @@
+ /dts-v1/;
+ #include "../imx6q.dtsi"
+ #include "imx6q-cm-fx6.dtsi"
+-#include "imx6qdl-sb-fx6x.dtsi"
+ #include "imx6qdl-sb-fx6.dtsi"
+ 
+ / {
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi
+index 9bb1bb3a7cfc..0668b3062e53 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6.dtsi
+@@ -16,6 +16,59 @@
+ 
+ / {
+ 
++	regulators {
++		compatible = "simple-bus";
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		/* regulator for mmc */
++		reg_3p3v: 3p3v {
++			compatible = "regulator-fixed";
++			regulator-name = "3P3V";
++			regulator-min-microvolt = <3300000>;
++			regulator-max-microvolt = <3300000>;
++			regulator-always-on;
++		};
++
++		reg_mipi_dsi_pwr_on_mode: mipi_dsi_pwr_on_mode {
++			compatible = "regulator-fixed";
++			regulator-name = "mipi_dsi_pwr_on_mode";
++			gpio = <&pca9555 12 0>;
++			enable-active-high;
++		};
++
++		mipi_dsi_reset: mipi-dsi-reset {
++			compatible = "gpio-reset";
++			reset-gpios = <&pca9555 11 GPIO_ACTIVE_LOW>;
++			reset-delay-us = <100>;
++			gpio-can-sleep;
++			#reset-cells = <0>;
++		};
++
++		vgen2_reg: vgen2 {
++			regulator-min-microvolt = <800000>;
++			regulator-max-microvolt = <1550000>;
++		};
++
++		vgen3_reg: vgen3 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <3300000>;
++		};
++
++		vgen4_reg: vgen4 {
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <3300000>;
++			regulator-always-on;
++		};
++
++		pcie_power_on_gpio: regulator-pcie-power-on-gpio {
++			compatible = "regulator-fixed";
++			regulator-name = "regulator-pcie-power-on-gpio";
++			gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
++			enable-active-low;
++		};
++	};
++
+ 	i2cmux {
+ 		compatible = "i2c-mux-gpio";
+ 		#address-cells = <1>;
+@@ -93,42 +146,71 @@
+ 
+ 	};
+ 
+-	reg_mipi_dsi_pwr_on_mode: mipi_dsi_pwr_on_mode {
+-		compatible = "regulator-fixed";
+-		regulator-name = "mipi_dsi_pwr_on_mode";
+-		gpio = <&pca9555 12 0>;
+-		enable-active-high;
++	eth@pcie {
++		compatible = "intel,i211";
++		local-mac-address = [FF FF FF FF FF FF];
++		status = "okay";
+ 	};
++};
+ 
+-	mipi_dsi_reset: mipi-dsi-reset {
+-		compatible = "gpio-reset";
+-		reset-gpios = <&pca9555 11 GPIO_ACTIVE_LOW>;
+-		reset-delay-us = <100>;
+-		gpio-can-sleep;
+-		#reset-cells = <0>;
+-	};
++&iomuxc {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_dvi0>;
++
++	imx6q-sb-fx6x {
++		/* pins for i2c1 */
++		pinctrl_i2c1: i2c1grp {
++			fsl,pins = <
++				MX6QDL_PAD_EIM_D21__I2C1_SCL 0x4001b8b1
++				MX6QDL_PAD_EIM_D28__I2C1_SDA 0x4001b8b1
++			>;
++		};
+ 
+-	vgen2_reg: vgen2 {
+-		regulator-min-microvolt = <800000>;
+-		regulator-max-microvolt = <1550000>;
+-	};
++		/* pins for mmc */
++		pinctrl_usdhc3: usdhc3grp {
++			fsl,pins = <
++				MX6QDL_PAD_SD3_CMD__SD3_CMD    0x17059
++				MX6QDL_PAD_SD3_CLK__SD3_CLK    0x10059
++				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x17059
++				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x17059
++				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x17059
++				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x17059
++				MX6QDL_PAD_SD3_DAT4__GPIO7_IO01 0x80000000
++				MX6QDL_PAD_SD3_DAT5__GPIO7_IO00 0x80000000
++			>;
++		};
+ 
+-	vgen3_reg: vgen3 {
+-		regulator-min-microvolt = <1800000>;
+-		regulator-max-microvolt = <3300000>;
+-	};
++		pinctrl_usdhc3_100mhz: usdhc3grp-100mhz { /* 100Mhz */
++			fsl,pins = <
++				MX6QDL_PAD_SD3_CMD__SD3_CMD 0x170B9
++				MX6QDL_PAD_SD3_CLK__SD3_CLK 0x100B9
++				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x170B9
++				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x170B9
++				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x170B9
++				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x170B9
++			>;
++		};
+ 
+-	vgen4_reg: vgen4 {
+-		regulator-min-microvolt = <1800000>;
+-		regulator-max-microvolt = <3300000>;
+-		regulator-always-on;
+-	};
++		pinctrl_usdhc3_200mhz: usdhc3grp-200mhz { /* 200Mhz */
++			fsl,pins = <
++				MX6QDL_PAD_SD3_CMD__SD3_CMD 0x170F9
++				MX6QDL_PAD_SD3_CLK__SD3_CLK 0x100F9
++				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x170F9
++				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x170F9
++				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x170F9
++				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x170F9
++			>;
++		};
+ 
+-	pcie_power_on_gpio: regulator-pcie-power-on-gpio {
+-		compatible = "regulator-fixed";
+-		regulator-name = "regulator-pcie-power-on-gpio";
+-		gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
+-		enable-active-low;
++		/* pins for dvi/ts */
++		pinctrl_dvi0: dvi0grp {
++			fsl,pins = <
++				/* DVI_DDC_SEL */
++				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x80000000
++				/* SB-FX6 Himax TS PENDOWN or SB-FX6m DVI HPD */
++				MX6QDL_PAD_GPIO_4__GPIO1_IO04 0x80000000
++			>;
++		};
+ 	};
+ };
+ 
+@@ -138,10 +220,20 @@
+ };
+ 
+ &i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c1>;
+ 	status = "okay";
+ };
+ 
+ &usdhc3 {
++	pinctrl-names = "default", "state_100mhz", "state_200mhz";
++	pinctrl-0 = <&pinctrl_usdhc3>;
++	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
++	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
++	bus-width = <4>;
++	no-1-8-v;
++	keep-power-in-suspend;
++	vmmc-supply = <&reg_3p3v>;
+ 	wp-gpios = <&gpio7 0 GPIO_ACTIVE_HIGH>;
+ 	cd-gpios = <&gpio7 1 GPIO_ACTIVE_LOW>;
+ 	status = "okay";
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6x.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6x.dtsi
+deleted file mode 100644
+index 565299703d20..000000000000
+--- a/arch/arm/boot/dts/compulab/imx6qdl-sb-fx6x.dtsi
++++ /dev/null
+@@ -1,116 +0,0 @@
+-/*
+- * Copyright 2014 CompuLab Ltd.
+- *
+- * Author: Valentin Raevsky <valentin@compulab.co.il>
+- *
+- * The code contained herein is licensed under the GNU General Public
+- * License. You may obtain a copy of the GNU General Public License
+- * Version 2 or later at the following locations:
+- *
+- * http://www.opensource.org/licenses/gpl-license.html
+- * http://www.gnu.org/copyleft/gpl.html
+- */
+-
+-/ {
+-	regulators {
+-		compatible = "simple-bus";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		/* regulator for mmc */
+-		reg_3p3v: 3p3v {
+-			compatible = "regulator-fixed";
+-			regulator-name = "3P3V";
+-			regulator-min-microvolt = <3300000>;
+-			regulator-max-microvolt = <3300000>;
+-			regulator-always-on;
+-		};
+-	};
+-
+-	eth@pcie {
+-		compatible = "intel,i211";
+-		local-mac-address = [FF FF FF FF FF FF];
+-		status = "okay";
+-	};
+-};
+-
+-&iomuxc {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_dvi0>;
+-
+-	imx6q-sb-fx6x {
+-		/* pins for i2c1 */
+-		pinctrl_i2c1: i2c1grp {
+-			fsl,pins = <
+-				MX6QDL_PAD_EIM_D21__I2C1_SCL 0x4001b8b1
+-				MX6QDL_PAD_EIM_D28__I2C1_SDA 0x4001b8b1
+-			>;
+-		};
+-
+-		/* pins for mmc */
+-		pinctrl_usdhc3: usdhc3grp {
+-			fsl,pins = <
+-				MX6QDL_PAD_SD3_CMD__SD3_CMD    0x17059
+-				MX6QDL_PAD_SD3_CLK__SD3_CLK    0x10059
+-				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x17059
+-				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x17059
+-				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x17059
+-				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x17059
+-				MX6QDL_PAD_SD3_DAT4__GPIO7_IO01 0x80000000
+-				MX6QDL_PAD_SD3_DAT5__GPIO7_IO00 0x80000000
+-			>;
+-		};
+-
+-		pinctrl_usdhc3_100mhz: usdhc3grp-100mhz { /* 100Mhz */
+-			fsl,pins = <
+-				MX6QDL_PAD_SD3_CMD__SD3_CMD 0x170B9
+-				MX6QDL_PAD_SD3_CLK__SD3_CLK 0x100B9
+-				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x170B9
+-				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x170B9
+-				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x170B9
+-				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x170B9
+-			>;
+-		};
+-
+-		pinctrl_usdhc3_200mhz: usdhc3grp-200mhz { /* 200Mhz */
+-			fsl,pins = <
+-				MX6QDL_PAD_SD3_CMD__SD3_CMD 0x170F9
+-				MX6QDL_PAD_SD3_CLK__SD3_CLK 0x100F9
+-				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x170F9
+-				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x170F9
+-				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x170F9
+-				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x170F9
+-			>;
+-		};
+-
+-		/* pins for dvi/ts */
+-		pinctrl_dvi0: dvi0grp {
+-			fsl,pins = <
+-				/* DVI_DDC_SEL */
+-				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x80000000
+-				/* SB-FX6 Himax TS PENDOWN or SB-FX6m DVI HPD */
+-				MX6QDL_PAD_GPIO_4__GPIO1_IO04 0x80000000
+-			>;
+-		};
+-	};
+-};
+-
+-/* i2c1 */
+-&i2c1 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_i2c1>;
+-	status = "disabled";
+-};
+-
+-/* mmc */
+-&usdhc3 {
+-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+-	pinctrl-0 = <&pinctrl_usdhc3>;
+-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+-	bus-width = <4>;
+-	no-1-8-v;
+-	keep-power-in-suspend;
+-	vmmc-supply = <&reg_3p3v>;
+-	status = "disabled";
+-};
+diff --git a/arch/arm/boot/dts/compulab/imx6qp-cl-som-imx6.dts b/arch/arm/boot/dts/compulab/imx6qp-cl-som-imx6.dts
+index aba7ee585d3b..f6b9c7ce4235 100644
+--- a/arch/arm/boot/dts/compulab/imx6qp-cl-som-imx6.dts
++++ b/arch/arm/boot/dts/compulab/imx6qp-cl-som-imx6.dts
+@@ -12,7 +12,6 @@
+  */
+ 
+ /dts-v1/;
+-#include "../imx6q.dtsi"
+ #include "../imx6qp.dtsi"
+ #include "imx6q-cm-fx6.dtsi"
+ 
+diff --git a/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6.dts b/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6.dts
+index 3588cb7788fd..a9984b5f540c 100644
+--- a/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6.dts
++++ b/arch/arm/boot/dts/compulab/imx6qp-sbc-imx6.dts
+@@ -12,10 +12,8 @@
+ */
+ 
+ /dts-v1/;
+-#include "../imx6q.dtsi"
+ #include "../imx6qp.dtsi"
+ #include "imx6q-cm-fx6.dtsi"
+-#include "imx6qdl-sb-fx6x.dtsi"
+ #include "imx6qdl-sb-fx6.dtsi"
+ 
+ / {
+-- 
+2.11.0
+

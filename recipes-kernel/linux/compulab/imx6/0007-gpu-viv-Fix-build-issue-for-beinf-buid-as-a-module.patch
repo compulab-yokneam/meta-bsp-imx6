@@ -1,0 +1,35 @@
+From 830de42b593847584d0c4511af280065863e795b Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 26 Nov 2020 11:30:32 +0200
+Subject: [PATCH] gpu-viv: Fix build issue for beinf buid as a module
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_driver.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_driver.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_driver.c
+index 87f26e721773..52f829bc477e 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_driver.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_driver.c
+@@ -1284,7 +1284,7 @@ static struct platform_driver gpu_driver = {
+ };
+ #endif /* USE_LINUX_PCIE */
+ 
+-static int __init gpu_init(void)
++static int gpu_init(void)
+ {
+     int ret = 0;
+ 
+@@ -1315,7 +1315,7 @@ static int __init gpu_init(void)
+     return 0;
+ }
+ 
+-static void __exit gpu_exit(void)
++static void gpu_exit(void)
+ {
+ #if USE_LINUX_PCIE
+     pci_unregister_driver(&gpu_driver);
+-- 
+2.11.0
+
