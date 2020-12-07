@@ -42,7 +42,7 @@ cd -
 | Distro Name | `DISTRO` environment variable | `IMAGE` environment variable
 | fsl-imx-x11 | export DISTRO=fsl-imx-x11 | export IMAGE=compulab-image-xfce
 | | | export IMAGE=fsl-image-qt5-validation-imx
-| fsl-imx-xwayland | export DISTRO=fsl-imx-fb | export IMAGE=fsl-image-qt5-validation-imx
+| fsl-imx-xwayland | export DISTRO=fsl-imx-xwayland | export IMAGE=fsl-image-qt5-validation-imx
 | fsl-imx-fb | export DISTRO=fsl-imx-fb | export IMAGE=fsl-image-qt5-validation-imx
 |===
 ```
