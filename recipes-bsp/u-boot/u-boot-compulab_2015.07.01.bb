@@ -1,3 +1,4 @@
+DESCRIPTION = "Compulab i.MX6 U-Boot"
 require recipes-bsp/u-boot/u-boot.inc
 
 DESCRIPTION = "u-boot which includes support for CompuLab boards."
@@ -7,49 +8,13 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=0507cd7da8e7ad6d6701926ec9b84c95"
 SECTION = "bootloader"
 PROVIDES = "u-boot"
 
-SRCBRANCH = "master"
-SRCREV = "v2015.07-cm-fx6-3"
-SRC_URI = "https://github.com/utilite-computer/u-boot/archive/v2015.07-cm-fx6-3.zip"
-SRC_URI[md5sum] = "df76d5ae2436ea9c126ed769e060ebee"
-
-SRC_URI_append_cl-som-imx6 += " \
-	file://cl_som_imx6_defconfig \
-	file://Fix-the-compile-issue-under-gcc6.patch \
-	file://Fix-the-compile-issue-under-gcc7.patch \
-	file://0001-arm-imx6-add-SPL-to-u-boot.imx.patch \
-	file://0002-arm-mx6-cl_som_mx6-Add-basic-support.patch \
-	file://0003-arm-mx6-cl_som_mx6-Fix-fec-phy-connecttivity-issue.patch \
-	file://0004-arm-mx6-cl_som_mx6-add-emmc-support.patch \
-	file://0005-arm-mx6-cl_som_mx6-add-emmc-support-1.patch \
-	file://0006-arm-mx6-cl_som_mx6-fix-board-name.patch \
-	file://0007-arm-mx6-cl_som_mx6-add-imx6qp-support.patch \
-	file://0008-arm-mx6-cl_som_mx6-mmc-rescan-fix-and-etc.patch \
-	file://0009-arm-mx6-cl-som-imx6-add-emmc-to-boot-device-list.patch \
-	file://0010-arm-mx6-cl-som-imx6-configure-i2cmux-switch-gpio.patch \
-	file://0011-arm-mx6-cl-som-imx6-Define-heart-beat-led.patch \
-	file://0012-arm-mx6-cl-som-imx6-Select-ENET-MAC0-TX-clock-from-P.patch \
-	file://0013-arm-mx6-define-get_cpu_rev_ext.patch \
-	file://0014-arm-mx6-cl-som-imx6-Add-cpu_type-environment-variabl.patch \
-	file://0015-arm-mx6-cl-som-imx6-Enable-PCA953X-config.patch \
-	file://0016-arm-mx6-cl-som-imx6-Add-ATP-support.patch \
-	file://0017-arm-mx6-cl_som_mx6-Tag-u-boot-version-cl-som-imx6-1..patch \
-	file://0018-arm-mx6qp-cl_som_mx6-update-mmdc-settings.patch \
-	file://0020-arm-mx6-cl-som-imx6-change-boot-device-order.patch \
-	file://0022-arm-mx6-cl-som-imx6-Add-mmc-card-detect.patch \
-	file://0024-arm-mx6q-cl_som_mx6-add-different-mmdc-settings-v3.0.patch \
-	file://0025-arm-imx6-compulab-Added-LCD-panel-support.patch \
-	file://0026-cm_fx6-Enable-USB-NetWork.patch \
-	file://0028-cm_fx6-Enable-CONFIG_USB_ETHER_ASIX88179.patch \
-	file://0029-usb_ether-Add-usb_net-environment-variable.patch \
-	file://0030-cm_fx6-Add-ext_phy-environment-variable.patch \
-	file://0031-cm_fx6-env-Update-the-SOM-boot-environmen.patch \
-	file://0032-cl-som-imx6-LOCALVERSION-instead-on-the-EXTRAVERSION.patch \
-	file://0033-cm-fx6-Refactor-the-board_eth_init.patch \
-	file://0034-cm-fx6-Refactor-the-cm_fx6_setup_usb_host.patch \
-	file://0035-net-Fix-u-boot-crash-with-the-modern-gcc.patch \
+UBOOT_SRC ?= "git://github.com/compulab/u-boot.git;protocol=https"
+SRCBRANCH = "2015.07-cm-fx6-3"
+SRC_URI = "${UBOOT_SRC};branch=${SRCBRANCH} \
 "
+SRCREV = "v2015.07-cm-fx6-3.1"
 
-S = "${WORKDIR}/u-boot-2015.07-cm-fx6-3"
+S = "${WORKDIR}/git"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_MACHINE = "(cl-som-imx6)"
+COMPATIBLE_MACHINE = "cl-som-imx6"
