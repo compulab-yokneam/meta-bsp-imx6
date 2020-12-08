@@ -1,0 +1,26 @@
+From d52d5052ecd2c490240e2b7d9f3ea92ef2436b08 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 8 Dec 2020 13:47:00 +0200
+Subject: [PATCH 11/11] cl-som-imx6: dts: Update the spi flash name
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+index 406787e81889..0531ab59f369 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+@@ -600,7 +600,7 @@
+ 	flash: m25p80@0 {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+-		compatible = "st,m25px16", "st,m25p";
++		compatible = "st,m25p16", "st,m25p";
+ 		spi-max-frequency = <20000000>;
+ 		reg = <0>;
+ 
+-- 
+2.11.0
+
