@@ -1,0 +1,26 @@
+From 47754db54026ca99d8e05fcdc6ec3ddacc3fd5d7 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 9 Dec 2020 18:15:11 +0200
+Subject: [PATCH] cl-som-imx6: config: Disable
+ CONFIG_FW_LOADER_USER_HELPER_FALLBACK
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/configs/cl-som-imx6_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/configs/cl-som-imx6_defconfig b/arch/arm/configs/cl-som-imx6_defconfig
+index b42c6cd8c989..e0e877a5a39d 100644
+--- a/arch/arm/configs/cl-som-imx6_defconfig
++++ b/arch/arm/configs/cl-som-imx6_defconfig
+@@ -90,6 +90,7 @@ CONFIG_MAC80211=y
+ CONFIG_DEVTMPFS=y
+ CONFIG_DEVTMPFS_MOUNT=y
+ # CONFIG_STANDALONE is not set
++# CONFIG_FW_LOADER_USER_HELPER_FALLBACK is not set
+ CONFIG_DMA_CMA=y
+ CONFIG_CMA_SIZE_MBYTES=0
+ CONFIG_IMX_WEIM=y
+-- 
+2.11.0
+

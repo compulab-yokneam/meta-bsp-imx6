@@ -1,0 +1,87 @@
+From 4e00b5aee3f8d6c6250acc4d92e866c570f23c89 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 9 Dec 2020 18:14:17 +0200
+Subject: [PATCH] cl-som-imx6: dts: Enable wifi as brcm,bcm4329-fmac
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi | 34 +++++++++++++-------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+index e72403eb00ea..9bf70932ebbd 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+@@ -77,16 +77,6 @@
+ 			enable-active-high;
+ 		};
+ 
+-		wlreg_on: fixedregulator@100 {
+-			compatible = "regulator-fixed";
+-			regulator-min-microvolt = <3300000>;
+-			regulator-max-microvolt = <3300000>;
+-			regulator-name = "wlreg_on";
+-			gpio = <&gpio6 16 0>;
+-			startup-delay-us = <100>;
+-			enable-active-high;
+-		};
+-
+ 		reg_emmc_vmmc: fixedregulator@101 {
+ 			compatible = "regulator-fixed";
+ 			regulator-name = "VSD_3V3";
+@@ -118,12 +108,6 @@
+ 		};
+ 	};
+ 
+-	/* Murata -- define hook for BCMDHD driver.   */
+-	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+-		compatible = "android,bcmdhd_wlan";
+-		wlreg_on-supply = <&wlreg_on>;
+-	};
+-
+ 	pu_dummy: pudummy_reg {
+ 		compatible = "fsl,imx6-dummy-pureg"; /* only used in ldo-bypass */
+ 	};
+@@ -250,6 +234,11 @@
+ 		compatible = "fsl,mxc_v4l2_output";
+ 		status = "okay";
+ 	};
++
++	usdhc1_pwrseq: usdhc1_pwrseq {
++		compatible = "mmc-pwrseq-simple";
++		reset-gpios = <&gpio6 16 1>;
++	};
+ };
+ 
+ &iomuxc {
+@@ -778,15 +767,26 @@
+ };
+ 
+ &usdhc1 {
++	#address-cells = <1>;
++	#size-cells = <0>;
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_usdhc1 &pinctrl_murata>;
+ 	bus-width = <4>;
+ 	non-removable;
+ 	wifi-host;
+-	cd-post;
++	cap-power-off-card;
+ 	pm-ignore-notify;
++	mmc-pwrseq = <&usdhc1_pwrseq>;
+ 	vmmc-supply = <&wlan_pwren_dn>;
+ 	status = "okay";
++
++	brcmf: bcrmf@1 {
++		reg = <1>;
++		compatible = "brcm,bcm4329-fmac";
++		interrupt-parent = <&gpio6>;
++		interrupts = <14 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "host-wake";
++        };
+ };
+ 
+ /* emmc */
+-- 
+2.11.0
+

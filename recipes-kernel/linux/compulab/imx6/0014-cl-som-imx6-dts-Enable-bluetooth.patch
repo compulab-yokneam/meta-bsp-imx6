@@ -1,0 +1,55 @@
+From 0b8784c4c9be91574f078140209b40f00d4db59a Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 10 Dec 2020 16:40:16 +0200
+Subject: [PATCH] cl-som-imx6: dts: Enable bluetooth
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+index 9bf70932ebbd..bf8c6a529d7c 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+@@ -471,7 +471,6 @@
+ 				MX6QDL_PAD_NANDF_CS3__GPIO6_IO16 0x80000000 /* WL_REG_ON_3V3 */
+ 				MX6QDL_PAD_NANDF_CS1__GPIO6_IO14 0x80000000 /* WL_HOST_WAKE */
+ 				MX6QDL_PAD_EIM_DA1__GPIO3_IO01 0x80000000 /* WLAN_PWREN_PD */
+-				MX6QDL_PAD_GPIO_17__GPIO7_IO12 0x80000000 /* BT_REG_ON_3V3 */
+ 			>;
+ 		};
+ 
+@@ -553,6 +552,12 @@
+ 				MX6QDL_PAD_SD4_DAT0__GPIO2_IO08		0x80000000
+ 			>;
+ 		};
++
++		pinctrl_bt: bt0grp {
++			fsl,pins = <
++				MX6QDL_PAD_GPIO_17__GPIO7_IO12 0x80000000 /* BT_REG_ON_3V3 */
++			>;
++		};
+ 	};
+ };
+ 
+@@ -744,9 +749,15 @@
+ 
+ &uart5 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_uart5>;
++	pinctrl-0 = <&pinctrl_uart5 &pinctrl_bt>;
+ 	fsl,uart-has-rtscts;
+ 	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm43438-bt";
++		max-speed = <3000000>;
++		shutdown-gpios = <&gpio7 12 0>;
++	};
+ };
+ 
+ /* usb otg */
+-- 
+2.11.0
+

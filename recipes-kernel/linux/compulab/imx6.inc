@@ -10,5 +10,11 @@ SRC_URI_append_cl-som-imx6 = " \
 	file://0008-cl-som-imx6-dts-Remove-imx6qdl-sb-fx6x.dtsi.patch \
 	file://0009-cl-som-imx8-dts-Fix-cma-location.patch \
 	file://0010-cl-som-imx6-Update-defconfig.patch \
+	file://0011-cl-som-imx6-dts-Fix-cma-range.patch \
+	file://0012-cl-som-imx6-dts-Enable-wifi-as-brcm-bcm4329-fmac.patch \
+	file://0013-cl-som-imx6-config-Disable-CONFIG_FW_LOADER_USER_HEL.patch \
+	file://0014-cl-som-imx6-dts-Enable-bluetooth.patch \
+	file://0015-hci_bcm-Fix-power-on-issue.patch \
+	file://0016-cl-som-imx6-config-Enable-bluetooth.patch \
 	file://defconfig \
 "

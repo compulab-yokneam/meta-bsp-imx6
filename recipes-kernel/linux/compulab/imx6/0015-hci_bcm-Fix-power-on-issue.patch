@@ -1,0 +1,152 @@
+From 094e2c2da207dd0dc901e5971767702528f6b0b2 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 11 Dec 2020 09:54:50 +0200
+Subject: [PATCH] hci_bcm: Fix power on issue
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ drivers/bluetooth/hci_bcm.c | 71 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 57 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 32527bdf4b50..ce0ced6365da 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -54,8 +54,10 @@
+ 
+ /* platform device driver resources */
+ struct bcm_device {
++	struct hci_uart		serdev_hu;
+ 	struct list_head	list;
+ 
++	struct device		*dev;
+ 	struct platform_device	*pdev;
+ 
+ 	const char		*name;
+@@ -76,11 +78,6 @@ struct bcm_device {
+ #endif
+ };
+ 
+-/* serdev driver resources */
+-struct bcm_serdev {
+-	struct hci_uart hu;
+-};
+-
+ /* generic bcm uart resources */
+ struct bcm_data {
+ 	struct sk_buff		*rx_skb;
+@@ -399,7 +396,7 @@ static int bcm_flush(struct hci_uart *hu)
+ 	return 0;
+ }
+ 
+-static int bcm_setup(struct hci_uart *hu)
++static int _bcm_setup(struct hci_uart *hu)
+ {
+ 	struct bcm_data *bcm = hu->priv;
+ 	char fw_name[64];
+@@ -466,6 +463,27 @@ static int bcm_setup(struct hci_uart *hu)
+ 	return err;
+ }
+ 
++static int bcm_setup(struct hci_uart *hu)
++{
++	int err, retry = 5;
++
++	struct serdev_device *serdev = hu->serdev;
++	struct bcm_device *bcmdev = serdev_device_get_drvdata(serdev);
++	do {
++		bcm_gpio_set_power(bcmdev, false);
++		msleep(5);
++		bcm_gpio_set_power(bcmdev, true);
++		msleep(100);
++
++		err = _bcm_setup(hu);
++		if (!err)
++			break;
++
++	} while (retry--);
++
++	return err;
++}
++
+ #define BCM_RECV_LM_DIAG \
+ 	.type = BCM_LM_DIAG_PKT, \
+ 	.hlen = BCM_LM_DIAG_SIZE, \
+@@ -887,7 +905,6 @@ static const struct hci_uart_proto bcm_proto = {
+ 	.close		= bcm_close,
+ 	.flush		= bcm_flush,
+ 	.setup		= bcm_setup,
+-	.set_baudrate	= bcm_set_baudrate,
+ 	.recv		= bcm_recv,
+ 	.enqueue	= bcm_enqueue,
+ 	.dequeue	= bcm_dequeue,
+@@ -932,9 +949,24 @@ static struct platform_driver bcm_driver = {
+ 	},
+ };
+ 
++static int bcm_get_resources(struct bcm_device *dev)
++{
++	dev->device_wakeup = devm_gpiod_get_optional(dev->dev, "device-wakeup",
++						     GPIOD_OUT_LOW);
++	if (IS_ERR(dev->device_wakeup))
++		return PTR_ERR(dev->device_wakeup);
++
++	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
++						GPIOD_OUT_LOW);
++	if (IS_ERR(dev->shutdown))
++		return PTR_ERR(dev->shutdown);
++
++	return 0;
++}
++
+ static int bcm_serdev_probe(struct serdev_device *serdev)
+ {
+-	struct bcm_serdev *bcmdev;
++	struct bcm_device *bcmdev;
+ 	u32 speed;
+ 	int err;
+ 
+@@ -942,23 +974,34 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+ 	if (!bcmdev)
+ 		return -ENOMEM;
+ 
+-	bcmdev->hu.serdev = serdev;
++	bcmdev->dev = &serdev->dev;
++#ifdef CONFIG_PM
++	bcmdev->hu = &bcmdev->serdev_hu;
++#endif
++	bcmdev->serdev_hu.serdev = serdev;
+ 	serdev_device_set_drvdata(serdev, bcmdev);
+ 
+ 	err = device_property_read_u32(&serdev->dev, "max-speed", &speed);
+ 	if (!err)
+-		bcmdev->hu.oper_speed = speed;
++		bcmdev->serdev_hu.oper_speed = speed;
++
++	err = bcm_get_resources(bcmdev);
++	if (err)
++		return err;
++
++	bcm_gpio_set_power(bcmdev, false);
+ 
+-	return hci_uart_register_device(&bcmdev->hu, &bcm_proto);
++	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
+ }
+ 
+ static void bcm_serdev_remove(struct serdev_device *serdev)
+ {
+-	struct bcm_serdev *bcmdev = serdev_device_get_drvdata(serdev);
++	struct bcm_device *bcmdev = serdev_device_get_drvdata(serdev);
+ 
+-	hci_uart_unregister_device(&bcmdev->hu);
+-}
++	bcm_gpio_set_power(bcmdev, false);
+ 
++	hci_uart_unregister_device(&bcmdev->serdev_hu);
++}
+ #ifdef CONFIG_OF
+ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm43438-bt" },
+-- 
+2.11.0
+
