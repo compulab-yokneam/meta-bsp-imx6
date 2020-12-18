@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/compulab/imx6:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-compulab-${PV}/imx6:"
 
-require compulab/imx6.inc
+require linux-compulab-${PV}/imx6.inc
 
 do_configure_append () {
     oe_runmake ${MACHINE}_defconfig
