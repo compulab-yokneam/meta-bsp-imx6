@@ -1,0 +1,62 @@
+From fcb6042c30b8f6e49730b8bc655a80540a5524ae Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 11 Dec 2020 17:59:25 +0200
+Subject: [PATCH] hci_bcm: Refactoring the bcm_setup()
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ drivers/bluetooth/hci_bcm.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 800132369134..e648568b42b0 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -480,7 +480,7 @@ static int bcm_flush(struct hci_uart *hu)
+ 	return 0;
+ }
+ 
+-static int bcm_setup(struct hci_uart *hu)
++static int _bcm_setup(struct hci_uart *hu)
+ {
+ 	struct bcm_data *bcm = hu->priv;
+ 	char fw_name[64];
+@@ -547,6 +547,27 @@ static int bcm_setup(struct hci_uart *hu)
+ 	return err;
+ }
+ 
++static int bcm_setup(struct hci_uart *hu)
++{
++	int err, retry = 5;
++
++	struct serdev_device *serdev = hu->serdev;
++	struct bcm_device *bcmdev = serdev_device_get_drvdata(serdev);
++	do {
++		bcm_gpio_set_power(bcmdev, false);
++		msleep(5);
++		bcm_gpio_set_power(bcmdev, true);
++		msleep(100);
++
++		err = _bcm_setup(hu);
++		if (!err)
++			break;
++
++	} while (retry--);
++
++	return err;
++}
++
+ #define BCM_RECV_LM_DIAG \
+ 	.type = BCM_LM_DIAG_PKT, \
+ 	.hlen = BCM_LM_DIAG_SIZE, \
+@@ -1074,7 +1095,6 @@ static const struct hci_uart_proto bcm_proto = {
+ 	.close		= bcm_close,
+ 	.flush		= bcm_flush,
+ 	.setup		= bcm_setup,
+-	.set_baudrate	= bcm_set_baudrate,
+ 	.recv		= bcm_recv,
+ 	.enqueue	= bcm_enqueue,
+ 	.dequeue	= bcm_dequeue,
+-- 
+2.11.0
+

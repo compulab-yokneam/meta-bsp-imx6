@@ -1,0 +1,253 @@
+From fdf8d4b8ad83ea4601360102bb2ce98331f12c75 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 11 Dec 2020 17:57:09 +0200
+Subject: [PATCH] cl-som-imx6: mach: Add the SoM mach driver
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/mach-imx/Kconfig            |  16 +++
+ arch/arm/mach-imx/Makefile           |   1 +
+ arch/arm/mach-imx/mach-cl_som_imx6.c | 192 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 209 insertions(+)
+ create mode 100644 arch/arm/mach-imx/mach-cl_som_imx6.c
+
+diff --git a/arch/arm/mach-imx/Kconfig b/arch/arm/mach-imx/Kconfig
+index 7d07f3e96529..c2e0d126b8f9 100644
+--- a/arch/arm/mach-imx/Kconfig
++++ b/arch/arm/mach-imx/Kconfig
+@@ -515,6 +515,22 @@ config SOC_IMX6Q
+ 	help
+ 	  This enables support for Freescale i.MX6 Quad processor.
+ 
++choice
++	prompt "CompuLab Boards Support"
++	depends on SOC_IMX6Q
++	default CL_SOM_IMX6
++
++	config CL_SOM_IMX6
++		bool "CompuLab CL-SOM-iMX6 Support"
++
++		help
++		  This enable support for CompuLab CL-SOM-iMX6 board.
++
++endchoice
++
++ config SOC_IMX6SL
++ 	bool "i.MX6 SoloLite support"
++ 	select HAVE_IMX_RNG
+ config SOC_IMX6SL
+ 	bool "i.MX6 SoloLite support"
+ 	select HAVE_IMX_RNG
+diff --git a/arch/arm/mach-imx/Makefile b/arch/arm/mach-imx/Makefile
+index c1911857afd7..9b6ce989ccb1 100644
+--- a/arch/arm/mach-imx/Makefile
++++ b/arch/arm/mach-imx/Makefile
+@@ -131,6 +131,7 @@ obj-$(CONFIG_SOC_IMX1) += mach-imx1.o
+ obj-$(CONFIG_SOC_IMX50) += mach-imx50.o
+ obj-$(CONFIG_SOC_IMX51) += mach-imx51.o
+ obj-$(CONFIG_SOC_IMX53) += mach-imx53.o
++obj-$(CONFIG_CL_SOM_IMX6) += mach-cl_som_imx6.o
+ 
+ obj-$(CONFIG_SOC_VF610) += mach-vf610.o
+ 
+diff --git a/arch/arm/mach-imx/mach-cl_som_imx6.c b/arch/arm/mach-imx/mach-cl_som_imx6.c
+new file mode 100644
+index 000000000000..48f1aac3b915
+--- /dev/null
++++ b/arch/arm/mach-imx/mach-cl_som_imx6.c
+@@ -0,0 +1,192 @@
++/*
++ *
++ * The code contained herein is licensed under the GNU General Public
++ * License. You may obtain a copy of the GNU General Public License
++ * Version 2 or later at the following locations:
++ *
++ * http://www.opensource.org/licenses/gpl-license.html
++ * http://www.gnu.org/copyleft/gpl.html
++ */
++
++#include <linux/module.h>
++#include <linux/of_platform.h>
++
++#include <linux/delay.h>
++#include <linux/err.h>
++#include <linux/io.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/mfd/syscon.h>
++#include <linux/mfd/syscon/imx6q-iomuxc-gpr.h>
++#include <linux/regmap.h>
++#include "common.h"
++#include "hardware.h"
++#include <linux/string.h>
++#include <linux/irq.h>
++#include <linux/interrupt.h>
++#include <linux/gpio.h>
++
++
++extern unsigned int system_rev;
++static unsigned int _system_rev;
++
++#define ANADIG_DIGPROG		0x260
++#define ANADIG_DIGPROG_IMX6SL	0x280
++
++extern unsigned int __mxc_cpu_type;
++
++static void revision_from_anatop(void)
++{
++	struct device_node *np;
++	void __iomem *anatop_base;
++	u32 cpu_type;
++	u16 offset = ANADIG_DIGPROG;
++	u32 fsl_system_rev = 0;
++
++	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-anatop");
++	anatop_base = of_iomap(np, 0);
++	WARN_ON(!anatop_base);
++	if (of_device_is_compatible(np, "fsl,imx6sl-anatop"))
++		offset = ANADIG_DIGPROG_IMX6SL;
++	cpu_type = readl_relaxed(anatop_base + offset);
++	iounmap(anatop_base);
++
++	/* Chip Silicon ID */
++	fsl_system_rev = ((cpu_type >> 16) & 0xFF) << 12;
++	/* Chip silicon major revision */
++	fsl_system_rev |= ((cpu_type >> 8) & 0xFF) << 4;
++	fsl_system_rev += 0x10;
++	/* Chip silicon minor revision */
++	fsl_system_rev |= cpu_type & 0xFF;
++
++	/*
++	 * Move the CompuLab board revision to a different variable,
++	 * so we can use it anytime it is needed.
++	 * Put the Freescale silicon revision information to the place where
++	 * the userspace video libraries expect it to be.
++	 */
++	system_rev = fsl_system_rev;
++}
++
++static void __init cl_som_imx6_csi_mux_init(void)
++{
++	/*
++	 * MX6Q sbc-fx6 board:
++	 * IPU1 CSI0 connects to parallel interface.
++	 * Set GPR1 bit 19 to 0x1.
++	 *
++	 * MX6DL sbc-fx6 board:
++	 * IPU1 CSI0 connects to parallel interface.
++	 * Set GPR13 bit 0-2 to 0x4.
++	 */
++	struct regmap *gpr;
++	struct device_node *np;
++	const char *status;
++	int ret;
++
++	/* Read mipi-csi status and set IPU1 CSI0 accordingly */
++	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-mipi-csi2");
++	if (np) {
++		ret = of_property_read_string(np, "status", &status);
++		if (!ret && (!strcasecmp(status, "okay"))) {
++			pr_info("IPU1 CSI0 is in mipi mode\n");
++			return;
++		}
++	}
++
++	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
++	if (!IS_ERR(gpr)) {
++		pr_info("IPU1 CSI0 is in parallel mode\n");
++		if (of_machine_is_compatible("fsl,imx6q"))
++			regmap_update_bits(gpr, IOMUXC_GPR1, 1 << 19, 1 << 19);
++		else if (of_machine_is_compatible("fsl,imx6dl"))
++			regmap_update_bits(gpr, IOMUXC_GPR13, 0x7, 0x4);
++	} else {
++		pr_err("%s(): failed to find fsl,imx6q-iomux-gpr regmap\n",
++		       __func__);
++	}
++}
++
++static void __init imx6qp_init(void)
++{
++	struct regmap *gpr;
++
++	pr_info("Set GPRx values for cl-som-imx6 imx6q/qp device\n");
++	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
++	if (!IS_ERR(gpr)) {
++		pr_info("1) GPR4: enable AXI cache for VDOA/VPU/IPU\n");
++		regmap_update_bits(gpr, IOMUXC_GPR4, 0xFFFFFFFF, 0xF00000CF);
++		pr_info("2) GPR6/7: set IPU AXI-id1 Qos=0x1 AXI-id0/2/3 Qos=0x7\n");
++		regmap_update_bits(gpr, IOMUXC_GPR6, 0xFFFFFFFF, 0x77177717);
++		regmap_update_bits(gpr, IOMUXC_GPR7, 0xFFFFFFFF, 0x77177717);
++	} else {
++		pr_err("%s(): failed to find fsl,imx6q-iomux-gpr regmap\n",
++		       __func__);
++	}
++}
++
++#ifdef CONFIG_KGDB
++#define	KGDB_GPIO IMX_GPIO_NR(7,13) /* SW6 */
++
++void kgdb_breakpoint(void);
++
++static irqreturn_t irq_handler(int irq, void *dev_id)
++{
++	static int count=0;
++
++	printk(KERN_DEBUG "interrupt received (irq[%d]: %d)\n", count++, irq);
++
++	kgdb_breakpoint();
++
++	return IRQ_HANDLED;
++}
++
++static void cl_som_imx6_kgdb_init(void)
++{
++	int ret;
++
++	ret = request_irq(gpio_to_irq(KGDB_GPIO),
++			irq_handler,
++			IRQF_TRIGGER_FALLING,
++			"irq_kgdb",
++			NULL);
++
++	if (ret)
++		printk(KERN_ERR
++			"cm-fx6: Failed to request irq for kgdb\n");
++
++}
++#else
++static void cl_som_imx6_kgdb_init(void){};
++#endif
++
++static int cl_som_imx6_init(void)
++{
++	struct device_node *np;
++
++	np = of_find_compatible_node(NULL, NULL, "compulab,cm-fx6");
++
++	if (!np)
++		return -EINVAL;
++
++	_system_rev = system_rev;
++	revision_from_anatop();
++	cl_som_imx6_csi_mux_init();
++
++	cl_som_imx6_kgdb_init();
++	imx6qp_init();
++
++	return 0;
++}
++
++static void __exit cl_som_imx6_exit(void)
++{
++	system_rev = _system_rev;
++}
++module_init(cl_som_imx6_init);
++module_exit(cl_som_imx6_exit);
++
++MODULE_AUTHOR("CompuLab, Ltd.");
++MODULE_DESCRIPTION("CompuLab CL-SOM-iMX6 machine driver");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS("platform:cl-som-imx6");
+-- 
+2.11.0
+
