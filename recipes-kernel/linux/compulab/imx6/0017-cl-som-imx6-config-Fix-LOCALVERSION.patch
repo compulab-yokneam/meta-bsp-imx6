@@ -1,0 +1,23 @@
+From 40d7d1fffbdc1762e6e4d1c39362194ebbbd7fe7 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 11 Dec 2020 17:54:18 +0200
+Subject: [PATCH] cl-som-imx6: config: Fix LOCALVERSION
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/configs/cl-som-imx6_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/cl-som-imx6_defconfig b/arch/arm/configs/cl-som-imx6_defconfig
+index f1fb0ac78787..293483505899 100644
+--- a/arch/arm/configs/cl-som-imx6_defconfig
++++ b/arch/arm/configs/cl-som-imx6_defconfig
+@@ -1,4 +1,4 @@
+-CONFIG_LOCALVERSION="-cl-som-imx6_4.14.98"
++CONFIG_LOCALVERSION="-cl-som-imx6"
+ CONFIG_KERNEL_LZO=y
+ CONFIG_SYSVIPC=y
+ CONFIG_NO_HZ=y
+-- 
+2.11.0
+
