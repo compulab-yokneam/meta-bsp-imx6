@@ -54,16 +54,34 @@ cd -
 ```
 
 ## Setup build environment
-* Initialize the build environment
-** Declare these environment variables:
+* Declare these environment variables:
 +
+[cols="3", options="header"]
 |===
-| Distro Name | `DISTRO` environment variable | `IMAGE` environment variable
-| fsl-imx-x11 | export DISTRO=fsl-imx-x11 | export IMAGE=compulab-image-xfce
-| | | export IMAGE=fsl-image-qt5-validation-imx
-| fsl-imx-xwayland | export DISTRO=fsl-imx-xwayland | export IMAGE=fsl-image-qt5-validation-imx
-| fsl-imx-fb | export DISTRO=fsl-imx-fb | export IMAGE=fsl-image-qt5-validation-imx
+|Distro Name
+|`DISTRO` environment variable
+|`IMAGE` environment variable
+
+
+|fsl-imx-x11
+|export DISTRO=fsl-imx-x11
+|export IMAGE=compulab-image-xfce
+
+|
+|
+|export IMAGE=fsl-image-qt5-validation-imx
+
+|fsl-imx-xwayland
+|export DISTRO=fsl-imx-xwayland
+|export IMAGE=fsl-image-qt5-validation-imx
+
+|fsl-imx-fb
+|export DISTRO=fsl-imx-fb
+|export IMAGE=fsl-image-qt5-validation-imx
 |===
+
+* Initialize the build environment:
++
 ```
 source sources/meta-bsp-imx6/tools/setup-env -b build-${MACHINE}
 ```
