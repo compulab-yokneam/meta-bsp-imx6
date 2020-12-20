@@ -1,3 +1,9 @@
+#
+# cl-som-imx6 local.conf.append
+#
 LICENSE_FLAGS_WHITELIST = "commercial"
-CORE_IMAGE_EXTRA_INSTALL += " cl-uboot cl-deploy cl-stest "
+CORE_IMAGE_EXTRA_INSTALL += " cl-uboot cl-deploy cl-stest cl-camera "
 CORE_IMAGE_EXTRA_INSTALL += " memtester htop iotop tmux iperf3 "
+
+PACKAGE_CLASSES = 'package_deb package_tar'
+IMAGE_FEATURES += " package-management ssh-server-openssh "
