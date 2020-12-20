@@ -1,0 +1,27 @@
+# CL-SOM-iMX6 U-Boot Build Procedure
+
+## Prerequisites
+* Download an setup the tool chain from https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/[Linaro]
+* Set environment variables:
+** `ARCH`, `CROSS_COMPILE`
+[source,code]
+export ARCH=arm
+export CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf-
+
+* Create a folder to organize the files:
+[source,code]
+mkdir cl-som-imx6
+cd cl-som-imx6
+
+* Download U-Boot code:
+[source,code]
+git clone -b 2015.07-cm-fx6-3 https://github.com/compulab/u-boot.git
+
+# Build
+* Configure
+[source,code]
+make -C u-boot cl_som_imx6_defconfig
+
+* Compile
+[source,code]
+make -C u-boot u-booy.imx
