@@ -9,11 +9,18 @@ export ARCH=arm
 export CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf-
 
 ** `TAG`, `SUBDIR`
-|====
-| Kernel Version | Environment variables
-| 4.14.98 | export TAG="rel_imx_4.14.98_2.0.0_ga" ; SUBDIR="linux-compulab-4.14.98"
-| 4.19.35 | export TAG="rel_imx_4.19.35_1.1.0" ; SUBDIR="linux-compulab-4.19.35"
-|====
++
+[cols="2", options="header"]
+|===
+|Kernel Version
+|Environment variables
+
+|4.14.98
+|export TAG="rel_imx_4.14.98_2.0.0_ga" ; SUBDIR="linux-compulab-4.14.98"
+
+|4.19.35
+|export TAG="rel_imx_4.19.35_1.1.0" ; SUBDIR="linux-compulab-4.19.35"
+|===
 
 * Create a folder to organize the files:
 [source,code]
