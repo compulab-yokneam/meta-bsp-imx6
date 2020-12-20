@@ -1,4 +1,4 @@
-# CL-SOM-iMX6 Linux Kernel Building
+# CL-SOM-iMX6 Linux Kernel Build Procedure
 
 ## Prerequisites
 * Download an setup the tool chain from https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/[Linaro]
