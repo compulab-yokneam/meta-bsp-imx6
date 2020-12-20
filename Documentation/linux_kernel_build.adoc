@@ -1,0 +1,39 @@
+# CL-SOM-iMX6 Linux Kernel Building
+
+## Prerequisites
+* Download an setup the tool chain from https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/[Linaro]
+* Set environment variables:
+** `ARCH`, `CROSS_COMPILE`
+[source,code]
+export ARCH=arm
+export CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf-
+
+** `TAG`, `SUBDIR`
+|====
+| Kernel Version | Environment variables
+| 4.14.98 | export TAG="rel_imx_4.14.98_2.0.0_ga" ; SUBDIR="linux-compulab-4.14.98"
+| 4.19.35 | export TAG="rel_imx_4.19.35_1.1.0" ; SUBDIR="linux-compulab-4.19.35"
+|====
+
+* Create a folder to organize the files:
+[source,code]
+mkdir cl-som-imx6
+cd cl-som-imx6
+
+* Download CompuLab BSP
+[source,code]
+git clone -b master https://github.com/compulab-yokneam/meta-bsp-imx6.git
+export PATCHES=$(pwd)/meta-bsp-imx6/recipes-kernel/linux/${SUBDIR}/imx6
+
+
+# CompuLab Linux Kernel setup
+[source,code]
+git clone https://source.codeaurora.org/external/imx/linux-imx.git
+git -C linux-imx checkout -b linux-compulab ${TAG}
+git -C linux-imx am ${PATCHES}/*.patch
+
+
+# Compile the Kernel
+[source,code]
+make -C linux-imx cl-som-imx6_defconfig
+make -C linux-imx
