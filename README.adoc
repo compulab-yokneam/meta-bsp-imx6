@@ -15,18 +15,28 @@ export MACHINE=cl-som-imx6
 
 * NXP
 ** Declare this environment variable:
++
+[cols="2", options="header"]
 |===
-| Branch | `REPO` environment variable
-| `Sumo` | export REPO="-b imx-linux-sumo -m imx-4.14.98-2.0.0_ga.xml"
-| `Warrior` | export REPO="-b imx-linux-warrior -m imx-4.19.35-1.1.0.xml"
+|Branch
+|`REPO` environment variable
+
+|`Sumo`
+|export REPO="-b imx-linux-sumo -m imx-4.14.98-2.0.0_ga.xml"
+
+|`Warrior`
+|export REPO="-b imx-linux-warrior -m imx-4.19.35-1.1.0.xml"
 |===
 
+** Issue `init` & `sync`:
++
 ```
 repo init -u git://source.codeaurora.org/external/imx/imx-manifest.git ${REPO}
 repo sync
 ```
 
 * CompuLab
++
 ```
 mkdir -p .repo/local_manifests
 cd .repo/local_manifests
@@ -35,6 +45,7 @@ cd -
 ```
 
 * Sync Them all
++
 ```
 repo sync
 cd .repo/local_manifests
@@ -45,6 +56,7 @@ cd -
 ## Setup build environment
 * Initialize the build environment
 ** Declare these environment variables:
++
 |===
 | Distro Name | `DISTRO` environment variable | `IMAGE` environment variable
 | fsl-imx-x11 | export DISTRO=fsl-imx-x11 | export IMAGE=compulab-image-xfce
@@ -56,6 +68,7 @@ cd -
 source sources/meta-bsp-imx6/tools/setup-env -b build-${MACHINE}
 ```
 * Building the image:
++
 ```
 bitbake -k ${IMAGE}
 ```
@@ -64,11 +77,13 @@ bitbake -k ${IMAGE}
 ### Create a bootable sd card
 
 * Goto the `tmp/deploy/images/${MACHINE}` directory:
++
 ```
 cd tmp/deploy/images/${MACHINE}
 ```
 
 * Deploy the image:
++
 ```
 bunzip -bc ${IMAGE}-${MACHINE}.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
 ```
