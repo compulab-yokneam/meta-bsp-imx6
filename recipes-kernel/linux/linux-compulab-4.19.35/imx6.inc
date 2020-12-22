@@ -3,5 +3,6 @@ SRC_URI_append_cl-som-imx6 = " \
 	file://0001-cl-som-imx6-mach-Add-the-SoM-mach-driver.patch \
 	file://0002-cl-som-imx6-conf-Add-the-SoM-config.patch \
 	file://0003-hci_bcm-Refactoring-the-bcm_setup.patch \
+	file://0004-cl-som-imx6-dts-Remove-an-incorrect-clk-node.patch \
 	file://defconfig \
 "

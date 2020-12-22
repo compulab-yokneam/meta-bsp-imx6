@@ -17,5 +17,6 @@ SRC_URI_append_cl-som-imx6 = " \
 	file://0015-hci_bcm-Fix-power-on-issue.patch \
 	file://0016-cl-som-imx6-config-Enable-bluetooth.patch \
 	file://0017-cl-som-imx6-config-Fix-LOCALVERSION.patch \
+	file://0018-cl-som-imx6-dts-Remove-an-incorrect-clk-node.patch \
 	file://defconfig \
 "
