@@ -105,3 +105,17 @@ cd tmp/deploy/images/${MACHINE}
 ```
 bunzip -bc ${IMAGE}-${MACHINE}.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
 ```
+
+* Ready to run precompiled images:
++
+[cols="2", options="header"]
+|===
+|image type
+|link
+
+|xwayland
+|https://drive.google.com/file/d/1wWx9HRIqm7V6w38R-eQnUcZeSxPHiHsk/view?usp=sharing[fsl-image-qt5-validation-imx-cl-som-imx6-20201222060636.rootfs.sdcard.xz]
+
+|x11
+|https://drive.google.com/file/d/1pxULz9fiXr0weLMt2udg1fNfZqnEPSPc/view?usp=sharing[compulab-image-xfce-cl-som-imx6-20201222053903.rootfs.sdcard.xz]
+|===
