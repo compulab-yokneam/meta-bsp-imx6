@@ -106,8 +106,7 @@ cd tmp/deploy/images/${MACHINE}
 bunzip -bc ${IMAGE}-${MACHINE}.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
 ```
 
-* Ready to run precompiled images:
-+
+## Precompiled images:
 [cols="2", options="header"]
 |===
 |image type
