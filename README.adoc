@@ -28,20 +28,17 @@ export MACHINE=cl-som-imx6
 |export REPO="-b imx-linux-warrior -m imx-4.19.35-1.1.0.xml"
 |===
 
-** Issue `init` & `sync`:
+** Issue `init`:
 +
 ```
 repo init -u git://source.codeaurora.org/external/imx/imx-manifest.git ${REPO}
-repo sync
 ```
 
 * CompuLab
 +
 ```
 mkdir -p .repo/local_manifests
-cd .repo/local_manifests
-wget https://raw.githubusercontent.com/compulab-yokneam/meta-bsp-imx6/devel/scripts/meta-bsp-imx6.xml
-cd -
+wget --directory-prefix .repo/local_manifests https://raw.githubusercontent.com/compulab-yokneam/meta-bsp-imx6/devel/scripts/meta-bsp-imx6.xml
 ```
 
 * Sync Them all
