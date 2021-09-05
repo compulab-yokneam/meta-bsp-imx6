@@ -7,4 +7,5 @@ SRC_URI_append_cl-som-imx6 = " \
 	file://0005-compulab-cl-som-imx6-Add-spl_mx6qp_noc_init.patch \
 	file://0006-cl-som-imx6-u-boot-Enable-CONFIG_COMPULAB_BANK_LAYOU.patch \
 	file://0007-cl-som-imx6-defconfig-Enable-CONFIG_CMD_MEMTEST.patch \
+	file://0008-cl-som-imx6-u-boot-Disable-CONFIG_COMPULAB_BANK_LAYO.patch \
 "

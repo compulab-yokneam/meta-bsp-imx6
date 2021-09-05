@@ -1,0 +1,27 @@
+From c2986300e7d1d436033542aefcb8bc0dc475267e Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sun, 5 Sep 2021 14:43:57 +0300
+Subject: [PATCH 8/8] cl-som-imx6: u-boot: Disable CONFIG_COMPULAB_BANK_LAYOUT
+
+Make use of the vendor provided dram_init_banksize().
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cl-som-imx6/cl-som-imx6.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/board/compulab/cl-som-imx6/cl-som-imx6.c b/board/compulab/cl-som-imx6/cl-som-imx6.c
+index f3b5c2d264..e399b8f6bf 100644
+--- a/board/compulab/cl-som-imx6/cl-som-imx6.c
++++ b/board/compulab/cl-som-imx6/cl-som-imx6.c
+@@ -857,7 +857,6 @@ int misc_init_r(void)
+ 	return 0;
+ }
+ 
+-#define CONFIG_COMPULAB_BANK_LAYOUT
+ #ifdef CONFIG_COMPULAB_BANK_LAYOUT
+ int dram_init_banksize(void)
+ {
+-- 
+2.11.0
+
