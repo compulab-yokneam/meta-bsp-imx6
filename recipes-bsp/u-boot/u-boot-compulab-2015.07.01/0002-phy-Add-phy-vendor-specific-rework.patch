@@ -1,0 +1,105 @@
+From 1d5c609f4941975c78f0fc145e9202149a512a85 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 27 Dec 2021 12:46:32 +0200
+Subject: [PATCH 2/7] phy: Add phy vendor specific rework
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 60 +++++++++++++++++++++++++++++++---
+ 1 file changed, 56 insertions(+), 4 deletions(-)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 20734f38b3..cd97860519 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -466,7 +466,7 @@ static int cm_fx6_setup_usb_host(void) { return 0; }
+ #define ENET_PAD_CTRL		(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
+ 				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+ 
+-static int mx6_rgmii_rework(struct phy_device *phydev)
++static int mx6_rgmii_rework_atheros(struct phy_device *phydev)
+ {
+ 	unsigned short val;
+ 
+@@ -505,13 +505,60 @@ static int mx6_rgmii_rework(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
++{
++#define TXDLY_MASK ((1 << 13) | (1 << 12))
++#define RXDLY_MASK ((1 << 13) | (1 << 11))
++
++	unsigned short val;
++
++	/* introduce tx clock delay */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x7);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0xa4);
++
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1c);
++	val |= TXDLY_MASK;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
++
++	/* introduce rx clock delay */
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1c);
++	val |= RXDLY_MASK;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
++
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0);
++	return 0;
++}
++
++static int mx6_rgmii_rework(struct phy_device *phydev)
++{
++#define PHY_VENDOR_ID_MASK (( 1<<5 ) - 1 )
++#define PHY_ATEROS_ID  0x7
++#define PHY_REALTEK_ID 0x11
++	unsigned short val = phy_read(phydev, MDIO_DEVAD_NONE, 0x3);
++
++	val = (( val >> 4 ) & PHY_VENDOR_ID_MASK);
++
++	switch (val) {
++	case PHY_ATEROS_ID:
++		mx6_rgmii_rework_atheros(phydev);
++		break;
++	case PHY_REALTEK_ID:
++		mx6_rgmii_rework_realtek(phydev);
++		break;
++	default:
++		break;
++	}
++
++	return 0;
++}
++
+ extern int phy_status;
+ int board_phy_config(struct phy_device *phydev)
+ {
+ 	if (phy_status) {
+-        setenv("ext_phy" , "yes");
+-        return 0;
+-    }
++		setenv("ext_phy" , "yes");
++		return 0;
++	}
+ 
+ 	mx6_rgmii_rework(phydev);
+ 
+@@ -748,9 +795,14 @@ int ft_board_setup(void *blob, bd_t *bd)
+ 	const char *gpmi_nand = "/soc/gpmi-nand@00112000";
+         const char *rtc_nand = "/soc/aips-bus@02100000/i2c@021a8000/rtc_nand@69";
+         const char *rtc_emmc = "/soc/aips-bus@02100000/i2c@021a8000/rtc_emmc@69";
++	const char *fec0="/soc/aips-bus@2100000/ethernet@2188000";
+ 	char *baseboard_name;
+ 	uint8_t enetaddr[6];
+ 
++	/* Remove phy reset */
++	nodeoffset = fdt_path_offset(blob,fec0);
++	fdt_delprop(blob, nodeoffset, "phy-reset-gpios");
++
+ 	/* MAC addr */
+ 	if (eth_getenv_enetaddr("ethaddr", enetaddr)) {
+ 		fdt_find_and_setprop(blob,
+-- 
+2.17.1
+

@@ -1,0 +1,77 @@
+From b72d92627c7dbde8bcdd458306bcc5d9f08eac47 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 27 Dec 2021 17:12:58 +0200
+Subject: [PATCH 3/7] cm_fx6: Report the DRAM size as a U-Boot environment
+ variable
+
+The total RAM size is tested during the ATP process.
+Store the total RAM size in the environment.
+
+Signed-off-by: Uri Mashiach <uri.mashiach@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 42 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index cd97860519..821f8064f7 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -875,6 +875,47 @@ static int cm_fx6_cpu_type(void)
+ 	return -1;
+ }
+ 
++static void cm_fx6_store_ram_size(void)
++{
++	unsigned long m = 0, n;
++	uint64_t f;
++	static const char names[] = {'E', 'P', 'T', 'G', 'M', 'K'};
++	unsigned long d = 10 * ARRAY_SIZE(names);
++	char c = 0;
++	unsigned int i;
++	uint64_t size=gd->ram_size;
++	char buffer[10];
++
++	for (i = 0; i < ARRAY_SIZE(names); i++, d -= 10) {
++		if (size >> d) {
++			c = names[i];
++			break;
++		}
++        }
++
++	if (!c) {
++		sprintf(buffer, "%llu", size);
++		goto store_res;
++	}
++
++	n = size >> d;
++	f = size & ((1ULL << d) - 1);
++
++	/* If there's a remainder, deal with it */
++	if (f) {
++		m = (10ULL * f + (1ULL << (d - 1))) >> d;
++
++                if (m >= 10) {
++			m -= 10;
++			n += 1;
++		}
++        }
++
++	sprintf(buffer, "%lu%c", n, c);
++store_res:
++	setenv("ram_size", buffer);
++}
++
+ int board_init(void)
+ {
+ 	int ret;
+@@ -919,6 +960,7 @@ int board_init(void)
+ int board_late_init(void)
+ {
+ 	cm_fx6_cpu_type();
++	cm_fx6_store_ram_size();
+ 
+ #ifdef CONFIG_ATP_ENV
+ 	setenv("atp" , "yes");
+-- 
+2.17.1
+

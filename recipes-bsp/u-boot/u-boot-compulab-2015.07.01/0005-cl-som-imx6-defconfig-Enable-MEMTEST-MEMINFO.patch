@@ -1,0 +1,26 @@
+From 19c7c09d1083c12f24fd95fae85749196c0ce155 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 12 Apr 2022 11:59:21 +0300
+Subject: [PATCH 5/7] cl-som-imx6: defconfig: Enable MEMTEST MEMINFO
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ configs/cl_som_imx6_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configs/cl_som_imx6_defconfig b/configs/cl_som_imx6_defconfig
+index 5cedca4a3b..020cf7ea1c 100644
+--- a/configs/cl_som_imx6_defconfig
++++ b/configs/cl_som_imx6_defconfig
+@@ -5,6 +5,8 @@ CONFIG_SPL=y
+ CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=arch/arm/imx-common/spl_sd.cfg,MX6QDL,SPL"
+ # CONFIG_CMD_IMLS is not set
+ # CONFIG_CMD_XIMG is not set
++CONFIG_CMD_MEMTEST=y
++CONFIG_CMD_MEMINFO=y
+ # CONFIG_CMD_LOADB is not set
+ # CONFIG_CMD_LOADS is not set
+ # CONFIG_CMD_FLASH is not set
+-- 
+2.17.1
+

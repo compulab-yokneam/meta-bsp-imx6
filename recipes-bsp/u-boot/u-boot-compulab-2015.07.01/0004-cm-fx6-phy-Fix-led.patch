@@ -1,0 +1,39 @@
+From 8f4509897e52450343b9e01f92f0b3ab488b2d76 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 5 Apr 2022 23:08:39 +0300
+Subject: [PATCH 4/7] cm-fx6: phy: Fix led
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 821f8064f7..54f97d0b71 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -526,6 +526,21 @@ static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
+ 	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
+ 
+ 	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0);
++
++	/*LEDs:*/
++	/* set to extension page */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0007);
++	/* extension Page44 */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0x002c);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, 0x0430);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1a, 0x0010);
++	/* To disable EEE LED mode (blinking .4s/2s) */
++	/* extension Page5 */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0005);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x05, 0x8b82);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x06, 0x052b);
++
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x00);
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+
