@@ -71,10 +71,6 @@ cd -
 
 |fsl-imx-x11
 |export DISTRO=fsl-imx-x11
-|export IMAGE=compulab-image-xfce
-
-|
-|
 |export IMAGE=fsl-image-qt5-validation-imx
 
 |fsl-imx-xwayland
