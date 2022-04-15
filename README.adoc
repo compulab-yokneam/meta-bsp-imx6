@@ -7,9 +7,18 @@
 mkdir compulab-bsp && cd compulab-bsp
 ```
 * Set a CompuLab machine:
-```
-export MACHINE=cl-som-imx6
-```
++
+[cols="2", options="header"]
+|===
+|Machine 
+|Environment variable
+
+|`cl-som-imx6`
+|export MACHINE=cl-som-imx6
+
+|`cl-som-imx6ul`
+|export MACHINE=cl-som-imx6ul
+|===
 
 ## Initialize repo manifests
 
