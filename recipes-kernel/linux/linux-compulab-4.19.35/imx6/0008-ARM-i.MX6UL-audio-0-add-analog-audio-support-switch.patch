@@ -1,0 +1,38 @@
+From 87a109ec3f2d5ddb3ba39583facab91febe5e679 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Fri, 15 Apr 2022 09:15:14 +0300
+Subject: [PATCH 08/11] ARM: i.MX6UL: audio-0: add analog audio support switch
+
+Add analog audio support switch for imx boards with wm8731.
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ sound/soc/fsl/Kconfig | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/sound/soc/fsl/Kconfig b/sound/soc/fsl/Kconfig
+index ea825752eb91..ef9ea7e4b8be 100644
+--- a/sound/soc/fsl/Kconfig
++++ b/sound/soc/fsl/Kconfig
+@@ -396,6 +396,18 @@ config SND_SOC_IMX_CS42888
+ 	 Say Y if you want to add support for SoC audio on an i.MX board with
+ 	 a cs42888 codec.
+ 
++config SND_SOC_IMX_WM8731
++	tristate "SoC Audio support for i.MX boards with wm8731"
++	depends on OF && I2C
++	select SND_SIMPLE_CARD
++	select SND_SOC_WM8731
++	select SND_SOC_IMX_PCM_DMA
++	select SND_SOC_FSL_SAI
++	select SND_SOC_FSL_UTILS
++	help
++	  Say Y if you want to add support for SoC audio on an i.MX board with
++	  a wm8731 codec.
++
+ config SND_SOC_IMX_WM8962
+ 	tristate "SoC Audio support for i.MX boards with wm8962"
+ 	depends on OF && I2C && INPUT
+-- 
+2.17.1
+
