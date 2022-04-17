@@ -1,9 +1,8 @@
-From 87a109ec3f2d5ddb3ba39583facab91febe5e679 Mon Sep 17 00:00:00 2001
+From 87a4e29bab3db931461cbf80ccd3df232b605433 Mon Sep 17 00:00:00 2001
 From: Valentin Raevsky <valentin@compulab.co.il>
-Date: Fri, 15 Apr 2022 09:15:14 +0300
-Subject: [PATCH 08/11] ARM: i.MX6UL: audio-0: add analog audio support switch
-
-Add analog audio support switch for imx boards with wm8731.
+Date: Thu, 9 Jun 2016 14:12:32 +0300
+Subject: [PATCH 16/40] ASoC: fsl: add analog audio support switch for imx
+ boards with wm8731
 
 Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
 ---

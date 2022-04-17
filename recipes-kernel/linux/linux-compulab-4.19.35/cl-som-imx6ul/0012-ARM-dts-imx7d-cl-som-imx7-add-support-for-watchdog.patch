@@ -1,0 +1,42 @@
+From e080441790bd4e32572392e171f0a01e994d514f Mon Sep 17 00:00:00 2001
+From: Ilya Ledvich <ilya@compulab.co.il>
+Date: Sun, 5 Mar 2017 15:21:53 +0200
+Subject: [PATCH 12/40] ARM: dts: imx7d: cl-som-imx7: add support for watchdog
+
+Add support for watchdog WDOG1 for board reset.
+
+Signed-off-by: Ilya Ledvich <ilya@compulab.co.il>
+---
+ arch/arm/boot/dts/imx7d-cl-som-imx7.dts | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/arm/boot/dts/imx7d-cl-som-imx7.dts b/arch/arm/boot/dts/imx7d-cl-som-imx7.dts
+index 4e9656c25f21..7cbd7a58fc72 100644
+--- a/arch/arm/boot/dts/imx7d-cl-som-imx7.dts
++++ b/arch/arm/boot/dts/imx7d-cl-som-imx7.dts
+@@ -327,6 +327,12 @@
+ 	status = "okay";
+ };
+ 
++&wdog1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_wdog>;
++	fsl,ext-reset-output;
++};
++
+ &iomuxc {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_hog>;
+@@ -443,4 +449,9 @@
+ 			MX7D_PAD_LPSR_GPIO1_IO05__GPIO1_IO5		0x14 /* OTG PWREN */
+ 		>;
+ 	};
++	pinctrl_wdog: wdoggrp {
++		fsl,pins = <
++			MX7D_PAD_LPSR_GPIO1_IO00__WDOG1_WDOG_B		0x74
++		>;
++	};
+ };
+-- 
+2.17.1
+
