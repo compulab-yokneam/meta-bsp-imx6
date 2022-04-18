@@ -109,6 +109,8 @@ bunzip -bc ${IMAGE}-${MACHINE}.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
 ```
 
 ## Precompiled images:
+* cl-som-imx6
++
 [cols="2", options="header"]
 |===
 |image type
@@ -119,4 +121,18 @@ bunzip -bc ${IMAGE}-${MACHINE}.sdcard.bz2 | sudo dd of=/dev/sdx bs=1M
 
 |x11
 |https://drive.google.com/file/d/1pxULz9fiXr0weLMt2udg1fNfZqnEPSPc/view?usp=sharing[compulab-image-xfce-cl-som-imx6-20201222053903.rootfs.sdcard.xz]
+|===
+
+* cl-som-imx6ul
++
+[cols="2", options="header"]
+|===
+|image type
+|link
+
+|Yocto x11
+|https://drive.google.com/file/d/1j_arLXDTljx_WZvsx2082voFD8qiZG_5/view?usp=sharing[fsl-image-multimedia-full-cl-som-imx6ul-20220418131450.rootfs.wic.xz]
+
+|Debian 11 fb
+|https://drive.google.com/file/d/1M8yJtkxfuiyqUfoAHRnuHXOQ6GtVGIuB/view?usp=sharing[debian-bullseye-armhf-minbase-20220418143533.sdcard.img.xz]
 |===
