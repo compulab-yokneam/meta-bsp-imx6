@@ -1,0 +1,72 @@
+From fba99f7a1a5deab90d027bc8302058f60f0b4948 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 20 Apr 2022 08:42:00 +0300
+Subject: [PATCH] cl-som-imx6ul: dts: Update the ecspi4 device list
+
+Update the ecspi4 device list.
+Remove touch screen due to the pinmux conflict with wdog.
+To be fixed.
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ .../dts/compulab/imx6ul-cl-som-imx6ul.dtsi    | 36 ++-----------------
+ 1 file changed, 3 insertions(+), 33 deletions(-)
+
+diff --git a/arch/arm/boot/dts/compulab/imx6ul-cl-som-imx6ul.dtsi b/arch/arm/boot/dts/compulab/imx6ul-cl-som-imx6ul.dtsi
+index 30376d9dd60c..fce38bf9e908 100644
+--- a/arch/arm/boot/dts/compulab/imx6ul-cl-som-imx6ul.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6ul-cl-som-imx6ul.dtsi
+@@ -410,10 +410,10 @@
+ };
+ 
+ &ecspi4 {
+-	fsl,spi-num-chipselects = <2>;
++	fsl,spi-num-chipselects = <1>;
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_ecspi4 &pinctrl_ecspi4_cs>;
+-	cs-gpios = <&gpio2 15 0>, <&gpio3 4 0>;
++	pinctrl-0 = <&pinctrl_ecspi4>;
++	cs-gpios = <&gpio2 15 0>;
+ 	status = "okay";
+ 
+ 	m25px16@0 {
+@@ -438,36 +438,6 @@
+ 			reg = <0x100000 0x100000>;
+ 		};
+ 	};
+-
+-	/* touch controller */
+-	touch:	tsc2046@0 {
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_tsc2046>;
+-
+-		compatible = "ti,tsc2046";
+-		vcc-supply = <&tsc2046reg>;
+-
+-		reg = <1>;
+-		spi-max-frequency = <1500000>;
+-
+-		interrupt-parent = <&gpio1>;
+-		interrupts = <1 0>;
+-		pendown-gpio = <&gpio1 1 0>;
+-
+-		ti,x-min = /bits/ 16 <0x0>;
+-		ti,x-max = /bits/ 16 <0x0fff>;
+-		ti,y-min = /bits/ 16 <0x0>;
+-		ti,y-max = /bits/ 16 <0x0fff>;
+-
+-		ti,x-plate-ohms = /bits/ 16 <180>;
+-		ti,pressure-max = /bits/ 16 <255>;
+-
+-		ti,debounce-max = /bits/ 16 <30>;
+-		ti,debounce-tol = /bits/ 16 <10>;
+-		ti,debounce-rep = /bits/ 16 <1>;
+-
+-		linux,wakeup;
+-	};
+ };
+ 
+ &fec1 {
+-- 
+2.17.1
+

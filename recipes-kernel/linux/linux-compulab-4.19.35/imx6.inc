@@ -48,5 +48,6 @@ SRC_URI_append_cl-som-imx6ul = " \
 	file://0038-mtd-tests-nandecctest-add-dummy-module-parameter.patch \
 	file://0039-ARM-configs-add-defconfig-for-compulab-imx7-based-de.patch \
 	file://0040-cl-som-imx6ul-Add-SoM-support.patch \
+	file://0041-cl-som-imx6ul-dts-Update-the-ecspi4-device-list.patch \
 	file://defconfig \
 "
