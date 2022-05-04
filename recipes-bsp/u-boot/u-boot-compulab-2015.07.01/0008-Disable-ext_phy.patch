@@ -1,0 +1,30 @@
+From c6d96846068e14c63bfab602dda7f8fcd51e0cb3 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 2 May 2022 17:52:35 +0300
+Subject: [PATCH 8/9] Disable: ext_phy
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index a7c272c..a73c6be 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -570,10 +570,12 @@ static int mx6_rgmii_rework(struct phy_device *phydev)
+ extern int phy_status;
+ int board_phy_config(struct phy_device *phydev)
+ {
++#if 0
+ 	if (phy_status) {
+ 		setenv("ext_phy" , "yes");
+ 		return 0;
+ 	}
++#endif
+ 
+ 	mx6_rgmii_rework(phydev);
+ 
+-- 
+1.9.1
+

@@ -8,4 +8,6 @@ SRC_URI_append_cl-som-imx6 = " \
     file://0005-cl-som-imx6-defconfig-Enable-MEMTEST-MEMINFO.patch \
     file://0006-compulab-imx6-Enable-ESDHC4-for-CL_SOM_IMX6-target-o.patch \
     file://0007-cl-som-imx6-defconfig-Update-LOCALVERSION-to-1.2.patch \
+    file://0008-Disable-ext_phy.patch \
+    file://0009-bypass-mx6_rgmii_rework_realtek.patch \
 "

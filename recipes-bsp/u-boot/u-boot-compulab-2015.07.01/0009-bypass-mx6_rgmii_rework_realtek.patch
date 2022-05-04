@@ -1,0 +1,38 @@
+From a91127d4f7268cbe212f8331e6372f93b3cdf7ad Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Mon, 2 May 2022 18:38:52 +0300
+Subject: [PATCH 9/9] bypass: mx6_rgmii_rework_realtek()
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index a73c6be..75f9007 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -505,6 +505,12 @@ static int mx6_rgmii_rework_atheros(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++#if 1
++static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
++{
++	return 0;
++}
++#else
+ static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
+ {
+ #define TXDLY_MASK ((1 << 13) | (1 << 12))
+@@ -543,6 +549,7 @@ static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
+ 	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x00);
+ 	return 0;
+ }
++#endif
+ 
+ static int mx6_rgmii_rework(struct phy_device *phydev)
+ {
+-- 
+1.9.1
+
