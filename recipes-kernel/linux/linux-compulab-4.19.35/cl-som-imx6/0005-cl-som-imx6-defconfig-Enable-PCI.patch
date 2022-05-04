@@ -1,0 +1,26 @@
+From ddcad709ab27081a2a56e6a482d002dd3c93605b Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 4 May 2022 14:43:11 +0300
+Subject: [PATCH] cl-som-imx6: defconfig: Enable PCI
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/configs/cl-som-imx6_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/configs/cl-som-imx6_defconfig b/arch/arm/configs/cl-som-imx6_defconfig
+index de1705647090..31368b3d9854 100644
+--- a/arch/arm/configs/cl-som-imx6_defconfig
++++ b/arch/arm/configs/cl-som-imx6_defconfig
+@@ -28,6 +28,8 @@ CONFIG_SOC_IMX7ULP=y
+ CONFIG_SOC_VF610=y
+ # CONFIG_SWP_EMULATE is not set
+ CONFIG_PCI=y
++CONFIG_PCI_MSI=y
++CONFIG_PCI_IMX6=y
+ CONFIG_SMP=y
+ CONFIG_VMSPLIT_2G=y
+ CONFIG_ARM_PSCI=y
+-- 
+2.17.1
+
