@@ -17,6 +17,6 @@ S = "${WORKDIR}/git"
 
 DEFAULT_PREFERENCE = "1"
 
-COMPATIBLE_MACHINE = "(cl-som-imx6|cl-som-imx6ul)"
+COMPATIBLE_MACHINE = "(cl-som-imx6|cl-som-imx6ul|cm-fx6-evk)"
 
 PR = "r1"

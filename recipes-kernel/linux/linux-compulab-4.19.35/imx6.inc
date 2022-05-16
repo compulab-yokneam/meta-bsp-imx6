@@ -52,3 +52,12 @@ SRC_URI_append_cl-som-imx6ul = " \
 	file://0041-cl-som-imx6ul-dts-Update-the-ecspi4-device-list.patch \
 	file://defconfig \
 "
+
+SRC_URI_append_cm-fx6-evk = " \
+	file://0000-cm-fx6-dts-Add-the-SoM-dts.patch \
+	file://0001-cm-fx6-mach-Add-the-SoM-mach-driver.patch \
+	file://0002-cm-fx6-conf-Add-the-SoM-config.patch \
+	file://0003-cm-fx6-dts-Update-the-spi-flash-compatible-string.patch \
+	file://0004-cm-fx6-mach-Disable-the-machine-init-code.patch \
+	file://defconfig \
+"
