@@ -1,0 +1,60 @@
+From 9668e912837a132713955a8b21b3749fd3cea382 Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Sat, 3 Jan 2015 22:00:36 +0200
+Subject: [PATCH] arm: mx6: cm-fx6: define fallback boot devices for spl
+
+Use spl alternate boot device feature to define fallback to
+the main boot device as it is defined by hardware.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/cm_fx6/spl.c | 19 ++++++++++---------
+ include/configs/cm_fx6.h    |  1 -
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/board/compulab/cm_fx6/spl.c b/board/compulab/cm_fx6/spl.c
+index e1ff5f87e6..ce79fbc5d1 100644
+--- a/board/compulab/cm_fx6/spl.c
++++ b/board/compulab/cm_fx6/spl.c
+@@ -366,16 +366,17 @@ void board_init_f(ulong dummy)
+ 	board_init_r(NULL, 0);
+ }
+ 
+-void spl_board_init(void)
++void board_boot_order(u32 *spl_boot_list)
+ {
+-	u32 boot_device = spl_boot_device();
+-
+-	if (boot_device == BOOT_DEVICE_SPI)
+-		puts("Booting from SPI flash\n");
+-	else if (boot_device == BOOT_DEVICE_MMC1)
+-		puts("Booting from MMC\n");
+-	else
+-		puts("Unknown boot device\n");
++	spl_boot_list[0] = spl_boot_device();
++	switch (spl_boot_list[0]) {
++	case BOOT_DEVICE_SPI:
++		spl_boot_list[1] = BOOT_DEVICE_MMC1;
++		break;
++	case BOOT_DEVICE_MMC1:
++		spl_boot_list[1] = BOOT_DEVICE_SPI;
++		break;
++	}
+ }
+ 
+ #ifdef CONFIG_SPL_MMC_SUPPORT
+diff --git a/include/configs/cm_fx6.h b/include/configs/cm_fx6.h
+index 231f4ba33d..247f8b6606 100644
+--- a/include/configs/cm_fx6.h
++++ b/include/configs/cm_fx6.h
+@@ -244,7 +244,6 @@
+ 
+ /* SPL */
+ #include "imx6_spl.h"
+-#define CONFIG_SPL_BOARD_INIT
+ #define CONFIG_SPL_MMC_SUPPORT
+ #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x80 /* offset 64 kb */
+ #define CONFIG_SYS_MONITOR_LEN	(CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS / 2 * 1024)
+-- 
+2.29.0
+

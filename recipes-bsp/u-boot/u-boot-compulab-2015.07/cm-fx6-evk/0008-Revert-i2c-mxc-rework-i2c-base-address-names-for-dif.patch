@@ -1,0 +1,166 @@
+From b1317667b4d978d80163253864485d793243e5da Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Tue, 18 Aug 2015 14:28:20 +0300
+Subject: [PATCH] Revert "i2c, mxc: rework i2c base address names for different
+ SoCs"
+
+This reverts commit e6c8b716c7035fd2b80d0b938e736176053b9ef6.
+---
+ arch/arm/include/asm/arch-imx/imx-regs.h   |  2 +-
+ arch/arm/include/asm/arch-mx25/imx-regs.h  |  6 +--
+ arch/arm/include/asm/arch-mx27/imx-regs.h  |  4 +-
+ arch/arm/include/asm/arch-vf610/imx-regs.h |  2 +-
+ drivers/i2c/mxc_i2c.c                      | 49 +++++++++++-----------
+ 5 files changed, 32 insertions(+), 31 deletions(-)
+
+diff --git a/arch/arm/include/asm/arch-imx/imx-regs.h b/arch/arm/include/asm/arch-imx/imx-regs.h
+index 93e336951c..4de0779d28 100644
+--- a/arch/arm/include/asm/arch-imx/imx-regs.h
++++ b/arch/arm/include/asm/arch-imx/imx-regs.h
+@@ -42,7 +42,7 @@
+ #define IMX_MMC_BASE               (0x14000 + IMX_IO_BASE)
+ #define IMX_ASP_BASE               (0x15000 + IMX_IO_BASE)
+ #define IMX_BTA_BASE               (0x16000 + IMX_IO_BASE)
+-#define I2C1_BASE_ADDR             (0x17000 + IMX_IO_BASE)
++#define IMX_I2C_BASE               (0x17000 + IMX_IO_BASE)
+ #define IMX_SSI_BASE               (0x18000 + IMX_IO_BASE)
+ #define IMX_SPI2_BASE              (0x19000 + IMX_IO_BASE)
+ #define IMX_MSHC_BASE              (0x1A000 + IMX_IO_BASE)
+diff --git a/arch/arm/include/asm/arch-mx25/imx-regs.h b/arch/arm/include/asm/arch-mx25/imx-regs.h
+index 78c4e9b088..3dffa4a396 100644
+--- a/arch/arm/include/asm/arch-mx25/imx-regs.h
++++ b/arch/arm/include/asm/arch-mx25/imx-regs.h
+@@ -293,13 +293,13 @@ struct cspi_regs {
+ #define IMX_ETB_SLOT4_BASE	(0x43F0C000)
+ #define IMX_ETB_SLOT5_BASE	(0x43F10000)
+ #define IMX_ECT_CTIO_BASE	(0x43F18000)
+-#define I2C1_BASE_ADDR		(0x43F80000)
+-#define I2C3_BASE_ADDR		(0x43F84000)
++#define IMX_I2C_BASE		(0x43F80000)
++#define IMX_I2C3_BASE		(0x43F84000)
+ #define IMX_CAN1_BASE		(0x43F88000)
+ #define IMX_CAN2_BASE		(0x43F8C000)
+ #define UART1_BASE		(0x43F90000)
+ #define UART2_BASE		(0x43F94000)
+-#define I2C2_BASE_ADDR		(0x43F98000)
++#define IMX_I2C2_BASE		(0x43F98000)
+ #define IMX_OWIRE_BASE		(0x43F9C000)
+ #define IMX_CSPI1_BASE		(0x43FA4000)
+ #define IMX_KPP_BASE		(0x43FA8000)
+diff --git a/arch/arm/include/asm/arch-mx27/imx-regs.h b/arch/arm/include/asm/arch-mx27/imx-regs.h
+index baf1d29cc3..7402e31354 100644
+--- a/arch/arm/include/asm/arch-mx27/imx-regs.h
++++ b/arch/arm/include/asm/arch-mx27/imx-regs.h
+@@ -184,13 +184,13 @@ struct fuse_bank0_regs {
+ #define UART2_BASE		(0x0b000 + IMX_IO_BASE)
+ #define UART3_BASE		(0x0c000 + IMX_IO_BASE)
+ #define UART4_BASE		(0x0d000 + IMX_IO_BASE)
+-#define I2C1_BASE_ADDR		(0x12000 + IMX_IO_BASE)
++#define IMX_I2C1_BASE		(0x12000 + IMX_IO_BASE)
+ #define IMX_GPIO_BASE		(0x15000 + IMX_IO_BASE)
+ #define IMX_TIM4_BASE		(0x19000 + IMX_IO_BASE)
+ #define IMX_TIM5_BASE		(0x1a000 + IMX_IO_BASE)
+ #define IMX_UART5_BASE		(0x1b000 + IMX_IO_BASE)
+ #define IMX_UART6_BASE		(0x1c000 + IMX_IO_BASE)
+-#define I2C2_BASE_ADDR		(0x1D000 + IMX_IO_BASE)
++#define IMX_I2C2_BASE		(0x1D000 + IMX_IO_BASE)
+ #define IMX_TIM6_BASE		(0x1f000 + IMX_IO_BASE)
+ #define IMX_AIPI2_BASE		(0x20000 + IMX_IO_BASE)
+ #define IMX_PLL_BASE		(0x27000 + IMX_IO_BASE)
+diff --git a/arch/arm/include/asm/arch-vf610/imx-regs.h b/arch/arm/include/asm/arch-vf610/imx-regs.h
+index 7df3b1e392..5a37193c51 100644
+--- a/arch/arm/include/asm/arch-vf610/imx-regs.h
++++ b/arch/arm/include/asm/arch-vf610/imx-regs.h
+@@ -74,7 +74,7 @@
+ #define ESAI_BASE_ADDR		(AIPS0_BASE_ADDR + 0x00062000)
+ #define ESAI_FIFO_BASE_ADDR	(AIPS0_BASE_ADDR + 0x00063000)
+ #define WDOG_BASE_ADDR		(AIPS0_BASE_ADDR + 0x00065000)
+-#define I2C1_BASE_ADDR		(AIPS0_BASE_ADDR + 0x00066000)
++#define I2C0_BASE_ADDR		(AIPS0_BASE_ADDR + 0x00066000)
+ #define WKUP_BASE_ADDR		(AIPS0_BASE_ADDR + 0x0006A000)
+ #define CCM_BASE_ADDR		(AIPS0_BASE_ADDR + 0x0006B000)
+ #define GPC_BASE_ADDR		(AIPS0_BASE_ADDR + 0x0006C000)
+diff --git a/drivers/i2c/mxc_i2c.c b/drivers/i2c/mxc_i2c.c
+index b3c50aaf30..2949e52b72 100644
+--- a/drivers/i2c/mxc_i2c.c
++++ b/drivers/i2c/mxc_i2c.c
+@@ -170,9 +170,6 @@ static int bus_i2c_set_bus_speed(struct mxc_i2c_bus *i2c_bus, int speed)
+ 	u8 idx = i2c_clk_div[clk_idx][1];
+ 	int reg_shift = quirk ? VF610_I2C_REGSHIFT : IMX_I2C_REGSHIFT;
+ 
+-	if (!base)
+-		return -ENODEV;
+-
+ 	/* Store divider value */
+ 	writeb(idx, base + (IFDR << reg_shift));
+ 
+@@ -354,10 +351,6 @@ static int i2c_init_transfer(struct mxc_i2c_bus *i2c_bus, u8 chip,
+ 	int ret;
+ 	int reg_shift = i2c_bus->driver_data & I2C_QUIRK_FLAG ?
+ 			VF610_I2C_REGSHIFT : IMX_I2C_REGSHIFT;
+-
+-	if (!i2c_bus->base)
+-		return -ENODEV;
+-
+ 	for (retry = 0; retry < 3; retry++) {
+ 		ret = i2c_init_transfer_(i2c_bus, chip, addr, alen);
+ 		if (ret >= 0)
+@@ -510,30 +503,38 @@ static int bus_i2c_write(struct mxc_i2c_bus *i2c_bus, u8 chip, u32 addr,
+ 	return ret;
+ }
+ 
+-#if !defined(I2C2_BASE_ADDR)
+-#define I2C2_BASE_ADDR	0
+-#endif
+-
+-#if !defined(I2C3_BASE_ADDR)
+-#define I2C3_BASE_ADDR	0
+-#endif
+-
+-#if !defined(I2C4_BASE_ADDR)
+-#define I2C4_BASE_ADDR	0
+-#endif
+-
+ static struct mxc_i2c_bus mxc_i2c_buses[] = {
+-#if defined(CONFIG_LS102XA) || defined(CONFIG_FSL_LSCH3)
++#if defined(CONFIG_MX25)
++	{ 0, IMX_I2C_BASE },
++	{ 1, IMX_I2C2_BASE },
++	{ 2, IMX_I2C3_BASE },
++#elif defined(CONFIG_MX27)
++	{ 0, IMX_I2C1_BASE },
++	{ 1, IMX_I2C2_BASE },
++#elif defined(CONFIG_MX31) || defined(CONFIG_MX35) || \
++	defined(CONFIG_MX51) || defined(CONFIG_MX53) ||	\
++	defined(CONFIG_MX6)
++	{ 0, I2C1_BASE_ADDR },
++	{ 1, I2C2_BASE_ADDR },
++	{ 2, I2C3_BASE_ADDR },
++#if defined(CONFIG_MX6DL)
++	{ 3, I2C4_BASE_ADDR },
++#endif
++#elif defined(CONFIG_LS102XA)
++	{ 0, I2C1_BASE_ADDR, I2C_QUIRK_FLAG },
++	{ 1, I2C2_BASE_ADDR, I2C_QUIRK_FLAG },
++	{ 2, I2C3_BASE_ADDR, I2C_QUIRK_FLAG },
++#elif defined(CONFIG_VF610)
++	{ 0, I2C0_BASE_ADDR, I2C_QUIRK_FLAG },
++#elif defined(CONFIG_FSL_LSCH3)
+ 	{ 0, I2C1_BASE_ADDR, I2C_QUIRK_FLAG },
+ 	{ 1, I2C2_BASE_ADDR, I2C_QUIRK_FLAG },
+ 	{ 2, I2C3_BASE_ADDR, I2C_QUIRK_FLAG },
+ 	{ 3, I2C4_BASE_ADDR, I2C_QUIRK_FLAG },
+ #else
+-	{ 0, I2C1_BASE_ADDR, 0 },
+-	{ 1, I2C2_BASE_ADDR, 0 },
+-	{ 2, I2C3_BASE_ADDR, 0 },
+-	{ 3, I2C4_BASE_ADDR, 0 },
++#error "architecture not supported"
+ #endif
++	{ }
+ };
+ 
+ struct mxc_i2c_bus *i2c_get_base(struct i2c_adapter *adap)
+-- 
+2.29.0
+

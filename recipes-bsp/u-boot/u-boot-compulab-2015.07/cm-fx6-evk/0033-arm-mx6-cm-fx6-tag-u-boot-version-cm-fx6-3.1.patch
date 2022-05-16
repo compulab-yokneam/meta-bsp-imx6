@@ -1,0 +1,28 @@
+From 81648abc680ab3a16307d9aa50ab1d5a0c8728e4 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 11 Oct 2018 10:57:27 +0300
+Subject: [PATCH] arm: mx6: cm-fx6: tag u-boot version -cm-fx6-3.1
+
+Tag u-boot version -cm-fx6-3.1
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 8839a3ca6b..0098bb2dd7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 2015
+ PATCHLEVEL = 07
+ SUBLEVEL =
+-EXTRAVERSION = -cm-fx6-3
++EXTRAVERSION = -cm-fx6-3.1
+ NAME =
+ 
+ # *DOCUMENTATION*
+-- 
+2.29.0
+

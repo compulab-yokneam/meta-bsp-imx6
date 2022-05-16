@@ -1,0 +1,63 @@
+From d90137938639cd6493012a74f324ee1d48b84d05 Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Mon, 17 Aug 2015 19:46:43 +0300
+Subject: [PATCH] splash_source: add support for filesystem formatted sata
+
+Add support for loading splashimage from filesystem formatted sata
+storage.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ common/splash_source.c | 9 +++++++++
+ include/splash.h       | 1 +
+ 2 files changed, 10 insertions(+)
+
+diff --git a/common/splash_source.c b/common/splash_source.c
+index 937ce17497..88d639e6d9 100644
+--- a/common/splash_source.c
++++ b/common/splash_source.c
+@@ -13,6 +13,7 @@
+ #include <spi_flash.h>
+ #include <spi.h>
+ #include <usb.h>
++#include <sata.h>
+ #include <bmp_layout.h>
+ #include <fs.h>
+ 
+@@ -116,6 +117,9 @@ static int splash_select_fs_dev(struct splash_location *location)
+ 	case SPLASH_STORAGE_USB:
+ 		res = fs_set_blk_dev("usb", location->devpart, FS_TYPE_ANY);
+ 		break;
++	case SPLASH_STORAGE_SATA:
++		res = fs_set_blk_dev("sata", location->devpart, FS_TYPE_ANY);
++		break;
+ 	default:
+ 		printf("Error: unsupported location storage.\n");
+ 		return -ENODEV;
+@@ -139,6 +143,11 @@ static int splash_load_fs(struct splash_location *location, u32 bmp_load_addr)
+ 	}
+ #endif
+ 
++#ifdef CONFIG_CMD_SATA
++	if (location->storage == SPLASH_STORAGE_SATA)
++		sata_initialize();
++#endif
++
+ 	res = splash_select_fs_dev(location);
+ 	if (res)
+ 		return res;
+diff --git a/include/splash.h b/include/splash.h
+index b728bd62a7..f0755ca695 100644
+--- a/include/splash.h
++++ b/include/splash.h
+@@ -29,6 +29,7 @@ enum splash_storage {
+ 	SPLASH_STORAGE_SF,
+ 	SPLASH_STORAGE_MMC,
+ 	SPLASH_STORAGE_USB,
++	SPLASH_STORAGE_SATA,
+ };
+ 
+ enum splash_flags {
+-- 
+2.29.0
+

@@ -1,0 +1,41 @@
+From e5f3e4048bf4385dc926553f9f7f562d971a911d Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Sun, 4 Jan 2015 14:02:43 +0200
+Subject: [PATCH] arm: mx6: cm-fx6: map HDMI to IPU1 DI0 explicitly
+
+U-Boot does not explicitly assign the display to an IPU interface. Instead, it
+relies on the power-on default of DI0.
+
+Since the kernel reassigns HDMI display to DI1, after a warm reset the HDMI
+display no longer works in U-Boot.
+
+Fix this by explicitly assigning HDMI to IPU1 DI0 in U-Boot.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 4617e353ee..048fba8ccf 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -102,6 +102,7 @@ size_t display_count = ARRAY_SIZE(displays);
+ static void cm_fx6_setup_display(void)
+ {
+ 	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
+ 	int reg;
+ 
+ 	enable_ipu_clock();
+@@ -109,6 +110,7 @@ static void cm_fx6_setup_display(void)
+ 	reg = __raw_readl(&mxc_ccm->CCGR3);
+ 	reg |= MXC_CCM_CCGR3_IPU1_IPU_DI0_MASK;
+ 	writel(reg, &mxc_ccm->CCGR3);
++	clrbits_le32(&iomuxc_regs->gpr[3], MXC_CCM_CCGR3_IPU1_IPU_DI0_MASK);
+ }
+ #else
+ static inline void cm_fx6_setup_display(void) {}
+-- 
+2.29.0
+

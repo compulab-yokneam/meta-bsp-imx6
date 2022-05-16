@@ -1,0 +1,47 @@
+From 0a107d7dba5f29d78e13b5b831d118e11a350bbc Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Mon, 17 Aug 2015 19:49:31 +0300
+Subject: [PATCH] arm: mx6: cm-fx6: add splash locations to cm-fx6
+
+Add the following splash locations to cm-fx6:
+* filesystem formatted mmc
+* filesystem formatted usb
+* filesystem formatted sata
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index f1839bb421..7b3167e2e2 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -40,6 +40,24 @@ static struct splash_location cm_fx6_splash_locations[] = {
+ 		.flags = SPLASH_STORAGE_RAW,
+ 		.offset = 0x100000,
+ 	},
++	{
++		.name = "mmc_fs",
++		.storage = SPLASH_STORAGE_MMC,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "2:1",
++	},
++	{
++		.name = "usb_fs",
++		.storage = SPLASH_STORAGE_USB,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "0:1",
++	},
++	{
++		.name = "sata_fs",
++		.storage = SPLASH_STORAGE_SATA,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "0:1",
++	},
+ };
+ 
+ int splash_screen_prepare(void)
+-- 
+2.29.0
+

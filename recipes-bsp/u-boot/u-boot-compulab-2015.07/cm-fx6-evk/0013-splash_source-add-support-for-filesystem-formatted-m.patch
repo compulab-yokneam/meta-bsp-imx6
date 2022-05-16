@@ -1,0 +1,142 @@
+From 7b88c64397cd142161060d35f5af68f2c784a026 Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Mon, 17 Aug 2015 19:44:39 +0300
+Subject: [PATCH] splash_source: add support for filesystem formatted mmc
+
+Add support for loading splash image from an SD card formatted with
+a filesystem. Update boards to maintain original behavior where needed.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c |  1 +
+ board/compulab/cm_t35/cm_t35.c |  1 +
+ common/splash_source.c         | 51 +++++++++++++++++++++++++++++++++-
+ include/splash.h               |  8 ++++++
+ 4 files changed, 60 insertions(+), 1 deletion(-)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 7a1bbafaa5..f1839bb421 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -37,6 +37,7 @@ static struct splash_location cm_fx6_splash_locations[] = {
+ 	{
+ 		.name = "sf",
+ 		.storage = SPLASH_STORAGE_SF,
++		.flags = SPLASH_STORAGE_RAW,
+ 		.offset = 0x100000,
+ 	},
+ };
+diff --git a/board/compulab/cm_t35/cm_t35.c b/board/compulab/cm_t35/cm_t35.c
+index 374edbcffc..398c5739bd 100644
+--- a/board/compulab/cm_t35/cm_t35.c
++++ b/board/compulab/cm_t35/cm_t35.c
+@@ -64,6 +64,7 @@ struct splash_location splash_locations[] = {
+ 	{
+ 		.name = "nand",
+ 		.storage = SPLASH_STORAGE_NAND,
++		.flags = SPLASH_STORAGE_RAW,
+ 		.offset = 0x100000,
+ 	},
+ };
+diff --git a/common/splash_source.c b/common/splash_source.c
+index 4820c12739..cb45c631fb 100644
+--- a/common/splash_source.c
++++ b/common/splash_source.c
+@@ -13,6 +13,7 @@
+ #include <spi_flash.h>
+ #include <spi.h>
+ #include <bmp_layout.h>
++#include <fs.h>
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+@@ -103,6 +104,49 @@ splash_address_too_high:
+ 	return -EFAULT;
+ }
+ 
++static int splash_select_fs_dev(struct splash_location *location)
++{
++	int res;
++
++	switch (location->storage) {
++	case SPLASH_STORAGE_MMC:
++		res = fs_set_blk_dev("mmc", location->devpart, FS_TYPE_ANY);
++		break;
++	default:
++		printf("Error: unsupported location storage.\n");
++		return -ENODEV;
++	}
++
++	if (res)
++		printf("Error: could not access storage.\n");
++
++	return res;
++}
++
++static int splash_load_fs(struct splash_location *location, u32 bmp_load_addr)
++{
++	int res;
++	loff_t bmp_size;
++
++	res = splash_select_fs_dev(location);
++	if (res)
++		return res;
++
++	res = fs_size("splash.bmp", &bmp_size);
++	if (res) {
++		printf("Error (%d): cannot determine file size\n", res);
++		return res;
++	}
++
++	if (bmp_load_addr + bmp_size >= gd->start_addr_sp) {
++		printf("Error: splashimage address too high. Data overwrites U-Boot and/or placed beyond DRAM boundaries.\n");
++		return -EFAULT;
++	}
++
++	splash_select_fs_dev(location);
++	return fs_read("splash.bmp", bmp_load_addr, 0, 0, NULL);
++}
++
+ /**
+  * select_splash_location - return the splash location based on board support
+  *			    and env variable "splashsource".
+@@ -172,5 +216,10 @@ int splash_source_load(struct splash_location *locations, uint size)
+ 	if (!splash_location)
+ 		return -EINVAL;
+ 
+-	return splash_load_raw(splash_location, bmp_load_addr);
++	if (splash_location->flags & SPLASH_STORAGE_RAW)
++		return splash_load_raw(splash_location, bmp_load_addr);
++	else if (splash_location->flags & SPLASH_STORAGE_FS)
++		return splash_load_fs(splash_location, bmp_load_addr);
++
++	return -EINVAL;
+ }
+diff --git a/include/splash.h b/include/splash.h
+index 7ae7a68688..d1fba69325 100644
+--- a/include/splash.h
++++ b/include/splash.h
+@@ -27,12 +27,20 @@
+ enum splash_storage {
+ 	SPLASH_STORAGE_NAND,
+ 	SPLASH_STORAGE_SF,
++	SPLASH_STORAGE_MMC,
++};
++
++enum splash_flags {
++	SPLASH_STORAGE_RAW,
++	SPLASH_STORAGE_FS,
+ };
+ 
+ struct splash_location {
+ 	char *name;
+ 	enum splash_storage storage;
++	enum splash_flags flags;
+ 	u32 offset;	/* offset from start of storage */
++	char *devpart;  /* Use the load command dev:part conventions */
+ };
+ 
+ int splash_source_load(struct splash_location *locations, uint size);
+-- 
+2.29.0
+

@@ -1,0 +1,36 @@
+From cdad1ebb2249b61dc1dc0ea3055e05a3ea8c22a9 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 19 Jul 2018 18:07:08 +0300
+Subject: [PATCH] cm-fx6: Update mmdc settings for imx6s
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/spl.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/board/compulab/cm_fx6/spl.c b/board/compulab/cm_fx6/spl.c
+index ce79fbc5d1..02d419972f 100644
+--- a/board/compulab/cm_fx6/spl.c
++++ b/board/compulab/cm_fx6/spl.c
+@@ -106,12 +106,12 @@ static void spl_mx6s_dram_init(enum ddr_config dram_config, bool reset)
+ 	while (mmdc_p0->mpzqhwctrl & 0x00010000)
+ 		;
+ 
+-	mmdc_p0->mpwldectrl0 = 0x005B0061;
+-	mmdc_p0->mpwldectrl1 = 0x004F0055;
+-	mmdc_p0->mpdgctrl0   = 0x0314030C;
+-	mmdc_p0->mpdgctrl1   = 0x025C0268;
+-	mmdc_p0->mprddlctl   = 0x42464646;
+-	mmdc_p0->mpwrdlctl   = 0x36322C34;
++	mmdc_p0->mpwldectrl0 = 0x001F001F;
++	mmdc_p0->mpwldectrl1 = 0x001F001F;
++	mmdc_p0->mpdgctrl0   = 0x0300023C;
++	mmdc_p0->mpdgctrl1   = 0x023C023C;
++	mmdc_p0->mprddlctl   = 0x484A4A4A;
++	mmdc_p0->mpwrdlctl   = 0x38362E38;
+ 	mmdc_p0->mprddqby0dl = 0x33333333;
+ 	mmdc_p0->mprddqby1dl = 0x33333333;
+ 	mmdc_p0->mprddqby2dl = 0x33333333;
+-- 
+2.29.0
+

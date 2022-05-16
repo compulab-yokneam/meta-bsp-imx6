@@ -1,0 +1,87 @@
+From 1c9227c3a676116d6e68c2a853609854404f7a2d Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Tue, 18 Aug 2015 18:27:46 +0300
+Subject: [PATCH] compulab: eeprom: select i2c bus when querying for board rev
+
+Add support for selecting which eeprom is queried for board revision by
+extending cl_eeprom_get_board_rev() to accept an i2c bus number.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 2 +-
+ board/compulab/cm_t35/cm_t35.c | 2 +-
+ board/compulab/common/eeprom.c | 4 ++--
+ board/compulab/common/eeprom.h | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 3ad12168ec..572111d438 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -708,7 +708,7 @@ int dram_init(void)
+ 
+ u32 get_board_rev(void)
+ {
+-	return cl_eeprom_get_board_rev();
++	return cl_eeprom_get_board_rev(CONFIG_SYS_I2C_EEPROM_BUS);
+ }
+ 
+ static struct mxc_serial_platdata cm_fx6_mxc_serial_plat = {
+diff --git a/board/compulab/cm_t35/cm_t35.c b/board/compulab/cm_t35/cm_t35.c
+index 398c5739bd..26c6a81a93 100644
+--- a/board/compulab/cm_t35/cm_t35.c
++++ b/board/compulab/cm_t35/cm_t35.c
+@@ -105,7 +105,7 @@ int board_init(void)
+  */
+ u32 get_board_rev(void)
+ {
+-	return cl_eeprom_get_board_rev();
++	return cl_eeprom_get_board_rev(CONFIG_SYS_I2C_EEPROM_BUS);
+ };
+ 
+ int misc_init_r(void)
+diff --git a/board/compulab/common/eeprom.c b/board/compulab/common/eeprom.c
+index 77bcea44b4..aaacd2e32e 100644
+--- a/board/compulab/common/eeprom.c
++++ b/board/compulab/common/eeprom.c
+@@ -121,7 +121,7 @@ static u32 board_rev;
+  * Routine: cl_eeprom_get_board_rev
+  * Description: read system revision from eeprom
+  */
+-u32 cl_eeprom_get_board_rev(void)
++u32 cl_eeprom_get_board_rev(uint eeprom_bus)
+ {
+ 	char str[5]; /* Legacy representation can contain at most 4 digits */
+ 	uint offset = BOARD_REV_OFFSET_LEGACY;
+@@ -129,7 +129,7 @@ u32 cl_eeprom_get_board_rev(void)
+ 	if (board_rev)
+ 		return board_rev;
+ 
+-	if (cl_eeprom_setup(CONFIG_SYS_I2C_EEPROM_BUS))
++	if (cl_eeprom_setup(eeprom_bus))
+ 		return 0;
+ 
+ 	if (cl_eeprom_layout != LAYOUT_LEGACY)
+diff --git a/board/compulab/common/eeprom.h b/board/compulab/common/eeprom.h
+index 50c6b0226f..e74c379217 100644
+--- a/board/compulab/common/eeprom.h
++++ b/board/compulab/common/eeprom.h
+@@ -12,13 +12,13 @@
+ 
+ #ifdef CONFIG_SYS_I2C
+ int cl_eeprom_read_mac_addr(uchar *buf, uint eeprom_bus);
+-u32 cl_eeprom_get_board_rev(void);
++u32 cl_eeprom_get_board_rev(uint eeprom_bus);
+ #else
+ static inline int cl_eeprom_read_mac_addr(uchar *buf, uint eeprom_bus)
+ {
+ 	return 1;
+ }
+-static inline u32 cl_eeprom_get_board_rev(void)
++static inline u32 cl_eeprom_get_board_rev(uint eeprom_bus)
+ {
+ 	return 0;
+ }
+-- 
+2.29.0
+

@@ -1,0 +1,83 @@
+From 519835987321d45d2b406512472eca2b471cb156 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 18 Jan 2022 17:25:43 +0200
+Subject: [PATCH] store RAM size
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 45 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 74beb69dbd..27a33faa0e 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -673,6 +673,47 @@ int ft_board_setup(void *blob, bd_t *bd)
+ }
+ #endif
+ 
++static void cm_fx6_store_ram_size(void)
++{
++	unsigned long m = 0, n;
++	uint64_t f;
++	static const char names[] = {'E', 'P', 'T', 'G', 'M', 'K'};
++	unsigned long d = 10 * ARRAY_SIZE(names);
++	char c = 0;
++	unsigned int i;
++	uint64_t size=gd->ram_size;
++	char buffer[10];
++
++	for (i = 0; i < ARRAY_SIZE(names); i++, d -= 10) {
++		if (size >> d) {
++			c = names[i];
++			break;
++		}
++        }
++
++	if (!c) {
++		sprintf(buffer, "%llu", size);
++		goto store_res;
++	}
++
++	n = size >> d;
++	f = size & ((1ULL << d) - 1);
++
++	/* If there's a remainder, deal with it */
++	if (f) {
++		m = (10ULL * f + (1ULL << (d - 1))) >> d;
++
++                if (m >= 10) {
++			m -= 10;
++			n += 1;
++		}
++        }
++
++	sprintf(buffer, "%lu%c", n, c);
++store_res:
++	setenv("ram_size", buffer);
++}
++
+ int board_init(void)
+ {
+ 	int ret;
+@@ -714,6 +755,7 @@ int board_init(void)
+ 
+ int board_late_init(void)
+ {
++	cm_fx6_store_ram_size();
+ 
+ #ifdef CONFIG_ATP_ENV
+ 	setenv("atp" , "yes");
+@@ -766,6 +808,9 @@ void dram_init_banksize(void)
+ 		gd->bd->bi_dram[0].size = 0x70000000;
+ 		gd->bd->bi_dram[1].size = 0x7FF00000;
+ 		break;
++	default:
++	        gd->bd->bi_dram[0].size = 0xDEADBEEF;
++		break;
+ 	}
+ }
+ 
+-- 
+2.29.0
+

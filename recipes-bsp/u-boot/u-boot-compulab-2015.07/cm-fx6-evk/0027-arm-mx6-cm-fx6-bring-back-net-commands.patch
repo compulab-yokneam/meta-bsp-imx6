@@ -1,0 +1,25 @@
+From 1033941610dad3f0effde1007723d0126f31d324 Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Wed, 2 Sep 2015 13:09:20 +0300
+Subject: [PATCH] arm: mx6: cm-fx6: bring back net commands
+
+Bring back dhcp and ping commands.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ configs/cm_fx6_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configs/cm_fx6_defconfig b/configs/cm_fx6_defconfig
+index 6be5c179ee..c358afcb6c 100644
+--- a/configs/cm_fx6_defconfig
++++ b/configs/cm_fx6_defconfig
+@@ -10,3 +10,5 @@ CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=arch/arm/imx-common/spl_sd.cfg,MX6QDL,SPL"
+ # CONFIG_CMD_FPGA is not set
+ # CONFIG_CMD_SETEXPR is not set
+ CONFIG_SPI_FLASH=y
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_PING=y
+-- 
+2.29.0
+

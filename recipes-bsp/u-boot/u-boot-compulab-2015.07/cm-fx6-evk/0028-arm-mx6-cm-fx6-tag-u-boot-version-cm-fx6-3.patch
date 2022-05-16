@@ -1,0 +1,28 @@
+From 299ea48a6328a1647986fe10becabd356c3f51ca Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Mon, 21 Sep 2015 16:44:14 +0300
+Subject: [PATCH] arm: mx6: cm-fx6: tag u-boot version -cm-fx6-3
+
+Tag u-boot version -cm-fx6-3
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index a7dce06408..b255262b5a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 2015
+ PATCHLEVEL = 07
+ SUBLEVEL =
+-EXTRAVERSION =
++EXTRAVERSION = -cm-fx6-3
+ NAME =
+ 
+ # *DOCUMENTATION*
+-- 
+2.29.0
+

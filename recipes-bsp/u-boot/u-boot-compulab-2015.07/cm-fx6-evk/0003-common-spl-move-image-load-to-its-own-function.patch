@@ -1,0 +1,219 @@
+From 77b50d7ab6f9f3d82fcb8b84735445fb87b82d3b Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Wed, 7 Jan 2015 17:33:38 +0200
+Subject: [PATCH] common: spl: move image load to its own function
+
+Refactor spl image load code out of board_init_r and into its own
+function. This is a preparation for supporting alternative boot
+devices.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ common/spl/spl.c | 143 +++++++++++++++++++++--------------------------
+ 1 file changed, 63 insertions(+), 80 deletions(-)
+
+diff --git a/common/spl/spl.c b/common/spl/spl.c
+index 6480fd98ce..27f0a3b1a1 100644
+--- a/common/spl/spl.c
++++ b/common/spl/spl.c
+@@ -150,124 +150,58 @@ static int spl_ram_load_image(void)
+ }
+ #endif
+ 
+-void board_init_r(gd_t *dummy1, ulong dummy2)
++static int spl_load_image(u32 boot_device)
+ {
+-	u32 boot_device;
+-	int ret;
+-
+-	debug(">>spl:board_init_r()\n");
+-
+-#if defined(CONFIG_SYS_SPL_MALLOC_START)
+-	mem_malloc_init(CONFIG_SYS_SPL_MALLOC_START,
+-			CONFIG_SYS_SPL_MALLOC_SIZE);
+-	gd->flags |= GD_FLG_FULL_MALLOC_INIT;
+-#elif defined(CONFIG_SYS_MALLOC_F_LEN)
+-	gd->malloc_limit = CONFIG_SYS_MALLOC_F_LEN;
+-	gd->malloc_ptr = 0;
+-#endif
+-	if (IS_ENABLED(CONFIG_OF_CONTROL) &&
+-			!IS_ENABLED(CONFIG_SPL_DISABLE_OF_CONTROL)) {
+-		ret = fdtdec_setup();
+-		if (ret) {
+-			debug("fdtdec_setup() returned error %d\n", ret);
+-			hang();
+-		}
+-	}
+-	if (IS_ENABLED(CONFIG_SPL_DM)) {
+-		ret = dm_init_and_scan(true);
+-		if (ret) {
+-			debug("dm_init_and_scan() returned error %d\n", ret);
+-			hang();
+-		}
+-	}
+-
+-#ifndef CONFIG_PPC
+-	/*
+-	 * timer_init() does not exist on PPC systems. The timer is initialized
+-	 * and enabled (decrementer) in interrupt_init() here.
+-	 */
+-	timer_init();
+-#endif
+-
+-#ifdef CONFIG_SPL_BOARD_INIT
+-	spl_board_init();
+-#endif
+-
+-	boot_device = spl_boot_device();
+-	debug("boot device - %d\n", boot_device);
+ 	switch (boot_device) {
+ #ifdef CONFIG_SPL_RAM_DEVICE
+ 	case BOOT_DEVICE_RAM:
+-		if (spl_ram_load_image())
+-			hang();
+-		break;
++		return spl_ram_load_image();
+ #endif
+ #ifdef CONFIG_SPL_MMC_SUPPORT
+ 	case BOOT_DEVICE_MMC1:
+ 	case BOOT_DEVICE_MMC2:
+ 	case BOOT_DEVICE_MMC2_2:
+-		if (spl_mmc_load_image())
+-			hang();
+-		break;
++		return spl_mmc_load_image();
+ #endif
+ #ifdef CONFIG_SPL_NAND_SUPPORT
+ 	case BOOT_DEVICE_NAND:
+-		if (spl_nand_load_image())
+-			hang();
+-		break;
++		return spl_nand_load_image();
+ #endif
+ #ifdef CONFIG_SPL_ONENAND_SUPPORT
+ 	case BOOT_DEVICE_ONENAND:
+-		if (spl_onenand_load_image())
+-			hang();
+-		break;
++		return spl_onenand_load_image();
+ #endif
+ #ifdef CONFIG_SPL_NOR_SUPPORT
+ 	case BOOT_DEVICE_NOR:
+-		if (spl_nor_load_image())
+-			hang();
+-		break;
++		return spl_nor_load_image();
+ #endif
+ #ifdef CONFIG_SPL_YMODEM_SUPPORT
+ 	case BOOT_DEVICE_UART:
+-		if (spl_ymodem_load_image())
+-			hang();
+-		break;
++		return spl_ymodem_load_image();
+ #endif
+ #ifdef CONFIG_SPL_SPI_SUPPORT
+ 	case BOOT_DEVICE_SPI:
+-		if (spl_spi_load_image())
+-			hang();
+-		break;
++		return spl_spi_load_image();
+ #endif
+ #ifdef CONFIG_SPL_ETH_SUPPORT
+ 	case BOOT_DEVICE_CPGMAC:
+ #ifdef CONFIG_SPL_ETH_DEVICE
+-		if (spl_net_load_image(CONFIG_SPL_ETH_DEVICE))
+-			hang();
++		return spl_net_load_image(CONFIG_SPL_ETH_DEVICE);
+ #else
+-		if (spl_net_load_image(NULL))
+-			hang();
++		return spl_net_load_image(NULL);
+ #endif
+-		break;
+ #endif
+ #ifdef CONFIG_SPL_USBETH_SUPPORT
+ 	case BOOT_DEVICE_USBETH:
+-		if (spl_net_load_image("usb_ether"))
+-			hang();
+-		break;
++		return spl_net_load_image("usb_ether");
+ #endif
+ #ifdef CONFIG_SPL_USB_SUPPORT
+ 	case BOOT_DEVICE_USB:
+-		if (spl_usb_load_image())
+-			hang();
+-		break;
++		return spl_usb_load_image();
+ #endif
+ #ifdef CONFIG_SPL_SATA_SUPPORT
+ 	case BOOT_DEVICE_SATA:
+-		if (spl_sata_load_image())
+-			hang();
+-		break;
++		return spl_sata_load_image();
+ #endif
+ #ifdef CONFIG_SPL_BOARD_LOAD_IMAGE
+ 	case BOOT_DEVICE_BOARD:
+@@ -278,9 +212,58 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
+ #if defined(CONFIG_SPL_SERIAL_SUPPORT) && defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
+ 		puts("SPL: Unsupported Boot Device!\n");
+ #endif
+-		hang();
+ 	}
+ 
++	return -EINVAL;
++}
++
++void board_init_r(gd_t *dummy1, ulong dummy2)
++{
++	u32 boot_device;
++	int ret;
++
++	debug(">>spl:board_init_r()\n");
++#if defined(CONFIG_SYS_SPL_MALLOC_START)
++	mem_malloc_init(CONFIG_SYS_SPL_MALLOC_START,
++			CONFIG_SYS_SPL_MALLOC_SIZE);
++	gd->flags |= GD_FLG_FULL_MALLOC_INIT;
++#elif defined(CONFIG_SYS_MALLOC_F_LEN)
++	gd->malloc_limit = CONFIG_SYS_MALLOC_F_LEN;
++	gd->malloc_ptr = 0;
++#endif
++	if (IS_ENABLED(CONFIG_OF_CONTROL) &&
++			!IS_ENABLED(CONFIG_SPL_DISABLE_OF_CONTROL)) {
++		ret = fdtdec_setup();
++		if (ret) {
++			debug("fdtdec_setup() returned error %d\n", ret);
++			hang();
++		}
++	}
++	if (IS_ENABLED(CONFIG_SPL_DM)) {
++		ret = dm_init_and_scan(true);
++		if (ret) {
++			debug("dm_init_and_scan() returned error %d\n", ret);
++			hang();
++		}
++	}
++
++#ifndef CONFIG_PPC
++	/*
++	 * timer_init() does not exist on PPC systems. The timer is initialized
++	 * and enabled (decrementer) in interrupt_init() here.
++	 */
++	timer_init();
++#endif
++
++#ifdef CONFIG_SPL_BOARD_INIT
++	spl_board_init();
++#endif
++
++	boot_device = spl_boot_device();
++	debug("boot device - %d\n", boot_device);
++	if (spl_load_image(boot_device))
++		hang();
++
+ 	switch (spl_image.os) {
+ 	case IH_OS_U_BOOT:
+ 		debug("Jumping to U-Boot\n");
+-- 
+2.29.0
+

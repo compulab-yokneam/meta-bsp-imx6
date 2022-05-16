@@ -1,0 +1,74 @@
+From 0a4450526f9e5793e4c7fc391bd1ddf1be8b5d6e Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Wed, 2 Sep 2015 12:51:24 +0300
+Subject: [PATCH] compulab: eeprom: add support for obtaining product name
+
+Introduce cl_eeprom_get_product_name() for obtaining product name
+from the eeprom.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/common/eeprom.c | 19 +++++++++++++++++++
+ board/compulab/common/eeprom.h |  5 +++++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/board/compulab/common/eeprom.c b/board/compulab/common/eeprom.c
+index aaacd2e32e..a48da93629 100644
+--- a/board/compulab/common/eeprom.c
++++ b/board/compulab/common/eeprom.c
+@@ -25,6 +25,8 @@
+ #define BOARD_REV_OFFSET		0
+ #define BOARD_REV_OFFSET_LEGACY		6
+ #define BOARD_REV_SIZE			2
++#define BOARD_PRODUCT_NAME_OFFSET	128
++#define BOARD_PRODUCT_NAME_SIZE		16
+ #define MAC_ADDR_OFFSET			4
+ #define MAC_ADDR_OFFSET_LEGACY		0
+ 
+@@ -149,3 +151,20 @@ u32 cl_eeprom_get_board_rev(uint eeprom_bus)
+ 
+ 	return board_rev;
+ };
++
++static char product_name[BOARD_PRODUCT_NAME_SIZE];
++char *cl_eeprom_get_product_name(uint eeprom_bus)
++{
++	if (cl_eeprom_setup(eeprom_bus))
++		return NULL;
++
++	if (cl_eeprom_read(BOARD_PRODUCT_NAME_OFFSET,
++			   (uchar *)product_name, BOARD_PRODUCT_NAME_SIZE)) {
++		return NULL;
++	}
++
++	/* Protect ourselves from invalid data (unterminated string) */
++	product_name[BOARD_PRODUCT_NAME_SIZE - 1] = '\0';
++
++	return product_name;
++}
+diff --git a/board/compulab/common/eeprom.h b/board/compulab/common/eeprom.h
+index e74c379217..97d1606a13 100644
+--- a/board/compulab/common/eeprom.h
++++ b/board/compulab/common/eeprom.h
+@@ -13,6 +13,7 @@
+ #ifdef CONFIG_SYS_I2C
+ int cl_eeprom_read_mac_addr(uchar *buf, uint eeprom_bus);
+ u32 cl_eeprom_get_board_rev(uint eeprom_bus);
++char *cl_eeprom_get_product_name(uint eeprom_bus);
+ #else
+ static inline int cl_eeprom_read_mac_addr(uchar *buf, uint eeprom_bus)
+ {
+@@ -22,6 +23,10 @@ static inline u32 cl_eeprom_get_board_rev(uint eeprom_bus)
+ {
+ 	return 0;
+ }
++static char *cl_eeprom_get_product_name(uint eeprom_bus)
++{
++	return NULL;
++}
+ #endif
+ 
+ #endif
+-- 
+2.29.0
+

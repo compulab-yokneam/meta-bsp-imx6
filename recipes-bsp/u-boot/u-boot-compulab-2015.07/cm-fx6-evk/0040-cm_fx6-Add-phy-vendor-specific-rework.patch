@@ -1,0 +1,104 @@
+From b83486501e47badce08b3c03e85177b88fe716d3 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 18 Jan 2022 17:25:09 +0200
+Subject: [PATCH] cm_fx6: Add phy vendor specific rework
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 55 +++++++++++++++++++++++++++++++---
+ include/configs/cm_fx6.h       |  2 ++
+ 2 files changed, 53 insertions(+), 4 deletions(-)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index ce4d3e4c0f..74beb69dbd 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -396,7 +396,7 @@ static int cm_fx6_setup_usb_host(void) { return 0; }
+ #define ENET_PAD_CTRL		(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
+ 				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+ 
+-static int mx6_rgmii_rework(struct phy_device *phydev)
++static int mx6_rgmii_rework_atheros(struct phy_device *phydev)
+ {
+ 	unsigned short val;
+ 
+@@ -429,13 +429,60 @@ static int mx6_rgmii_rework(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
++{
++#define TXDLY_MASK ((1 << 13) | (1 << 12))
++#define RXDLY_MASK ((1 << 13) | (1 << 11))
++
++	unsigned short val;
++
++	/* introduce tx clock delay */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x7);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0xa4);
++
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1c);
++	val |= TXDLY_MASK;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
++
++	/* introduce rx clock delay */
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1c);
++	val |= RXDLY_MASK;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
++
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0);
++	return 0;
++}
++
++static int mx6_rgmii_rework(struct phy_device *phydev)
++{
++#define PHY_VENDOR_ID_MASK (( 1<<5 ) - 1 )
++#define PHY_ATEROS_ID  0x7
++#define PHY_REALTEK_ID 0x11
++	unsigned short val = phy_read(phydev, MDIO_DEVAD_NONE, 0x3);
++
++	val = (( val >> 4 ) & PHY_VENDOR_ID_MASK);
++
++	switch (val) {
++	case PHY_ATEROS_ID:
++		mx6_rgmii_rework_atheros(phydev);
++		break;
++	case PHY_REALTEK_ID:
++		mx6_rgmii_rework_realtek(phydev);
++		break;
++	default:
++		break;
++	}
++
++	return 0;
++}
++
+ extern int phy_status;
+ int board_phy_config(struct phy_device *phydev)
+ {
+ 	if (phy_status) {
+-        setenv("ext_phy" , "yes");
+-        return 0;
+-    }
++		setenv("ext_phy" , "yes");
++		return 0;
++	}
+ 
+ 	mx6_rgmii_rework(phydev);
+ 
+diff --git a/include/configs/cm_fx6.h b/include/configs/cm_fx6.h
+index df4274cac7..f1eec6e714 100644
+--- a/include/configs/cm_fx6.h
++++ b/include/configs/cm_fx6.h
+@@ -193,6 +193,8 @@
+ #define IMX_FEC_BASE			ENET_BASE_ADDR
+ #define CONFIG_PHYLIB
+ #define CONFIG_PHY_ATHEROS
++#define CONFIG_PHY_REALTEK
++#define CONFIG_PHY_FIXED
+ #define CONFIG_MII
+ #define CONFIG_ETHPRIME			"FEC0"
+ #define CONFIG_ARP_TIMEOUT		200UL
+-- 
+2.29.0
+

@@ -1,0 +1,102 @@
+From 8b54ccb3bf42113eaa8926695b441b70f2ab9c44 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 18 Jan 2022 17:19:39 +0200
+Subject: [PATCH] cm_fx6: Add ATP config support
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ Makefile                       |  3 +++
+ board/compulab/cm_fx6/Kconfig  |  4 ++++
+ board/compulab/cm_fx6/cm_fx6.c | 12 +++++++++++-
+ common/env_common.c            |  5 +++++
+ include/configs/cm_fx6.h       |  8 ++++++++
+ 5 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 0098bb2dd7..e4eaaf8c5f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -957,6 +957,9 @@ u-boot-with-spl.imx u-boot-with-nand-spl.imx: SPL u-boot.bin FORCE
+ u-boot.imx: SPL u-boot.img FORCE
+ 	@dd if=SPL of=$@ bs=1K seek=0 conv=notrunc 2>/dev/null
+ 	@dd if=u-boot.img of=$@ bs=1K seek=63 conv=notrunc 2>/dev/null
++ifeq ($(CONFIG_ATP_ENV),y)
++	@cp $@ u-boot-atp.imx
++endif
+ 
+ MKIMAGEFLAGS_u-boot.ubl = -n $(UBL_CONFIG) -T ublimage -e $(CONFIG_SYS_TEXT_BASE)
+ 
+diff --git a/board/compulab/cm_fx6/Kconfig b/board/compulab/cm_fx6/Kconfig
+index 508c21f58b..eecdc7ba69 100644
+--- a/board/compulab/cm_fx6/Kconfig
++++ b/board/compulab/cm_fx6/Kconfig
+@@ -12,4 +12,8 @@ config SYS_SOC
+ config SYS_CONFIG_NAME
+ 	default "cm_fx6"
+ 
++config ATP_ENV
++	bool "Set ATP Environment"
++	default n
++
+ endif
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index accfc50532..ce4d3e4c0f 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -665,9 +665,19 @@ int board_init(void)
+ 	return 0;
+ }
+ 
++int board_late_init(void)
++{
++
++#ifdef CONFIG_ATP_ENV
++	setenv("atp" , "yes");
++#endif
++
++	return 0;
++}
++
+ int checkboard(void)
+ {
+-	puts("Board: CM-FX6\n");
++	puts("Board: "CONFIG_BOARD_NAME"\n");
+ 	return 0;
+ }
+ 
+diff --git a/common/env_common.c b/common/env_common.c
+index af59c72e1f..c053549bf1 100644
+--- a/common/env_common.c
++++ b/common/env_common.c
+@@ -255,6 +255,11 @@ void env_relocate(void)
+ 	env_reloc();
+ 	env_htab.change_ok += gd->reloc_off;
+ #endif
++
++#if defined(CONFIG_ATP_ENV)
++	set_default_env("ATP Environment\n");
++	return;
++#endif
+ 	if (gd->env_valid == 0) {
+ #if defined(CONFIG_ENV_IS_NOWHERE) || defined(CONFIG_SPL_BUILD)
+ 		/* Environment not changable */
+diff --git a/include/configs/cm_fx6.h b/include/configs/cm_fx6.h
+index e13fe20f4e..df4274cac7 100644
+--- a/include/configs/cm_fx6.h
++++ b/include/configs/cm_fx6.h
+@@ -280,4 +280,12 @@
+ #define CONFIG_VIDEO_LOGO
+ #define CONFIG_VIDEO_BMP_LOGO
+ 
++#define CONFIG_BOARD_LATE_INIT
++
++#define CONFIG_BOARD_NAME	"CM-FX6"
++#ifdef CONFIG_ATP_ENV
++#undef CONFIG_BOARD_NAME
++#define CONFIG_BOARD_NAME	"CM-FX6-ATP"
++#endif
++
+ #endif	/* __CONFIG_CM_FX6_H */
+-- 
+2.29.0
+

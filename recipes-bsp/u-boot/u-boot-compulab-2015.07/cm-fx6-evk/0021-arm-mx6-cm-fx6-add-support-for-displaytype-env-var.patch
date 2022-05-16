@@ -1,0 +1,35 @@
+From 77886cd5b28182a48a9e52e67a8b326c1cab40db Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Wed, 14 Jan 2015 19:13:22 +0200
+Subject: [PATCH] arm: mx6: cm-fx6: add support for displaytype env var
+
+Add support for selecting display preset using the environment variable
+"displaytype". This is a preparation for future merging of compulab
+omap3_display.c display selection code with the cm-fx6 display selection code.
+
+The "panel" environment variable is retained for backwards compatibility.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ board/compulab/cm_fx6/cm_fx6.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 9afa66e77b..e4777db887 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -114,7 +114,10 @@ int board_video_skip(void)
+ {
+ 	int ret;
+ 	struct display_info_t *preset;
+-	char const *panel = getenv("panel");
++	char const *panel = getenv("displaytype");
++
++	if (!panel) /* Also accept panel for backward compatibility */
++		panel = getenv("panel");
+ 
+ 	if (!panel)
+ 		return -ENOENT;
+-- 
+2.29.0
+

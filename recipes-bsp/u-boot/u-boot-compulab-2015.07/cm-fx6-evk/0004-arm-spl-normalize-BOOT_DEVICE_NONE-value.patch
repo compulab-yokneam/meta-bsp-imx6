@@ -1,0 +1,47 @@
+From 6e4050ba6933aab83e689f53eb19a7f1af1169f4 Mon Sep 17 00:00:00 2001
+From: Nikita Kiryanov <nikita@compulab.co.il>
+Date: Sat, 3 Jan 2015 21:59:22 +0200
+Subject: [PATCH] arm: spl: normalize BOOT_DEVICE_NONE value
+
+In order to support a boot device list in SPL, it is necessary to
+be able to designate a value for "no entry" to serve as a list
+terminator.
+
+BOOT_DEVICE_NONE is a natural candidate, but it is not defined for
+all architectures. In itself, that is not a problem, since it can be
+conditionally defined in spl common code where it shall be needed.
+However, BOOT_DEVICE_NONE value needs to be normalized across architectures,
+otherwise the definition done in spl common code will differ from
+other spl code, and weird bugs may happen.
+
+The standard value for BOOT_DEVICE_NONE across most of U-Boot is 0.
+Make it consistent by removing the only exception.
+
+Signed-off-by: Nikita Kiryanov <nikita@compulab.co.il>
+---
+ arch/arm/include/asm/spl.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/include/asm/spl.h b/arch/arm/include/asm/spl.h
+index 6db405d7d9..d5a4c43769 100644
+--- a/arch/arm/include/asm/spl.h
++++ b/arch/arm/include/asm/spl.h
+@@ -15,6 +15,7 @@
+ 
+ #else
+ enum {
++	BOOT_DEVICE_NONE,
+ 	BOOT_DEVICE_RAM,
+ 	BOOT_DEVICE_MMC1,
+ 	BOOT_DEVICE_MMC2,
+@@ -27,7 +28,6 @@ enum {
+ 	BOOT_DEVICE_SATA,
+ 	BOOT_DEVICE_I2C,
+ 	BOOT_DEVICE_BOARD,
+-	BOOT_DEVICE_NONE
+ };
+ #endif
+ 
+-- 
+2.29.0
+
