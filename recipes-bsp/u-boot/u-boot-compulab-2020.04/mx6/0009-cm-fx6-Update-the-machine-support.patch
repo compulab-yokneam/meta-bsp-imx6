@@ -1,0 +1,446 @@
+From 00f93ecc7a2948a5a12214eb3a3713c91c33fb62 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 17 May 2022 08:13:00 +0300
+Subject: [PATCH] cm-fx6: Update the machine support
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/dts/Makefile          |   1 -
+ board/compulab/cm_fx6/cm_fx6.c |  49 ++++++++++-
+ board/compulab/cm_fx6/spl.c    | 143 ++++++++++++++++++++++++---------
+ configs/cm_fx6_defconfig       |  30 ++++++-
+ include/configs/cm_fx6.h       |   2 +-
+ 5 files changed, 184 insertions(+), 41 deletions(-)
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 55104ee27e..4ea4645b31 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -988,7 +988,6 @@ dtb-$(CONFIG_TARGET_DURIAN) += phytium-durian.dtb
+ dtb-$(CONFIG_TARGET_PRESIDIO_ASIC) += ca-presidio-engboard.dtb
+ 
+ dtb-$(CONFIG_TARGET_CL_SOM_IMX6) += imx6qp-cl-som-imx6.dtb
+-dtb-$(CONFIG_TARGET_CM_FX6) += imx6q-cm-fx6
+ 
+ targets += $(dtb-y)
+ 
+diff --git a/board/compulab/cm_fx6/cm_fx6.c b/board/compulab/cm_fx6/cm_fx6.c
+index 3e185ad82a..fdb6a0af45 100644
+--- a/board/compulab/cm_fx6/cm_fx6.c
++++ b/board/compulab/cm_fx6/cm_fx6.c
+@@ -368,7 +368,7 @@ static int cm_fx6_setup_usb_host(void) { return 0; }
+ #define ENET_PAD_CTRL		(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
+ 				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+ 
+-static int mx6_rgmii_rework(struct phy_device *phydev)
++static int mx6_rgmii_rework_atheros(struct phy_device *phydev)
+ {
+ 	unsigned short val;
+ 
+@@ -401,6 +401,53 @@ static int mx6_rgmii_rework(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int mx6_rgmii_rework_realtek(struct phy_device *phydev)
++{
++#define TXDLY_MASK ((1 << 13) | (1 << 12))
++#define RXDLY_MASK ((1 << 13) | (1 << 11))
++
++	unsigned short val;
++
++	/* introduce tx clock delay */
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x7);
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0xa4);
++
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1c);
++	val |= TXDLY_MASK;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
++
++	/* introduce rx clock delay */
++	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x1c);
++	val |= RXDLY_MASK;
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1c, val);
++
++	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0);
++	return 0;
++}
++
++static int mx6_rgmii_rework(struct phy_device *phydev)
++{
++#define PHY_VENDOR_ID_MASK (( 1<<5 ) - 1 )
++#define PHY_ATEROS_ID  0x7
++#define PHY_REALTEK_ID 0x11
++	unsigned short val = phy_read(phydev, MDIO_DEVAD_NONE, 0x3);
++
++	val = (( val >> 4 ) & PHY_VENDOR_ID_MASK);
++
++	switch (val) {
++	case PHY_ATEROS_ID:
++		mx6_rgmii_rework_atheros(phydev);
++		break;
++	case PHY_REALTEK_ID:
++		mx6_rgmii_rework_realtek(phydev);
++		break;
++	default:
++		break;
++	}
++
++	return 0;
++}
++
+ int board_phy_config(struct phy_device *phydev)
+ {
+ 	mx6_rgmii_rework(phydev);
+diff --git a/board/compulab/cm_fx6/spl.c b/board/compulab/cm_fx6/spl.c
+index 592d741095..3a3d7737a1 100644
+--- a/board/compulab/cm_fx6/spl.c
++++ b/board/compulab/cm_fx6/spl.c
+@@ -82,11 +82,14 @@ enum ddr_config {
+ 	.grp_ctlds	= 0x00000038, \
+ 	.grp_ddr_type	= 0x000C0000,
+ 
+-static struct mx6sdl_iomux_ddr_regs ddr_iomux_s = { CM_FX6_DDR_IOMUX_CFG };
+-static struct mx6sdl_iomux_grp_regs grp_iomux_s = { CM_FX6_GPR_IOMUX_CFG };
+ static struct mx6dq_iomux_ddr_regs ddr_iomux_q = { CM_FX6_DDR_IOMUX_CFG };
+ static struct mx6dq_iomux_grp_regs grp_iomux_q = { CM_FX6_GPR_IOMUX_CFG };
+ 
++#if defined(CONFIG_MX6SL)
++
++static struct mx6sdl_iomux_ddr_regs ddr_iomux_s = { CM_FX6_DDR_IOMUX_CFG };
++static struct mx6sdl_iomux_grp_regs grp_iomux_s = { CM_FX6_GPR_IOMUX_CFG };
++
+ static struct mx6_mmdc_calibration cm_fx6_calib_s = {
+ 	.p0_mpwldectrl0	= 0x005B0061,
+ 	.p0_mpwldectrl1	= 0x004F0055,
+@@ -147,21 +150,7 @@ static void spl_mx6s_dram_init(enum ddr_config dram_config, bool reset)
+ 	mx6_dram_cfg(&cm_fx6_sysinfo_s, &cm_fx6_calib_s, &cm_fx6_ddr3_cfg_s);
+ 	udelay(100);
+ }
+-
+-static struct mx6_mmdc_calibration cm_fx6_calib_q = {
+-	.p0_mpwldectrl0	= 0x00630068,
+-	.p0_mpwldectrl1	= 0x0068005D,
+-	.p0_mpdgctrl0	= 0x04140428,
+-	.p0_mpdgctrl1	= 0x037C037C,
+-	.p0_mprddlctl	= 0x3C30303A,
+-	.p0_mpwrdlctl	= 0x3A344038,
+-	.p1_mpwldectrl0	= 0x0035004C,
+-	.p1_mpwldectrl1	= 0x00170026,
+-	.p1_mpdgctrl0	= 0x0374037C,
+-	.p1_mpdgctrl1	= 0x0350032C,
+-	.p1_mprddlctl	= 0x30322A3C,
+-	.p1_mpwrdlctl	= 0x48304A3E,
+-};
++#endif
+ 
+ static struct mx6_ddr_sysinfo cm_fx6_sysinfo_q = {
+ 	.cs_density	= 16,
+@@ -189,11 +178,51 @@ static struct mx6_ddr3_cfg cm_fx6_ddr3_cfg_q = {
+ 	.trasmin	= 9750,
+ 	.SRT		= 0,
+ };
++int mmdc_do_write_level_calibration(struct mx6_ddr_sysinfo const *sysinfo);
++int mmdc_do_dqs_calibration(struct mx6_ddr_sysinfo const *sysinfo);
++void mmdc_read_calibration(struct mx6_ddr_sysinfo const *sysinfo,
++                           struct mx6_mmdc_calibration *calib);
++
++#define MX6DQP_NOC_SCHED_BASE	0x00bb0000
++struct mx6dqp_noc_sched_regs {
++	u32 coreid;
++	u32 revid;
++	u32 ddrconf;
++	u32 ddrtiming;
++	u32 ddrmode;
++	u32 rlat;
++	u32 res1[4];
++	u32 ipu1;
++	u32 ipu2;
++	u32 res2[2];
++	u32 activate;
++	u32 res3[16];
++};
++
++static void spl_mx6qp_noc_init(void) {
++	/* NoC DDR configuration register set 0x00BB0000 0x00BB003F */
++	volatile struct mx6dqp_noc_sched_regs *noc_sched;
++	noc_sched = (struct mx6dqp_noc_sched_regs *)MX6DQP_NOC_SCHED_BASE;
++	noc_sched->ddrconf = 0x00000000;
++	noc_sched->ddrtiming = 0x2891E41A;
++	noc_sched->activate = 0x00000564;
++	noc_sched->rlat = 0x00000040;
++	noc_sched->ipu1 = 0x00000020;
++	noc_sched->ipu2 = 0x00000020;
++}
+ 
+ static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
+ {
++	int errs;
++	struct mx6_mmdc_calibration calibration = {0};
++	struct mmdc_p_regs *mmdc_p0_regs = (struct mmdc_p_regs *)MX6_MMDC_P0_MDCTL;
++
+ 	if (reset)
+-		((struct mmdc_p_regs *)MX6_MMDC_P0_MDCTL)->mdmisc = 2;
++		mmdc_p0_regs->mdmisc = 2;
++
++	/* write leveling calibration defaults */
++	calibration.p0_mpwrdlctl = 0x40404040;
++	calibration.p1_mpwrdlctl = 0x40404040;
+ 
+ 	cm_fx6_ddr3_cfg_q.rowaddr = 14;
+ 	switch (dram_config) {
+@@ -223,15 +252,36 @@ static void spl_mx6q_dram_init(enum ddr_config dram_config, bool reset)
+ 		hang();
+ 	}
+ 
+-	mx6_dram_cfg(&cm_fx6_sysinfo_q, &cm_fx6_calib_q, &cm_fx6_ddr3_cfg_q);
++	/* write leveling calibration defaults */
++	calibration.p0_mpwrdlctl = 0x40404040;
++	calibration.p1_mpwrdlctl = 0x40404040;
++
++
++	if (get_cpu_type() == MXC_CPU_MX6QP)
++		spl_mx6qp_noc_init();
++
++	mx6_dram_cfg(&cm_fx6_sysinfo_q, &calibration, &cm_fx6_ddr3_cfg_q);
++
++	errs = mmdc_do_write_level_calibration(&cm_fx6_sysinfo_q);
++	if (errs) {
++		printf("error %d from write level calibration\n", errs);
++	} else {
++		errs = mmdc_do_dqs_calibration(&cm_fx6_sysinfo_q);
++		if (errs) {
++			printf("error %d from dqs calibration\n", errs);
++		} else {
++			mmdc_read_calibration(&cm_fx6_sysinfo_q, &calibration);
++		}
++	}
+ 	udelay(100);
+ }
+ 
+-static int cm_fx6_spl_dram_init(void)
++static int spl_dram_init(void)
+ {
+ 	unsigned long bank1_size, bank2_size;
+ 
+ 	switch (get_cpu_type()) {
++#if defined(CONFIG_MX6SL)
+ 	case MXC_CPU_MX6SOLO:
+ 		mx6sdl_dram_iocfg(64, &ddr_iomux_s, &grp_iomux_s);
+ 
+@@ -252,8 +302,10 @@ static int cm_fx6_spl_dram_init(void)
+ 			return 0;
+ 
+ 		break;
++#endif
+ 	case MXC_CPU_MX6D:
+ 	case MXC_CPU_MX6Q:
++	case MXC_CPU_MX6QP:
+ 		mx6dq_dram_iocfg(64, &ddr_iomux_q, &grp_iomux_q);
+ 
+ 		spl_mx6q_dram_init(DDR_64BIT_4GB, false);
+@@ -295,45 +347,59 @@ static iomux_v3_cfg_t const uart4_pads[] = {
+ 	IOMUX_PADS(PAD_KEY_ROW0__UART4_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
+ };
+ 
+-static void cm_fx6_setup_uart(void)
++static void setup_uart(void)
+ {
+ 	SETUP_IOMUX_PADS(uart4_pads);
+ 	enable_uart_clk(1);
+ }
+ 
+ #ifdef CONFIG_SPL_SPI_SUPPORT
+-static void cm_fx6_setup_ecspi(void)
++static void setup_ecspi(void)
+ {
+ 	cm_fx6_set_ecspi_iomux();
+ 	enable_spi_clk(1, 0);
+ }
+ #else
+-static void cm_fx6_setup_ecspi(void) { }
++static void setup_ecspi(void) { }
+ #endif
+ 
++static void ccgr_init(void)
++{
++	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++
++	writel(0x00C03F3F, &ccm->CCGR0);
++	writel(0x0030FC03, &ccm->CCGR1);
++	writel(0x0FFFC000, &ccm->CCGR2);
++	writel(0x3FF00000, &ccm->CCGR3);
++	writel(0xFFFFF300, &ccm->CCGR4);
++	writel(0x0F0000F3, &ccm->CCGR5);
++	writel(0x00000FFF, &ccm->CCGR6);
++}
++
+ void board_init_f(ulong dummy)
+ {
+-	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
++	arch_cpu_init();
+ 
+-	/*
+-	 * We don't use DMA in SPL, but we do need it in U-Boot. U-Boot
+-	 * initializes DMA very early (before all board code), so the only
+-	 * opportunity we have to initialize APBHDMA clocks is in SPL.
+-	 */
+-	setbits_le32(&mxc_ccm->CCGR0, MXC_CCM_CCGR0_APBHDMA_MASK);
+-	enable_usdhc_clk(1, 2);
++	ccgr_init();
++
++	gpr_init();
+ 
+-	arch_cpu_init();
+ 	timer_init();
+-	cm_fx6_setup_ecspi();
+-	cm_fx6_setup_uart();
+-	get_clocks();
++
++	setup_uart();
++
+ 	preloader_console_init();
++
++	setup_ecspi();
++
+ 	gpio_direction_output(CM_FX6_GREEN_LED, 1);
+-	if (cm_fx6_spl_dram_init()) {
++	if (spl_dram_init()) {
+ 		puts("!!!ERROR!!! DRAM detection failed!!!\n");
+ 		hang();
+ 	}
++
++	memset(__bss_start, 0, __bss_end - __bss_start);
++	board_init_r(NULL, 0);
+ }
+ 
+ void board_boot_order(u32 *spl_boot_list)
+@@ -364,3 +430,8 @@ int board_mmc_init(bd_t *bis)
+ 	return fsl_esdhc_initialize(bis, &usdhc_cfg);
+ }
+ #endif
++
++int board_fit_config_name_match(const char *name)
++{
++	return 0;
++}
+diff --git a/configs/cm_fx6_defconfig b/configs/cm_fx6_defconfig
+index d2de5cfe65..2dde362a09 100644
+--- a/configs/cm_fx6_defconfig
++++ b/configs/cm_fx6_defconfig
+@@ -4,6 +4,8 @@ CONFIG_SYS_TEXT_BASE=0x17800000
+ CONFIG_SPL_GPIO_SUPPORT=y
+ CONFIG_SPL_LIBCOMMON_SUPPORT=y
+ CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_MX6_DDRCAL=y
++# CONFIG_LDO_BYPASS_CHECK is not set
+ CONFIG_TARGET_CM_FX6=y
+ CONFIG_ENV_SIZE=0x2000
+ CONFIG_ENV_SECT_SIZE=0x10000
+@@ -15,28 +17,37 @@ CONFIG_SPL=y
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI_SUPPORT=y
+ # CONFIG_CMD_BMODE is not set
++CONFIG_SMBIOS_PRODUCT_NAME=""
+ CONFIG_AHCI=y
+ CONFIG_SPL_TEXT_BASE=0x00908000
+ CONFIG_DISTRO_DEFAULTS=y
++CONFIG_FIT=y
++CONFIG_SPL_FIT_PRINT=y
++CONFIG_SPL_LOAD_FIT=y
+ CONFIG_OF_BOARD_SETUP=y
+ CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=arch/arm/mach-imx/spl_sd.cfg"
+ CONFIG_BOOTDELAY=3
+ CONFIG_BOOTCOMMAND="run findfdt; run distro_bootcmd; run legacy_bootcmd"
+ CONFIG_USE_PREBOOT=y
+-CONFIG_PREBOOT="usb start;sf probe"
+ CONFIG_MISC_INIT_R=y
+ CONFIG_BOUNCE_BUFFER=y
++CONFIG_SPL_SEPARATE_BSS=y
+ CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x80
++CONFIG_SPL_FIT_IMAGE_TINY=y
+ CONFIG_SPL_I2C_SUPPORT=y
+ CONFIG_SPL_SPI_LOAD=y
+ CONFIG_SYS_SPI_U_BOOT_OFFS=0x10000
+ CONFIG_SPL_WATCHDOG_SUPPORT=y
+ CONFIG_SYS_PROMPT="CM-FX6 # "
+ # CONFIG_CMD_XIMG is not set
++CONFIG_CMD_SPL=y
++CONFIG_CMD_SPL_WRITE_SIZE=0x20000
+ CONFIG_CMD_GREPENV=y
+ CONFIG_CMD_EEPROM=y
+ CONFIG_CMD_EEPROM_LAYOUT=y
+ CONFIG_EEPROM_LAYOUT_HELP_STRING="v2, v3"
++CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_MEMTEST=y
+ # CONFIG_CMD_FLASH is not set
+ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_I2C=y
+@@ -57,14 +68,18 @@ CONFIG_DEFAULT_DEVICE_TREE="imx6q-cm-fx6"
+ CONFIG_ENV_IS_IN_SPI_FLASH=y
+ CONFIG_SYS_RELOC_GD_ENV_ADDR=y
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++# CONFIG_DM_DEVICE_REMOVE is not set
+ CONFIG_DWC_AHSATA=y
+ # CONFIG_DWC_AHSATA_AHCI is not set
++CONFIG_APBH_DMA=y
++CONFIG_APBH_DMA_BURST=y
++CONFIG_APBH_DMA_BURST8=y
++CONFIG_DM_I2C=y
+ CONFIG_DM_KEYBOARD=y
+ CONFIG_DM_MMC=y
+ CONFIG_FSL_USDHC=y
+ CONFIG_MTD=y
+ CONFIG_MTD_RAW_NAND=y
+-CONFIG_NAND_MXS=y
+ CONFIG_DM_SPI_FLASH=y
+ CONFIG_SF_DEFAULT_MODE=0
+ CONFIG_SF_DEFAULT_SPEED=25000000
+@@ -79,7 +94,11 @@ CONFIG_SPI_FLASH_WINBOND=y
+ CONFIG_SPI_FLASH_MTD=y
+ CONFIG_PHYLIB=y
+ CONFIG_DM_ETH=y
++CONFIG_FEC_MXC=y
++CONFIG_RGMII=y
+ CONFIG_MII=y
++CONFIG_PINCTRL=y
++CONFIG_PINCTRL_IMX6=y
+ CONFIG_DM_PMIC=y
+ CONFIG_DM_REGULATOR=y
+ CONFIG_SPI=y
+@@ -89,6 +108,13 @@ CONFIG_USB=y
+ CONFIG_DM_USB=y
+ CONFIG_USB_KEYBOARD=y
+ CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE=y
++CONFIG_USB_HOST_ETHER=y
++CONFIG_USB_ETHER_ASIX=y
++CONFIG_USB_ETHER_ASIX88179=y
+ CONFIG_DM_VIDEO=y
++# CONFIG_VIDEO_BPP8 is not set
++# CONFIG_VIDEO_BPP32 is not set
++CONFIG_SYS_WHITE_ON_BLACK=y
+ CONFIG_VIDEO_IPUV3=y
+ CONFIG_FDT_FIXUP_PARTITIONS=y
++CONFIG_SMBIOS_MANUFACTURER=""
+diff --git a/include/configs/cm_fx6.h b/include/configs/cm_fx6.h
+index 53ae5f08eb..15158f9546 100644
+--- a/include/configs/cm_fx6.h
++++ b/include/configs/cm_fx6.h
+@@ -161,7 +161,6 @@
+ #endif
+ 
+ /* Ethernet */
+-#define CONFIG_FEC_MXC
+ #define CONFIG_FEC_MXC_PHYADDR		0
+ #define CONFIG_FEC_XCV_TYPE		RGMII
+ #define IMX_FEC_BASE			ENET_BASE_ADDR
+@@ -178,6 +177,7 @@
+ 
+ /* I2C */
+ #define CONFIG_SYS_I2C
++#undef CONFIG_SYS_I2C
+ #define CONFIG_SYS_I2C_MXC
+ #define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */
+ #define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
+-- 
+2.17.1
+

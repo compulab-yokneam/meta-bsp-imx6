@@ -1,4 +1,4 @@
-SRC_URI_append_cl-som-imx6 = " \
+SRC_URI_append_mx6 = " \
 	file://0000-Makefile-Add-u-boot.imx-targer.patch \
 	file://0001-compulab-epprom-Add-CONFIG_DM_I2C-support.patch \
 	file://0002-compulab-cl-som-imx6-Add-board-support.patch \
@@ -7,4 +7,6 @@ SRC_URI_append_cl-som-imx6 = " \
 	file://0005-compulab-cl-som-imx6-Add-spl_mx6qp_noc_init.patch \
 	file://0006-cl-som-imx6-u-boot-Enable-CONFIG_COMPULAB_BANK_LAYOU.patch \
 	file://0007-cl-som-imx6-defconfig-Enable-CONFIG_CMD_MEMTEST.patch \
+	file://0009-cm-fx6-Update-the-machine-support.patch \
+	file://fw_env.config \
 "
