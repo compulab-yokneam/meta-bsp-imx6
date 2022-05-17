@@ -49,4 +49,4 @@ do_populate_sysroot[noexec] = "1"
 FILES_${PN} = "/boot"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_MACHINE = "(cl-som-imx6|cl-som-imx6ul)"
+COMPATIBLE_MACHINE = "(cm-fx6-evk|cl-som-imx6|cl-som-imx6ul)"

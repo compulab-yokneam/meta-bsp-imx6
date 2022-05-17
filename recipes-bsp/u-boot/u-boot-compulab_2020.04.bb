@@ -16,9 +16,12 @@ SRC_URI = "${UBOOT_SRC};branch=${SRCBRANCH} \
 "
 SRCREV = "4979a99482f7e04a3c1f4fb55e3182395ee8f710"
 
+require ${PN}-${PV}/cl-som-imx6.inc
+
 S = "${WORKDIR}/git"
 
 LOCALVERSION = "-5.4.24-2.1.0-compulab"
+UBOOT_MACHINE = "cl-som-imx6_defconfig"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_MACHINE = "(cl-som-imx6)"
+COMPATIBLE_MACHINE = "cl-som-imx6"

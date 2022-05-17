@@ -1,5 +1,3 @@
-SRCREV = "003c4fb469aa7fd21017b6dc24cd5e5de3b4ffe3"
-
 SRC_URI_append_cl-som-imx6 = " \
     file://0001-cm_fx6-config-Add-PHY_REALTEK-and-PHY_FIXED.patch \
     file://0002-phy-Add-phy-vendor-specific-rework.patch \

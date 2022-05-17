@@ -11,7 +11,9 @@ UBOOT_SRC ?= "git://github.com/compulab/u-boot.git;protocol=https"
 SRCBRANCH = "2015.07-cm-fx6-3"
 SRC_URI = "${UBOOT_SRC};branch=${SRCBRANCH} \
 "
-SRCREV = "v2015.07-cm-fx6-3.1"
+SRCREV = "003c4fb469aa7fd21017b6dc24cd5e5de3b4ffe3"
+
+require ${PN}-${PV}/cl-som-imx6.inc
 
 S = "${WORKDIR}/git"
 
