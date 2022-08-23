@@ -22,15 +22,40 @@ export CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf-
 |export TAG="rel_imx_4.19.35_1.1.0" ; SUBDIR="linux-compulab-4.19.35"
 |===
 
+
+** `SOM`, `Machine`, `Config`
++
+[cols="3", options="header"]
+|===
+|SOM
+|Machine
+|Environment variables
+
+|cm-fx6
+|cm-fx6-evx
+|export CONFIG=cm_fx6_defconfig
+
+|cl-som-imx6
+|cl-som-imx6
+|export CONFIG=cl-som-imx6_defconfig
+
+|cl-som-imx6ul
+|cl-som-imx6ul
+|export CONFIG=cl-som-imx6ul_defconfig
+
+
+|===
+
+
 * Create a folder to organize the files:
 [source,code]
-mkdir cl-som-imx6
-cd cl-som-imx6
+mkdir imx6
+cd imx6
 
 * Download CompuLab BSP
 [source,code]
 git clone -b master https://github.com/compulab-yokneam/meta-bsp-imx6.git
-export PATCHES=$(pwd)/meta-bsp-imx6/recipes-kernel/linux/${SUBDIR}/imx6
+export PATCHES=$(pwd)/meta-bsp-imx6/recipes-kernel/linux/${SUBDIR}/${MACHINE}
 
 
 # CompuLab Linux Kernel setup
@@ -42,5 +67,5 @@ git -C linux-imx am ${PATCHES}/*.patch
 
 # Compile the Kernel
 [source,code]
-make -C linux-imx cl-som-imx6_defconfig
+make -C linux-imx ${CONFIG}
 make -C linux-imx
