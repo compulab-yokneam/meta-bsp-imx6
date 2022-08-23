@@ -13,6 +13,9 @@ mkdir compulab-bsp && cd compulab-bsp
 |Machine 
 |Environment variable
 
+|`cm-fx6`
+|export MACHINE=cm-fx6-evk
+
 |`cl-som-imx6`
 |export MACHINE=cl-som-imx6
 
