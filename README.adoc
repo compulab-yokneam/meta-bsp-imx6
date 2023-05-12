@@ -43,7 +43,8 @@ mkdir compulab-bsp && cd compulab-bsp
 ** Issue `init`:
 +
 ```
-repo init -u git://source.codeaurora.org/external/imx/imx-manifest.git ${REPO}
+repo init -u https://github.com/nxp-imx/imx-manifest -b imx-linux-warrior ${REPO}
+
 ```
 
 * CompuLab
