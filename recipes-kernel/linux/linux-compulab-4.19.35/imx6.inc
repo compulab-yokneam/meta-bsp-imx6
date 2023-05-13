@@ -59,5 +59,6 @@ SRC_URI_append_cm-fx6-evk = " \
 	file://0002-cm-fx6-conf-Add-the-SoM-config.patch \
 	file://0003-cm-fx6-dts-Update-the-spi-flash-compatible-string.patch \
 	file://0004-cm-fx6-mach-Disable-the-machine-init-code.patch \
+	file://0005-cm-fx6-dts-Add-imx6q-sbc-fx6-multi.dts.patch \
 	file://defconfig \
 "

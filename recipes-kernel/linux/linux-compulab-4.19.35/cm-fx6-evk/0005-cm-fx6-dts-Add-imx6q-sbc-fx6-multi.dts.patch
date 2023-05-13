@@ -1,0 +1,97 @@
+From ce08953405ae1bbe8660f846e9677fd601a1dc95 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sat, 13 May 2023 09:16:38 +0300
+Subject: [PATCH] cm-fx6: dts: Add imx6q-sbc-fx6-multi.dts
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/Makefile           |  1 +
+ .../boot/dts/compulab/imx6q-sbc-fx6-multi.dts | 64 +++++++++++++++++++
+ 2 files changed, 65 insertions(+)
+ create mode 100644 arch/arm/boot/dts/compulab/imx6q-sbc-fx6-multi.dts
+
+diff --git a/arch/arm/boot/dts/compulab/Makefile b/arch/arm/boot/dts/compulab/Makefile
+index 57a98ccc7b92..87ca4c041d34 100644
+--- a/arch/arm/boot/dts/compulab/Makefile
++++ b/arch/arm/boot/dts/compulab/Makefile
+@@ -23,6 +23,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-fx6-ldb-800x480-60-tft.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-fx6m.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-fx6-mipi.dtb
+ dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-fx6-parallel.dtb
++dtb-$(CONFIG_SOC_IMX6Q) += imx6q-sbc-fx6-multi.dtb
+ 
+ always         := $(dtb-y)
+ subdir-y       := $(dtb-dirs)
+diff --git a/arch/arm/boot/dts/compulab/imx6q-sbc-fx6-multi.dts b/arch/arm/boot/dts/compulab/imx6q-sbc-fx6-multi.dts
+new file mode 100644
+index 000000000000..f67252d96051
+--- /dev/null
++++ b/arch/arm/boot/dts/compulab/imx6q-sbc-fx6-multi.dts
+@@ -0,0 +1,64 @@
++#include "imx6q-sbc-fx6.dts"
++#include "imx6q-display-settings.dtsi"
++
++/* lvds 1-st port timing */
++&timing0 {
++	clock-frequency = <10390000>;
++        hactive = <640>;
++        vactive = <240>;
++        hback-porch = <10>;
++        hfront-porch = <10>;
++        vback-porch = <10>;
++        vfront-porch = <10>;
++        hsync-len = <77>;
++        vsync-len = <14>;
++};
++
++/* lvds 2-nd port timing */
++&timing1 {
++	clock-frequency = <10390000>;
++        hactive = <640>;
++        vactive = <240>;
++        hback-porch = <10>;
++        hfront-porch = <10>;
++        vback-porch = <10>;
++        vfront-porch = <10>;
++        hsync-len = <77>;
++        vsync-len = <14>;
++};
++
++&lvds0 {
++	crtc = "ipu1-di0";
++};
++
++&lvds1 {
++	crtc = "ipu1-di1";
++};
++
++&hdmi_core {
++	ipu_id = <1>;
++	disp_id = <0>;
++	status = "okay";
++};
++
++&mxcfb1 {
++	/* lcd paralle output managed by ldb driver */
++	LDB24
++	default_bpp = <24>;
++};
++
++&mxcfb2 {
++	/* ldb */
++	LDB
++	default_bpp = <24>;
++};
++
++&mxcfb3 {
++	HDMI
++	/* hdmi driver ignores this */
++	mode_str ="640x240M-18@51";
++};
++
++&mxcfb4 {
++	status = "disabled";
++};
+-- 
+2.17.1
+
