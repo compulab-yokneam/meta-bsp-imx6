@@ -1,0 +1,44 @@
+From 68f977010547ba241fb479adbd65315e23a1df0a Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Tue, 10 Aug 2021 13:42:32 +0300
+Subject: [PATCH] mxc_hdmi: Add 1280x1024p-60 and 1024x768p-60 vga modes
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ drivers/video/fbdev/mxc/mxc_hdmi.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/video/fbdev/mxc/mxc_hdmi.c b/drivers/video/fbdev/mxc/mxc_hdmi.c
+index 513bda716017..9ff1cbd56892 100644
+--- a/drivers/video/fbdev/mxc/mxc_hdmi.c
++++ b/drivers/video/fbdev/mxc/mxc_hdmi.c
+@@ -91,6 +91,17 @@ static const struct fb_videomode vga_mode = {
+ 	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, FB_MODE_IS_VESA,
+ };
+ 
++static const struct fb_videomode vga_mode0 = {
++	NULL, 60, 1024, 768, 15598, 160, 56, 23, 1, 104, 3,
++	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, FB_MODE_IS_VESA,
++};
++
++static const struct fb_videomode vga_mode1 = {
++	NULL, 60, 1280, 1024, 9184, 216, 80, 32, 1, 136, 3,
++	FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
++	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0
++};
++
+ enum hdmi_datamap {
+ 	RGB444_8B = 0x01,
+ 	RGB444_10B = 0x03,
+@@ -1788,6 +1799,8 @@ static void mxc_hdmi_edid_rebuild_modelist(struct mxc_hdmi *hdmi)
+ 
+ 	fb_destroy_modelist(&hdmi->fbi->modelist);
+ 	fb_add_videomode(&vga_mode, &hdmi->fbi->modelist);
++	fb_add_videomode(&vga_mode1, &hdmi->fbi->modelist);
++	fb_add_videomode(&vga_mode0, &hdmi->fbi->modelist);
+ 
+ 	for (i = 0; i < hdmi->fbi->monspecs.modedb_len; i++) {
+ 		/*
+-- 
+2.17.1
+

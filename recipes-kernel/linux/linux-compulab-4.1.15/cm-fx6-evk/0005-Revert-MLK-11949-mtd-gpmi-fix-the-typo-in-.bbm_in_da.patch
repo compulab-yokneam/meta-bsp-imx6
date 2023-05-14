@@ -1,0 +1,27 @@
+From 2bc2aeda905c5322b799144b7707b33f270afbba Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 2 Nov 2016 15:46:16 +0200
+Subject: [PATCH] Revert "MLK-11949 mtd: gpmi: fix the typo in
+ .bbm_in_data_chunk()"
+
+This reverts commit be1dae951e22628390ab3c9af9c1361bc9c1f00a.
+---
+ drivers/mtd/nand/gpmi-nand/gpmi-nand.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+index 7d2a5df7235b..04cfe64edce5 100644
+--- a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
++++ b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+@@ -159,7 +159,7 @@ static inline bool bbm_in_data_chunk(struct gpmi_nand_data *this,
+ 	struct mtd_info *mtd = &this->mtd;
+ 	unsigned int i, j;
+ 
+-	if (geo->ecc_chunk0_size != geo->ecc_chunkn_size) {
++	if (geo->ecc_chunk0_size != geo->ecc_chunk0_size) {
+ 		dev_err(this->dev, "The size of chunk0 must equal to chunkn\n");
+ 		return false;
+ 	}
+-- 
+2.17.1
+

@@ -1,0 +1,23 @@
+From 81630cc10ad010799d604d8876f74a5ed9fa4036 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 29 Mar 2017 17:02:37 +0300
+Subject: [PATCH] ARM: i.MX6: cm-fx6: tag kernel version -cm-fx6-8.0-aristo
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/configs/cm_fx6_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/cm_fx6_defconfig b/arch/arm/configs/cm_fx6_defconfig
+index cb8fcd1f2f2b..b7f6168e7f87 100644
+--- a/arch/arm/configs/cm_fx6_defconfig
++++ b/arch/arm/configs/cm_fx6_defconfig
+@@ -1,4 +1,4 @@
+-CONFIG_LOCALVERSION="-cm-fx6-8.0"
++CONFIG_LOCALVERSION="-cm-fx6-8.0-aristo"
+ CONFIG_KERNEL_LZO=y
+ CONFIG_SYSVIPC=y
+ CONFIG_FHANDLE=y
+-- 
+2.17.1
+

@@ -1,0 +1,29 @@
+From 84262844c239b2ba7c21847f964aeeff0edd44d0 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 2 Nov 2016 15:46:17 +0200
+Subject: [PATCH] Revert "MLK-11751: mtd: gpmi: add empty sentinel entry at the
+ end of of_device_id table"
+
+This reverts commit 516db20f24938aa5482334d2726d70e9935ed32b.
+---
+ drivers/mtd/nand/gpmi-nand/gpmi-nand.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+index b784b3929f33..9faffd889821 100644
+--- a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
++++ b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+@@ -2307,8 +2307,8 @@ static const struct of_device_id gpmi_nand_id_table[] = {
+ 		.data = (void *)&gpmi_devdata_imx6ul,
+ 	}, {
+ 		.compatible = "fsl,imx7d-gpmi-nand",
+-		.data = (void *)&gpmi_devdata_imx7d,
+-	}, { /* sentinel */ }
++		.data = &gpmi_devdata_imx7d,
++	}
+ };
+ MODULE_DEVICE_TABLE(of, gpmi_nand_id_table);
+ 
+-- 
+2.17.1
+

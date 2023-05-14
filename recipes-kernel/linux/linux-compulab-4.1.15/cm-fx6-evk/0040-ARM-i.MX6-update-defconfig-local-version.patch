@@ -1,0 +1,25 @@
+From cb871b5c3ab37f1e37f9729525290a9b48876405 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 16 Nov 2016 14:51:59 +0200
+Subject: [PATCH] ARM: i.MX6: update defconfig local version
+
+Update defconfig local version.
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/configs/cm_fx6_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/cm_fx6_defconfig b/arch/arm/configs/cm_fx6_defconfig
+index 407319a11c72..e112e945594a 100644
+--- a/arch/arm/configs/cm_fx6_defconfig
++++ b/arch/arm/configs/cm_fx6_defconfig
+@@ -1,4 +1,4 @@
+-CONFIG_LOCALVERSION="-cm-fx6-7.1"
++CONFIG_LOCALVERSION="-cm-fx6-8.0"
+ CONFIG_KERNEL_LZO=y
+ CONFIG_SYSVIPC=y
+ CONFIG_FHANDLE=y
+-- 
+2.17.1
+

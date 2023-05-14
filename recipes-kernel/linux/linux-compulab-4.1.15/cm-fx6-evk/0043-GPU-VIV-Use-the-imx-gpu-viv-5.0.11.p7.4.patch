@@ -1,0 +1,3270 @@
+From c86f17f550337c4b255ca1806488b588f807a794 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sun, 11 Dec 2016 16:54:50 +0200
+Subject: [PATCH] GPU: VIV: Use the imx-gpu-viv 5.0.11.p7.4
+
+Make use of the kernel-module-imx-gpu-viv code 5.0.11.p7.4
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ .../hal/kernel/arch/gc_hal_kernel_context.c   |  15 +-
+ .../hal/kernel/arch/gc_hal_kernel_context.h   |   4 +-
+ .../hal/kernel/arch/gc_hal_kernel_hardware.c  | 170 +-----------------
+ .../hal/kernel/arch/gc_hal_kernel_hardware.h  |  13 +-
+ .../hal/kernel/arch/gc_hal_kernel_recorder.c  |   4 +-
+ .../gc_hal_kernel_hardware_command_vg.c       |   4 +-
+ .../gc_hal_kernel_hardware_command_vg.h       |   4 +-
+ .../kernel/archvg/gc_hal_kernel_hardware_vg.c |   4 +-
+ .../kernel/archvg/gc_hal_kernel_hardware_vg.h |   4 +-
+ .../mxc/gpu-viv/hal/kernel/gc_hal_kernel.c    |  30 +++-
+ .../mxc/gpu-viv/hal/kernel/gc_hal_kernel.h    |   4 +-
+ .../hal/kernel/gc_hal_kernel_command.c        |  45 +----
+ .../hal/kernel/gc_hal_kernel_command_vg.c     |   4 +-
+ .../mxc/gpu-viv/hal/kernel/gc_hal_kernel_db.c |   4 +-
+ .../gpu-viv/hal/kernel/gc_hal_kernel_debug.c  |   4 +-
+ .../gpu-viv/hal/kernel/gc_hal_kernel_event.c  |  28 ++-
+ .../gpu-viv/hal/kernel/gc_hal_kernel_heap.c   |   4 +-
+ .../hal/kernel/gc_hal_kernel_interrupt_vg.c   |   4 +-
+ .../gpu-viv/hal/kernel/gc_hal_kernel_mmu.c    | 108 ++++++-----
+ .../gpu-viv/hal/kernel/gc_hal_kernel_mmu_vg.c |   4 +-
+ .../gpu-viv/hal/kernel/gc_hal_kernel_power.c  |   4 +-
+ .../hal/kernel/gc_hal_kernel_precomp.h        |   4 +-
+ .../hal/kernel/gc_hal_kernel_security.c       |   4 +-
+ .../mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.c |  31 ++--
+ .../mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.h |   4 +-
+ .../hal/kernel/gc_hal_kernel_video_memory.c   |   4 +-
+ drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal.h   |   4 +-
+ .../mxc/gpu-viv/hal/kernel/inc/gc_hal_base.h  |  13 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_driver.h    |   4 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_driver_vg.h |   4 +-
+ .../mxc/gpu-viv/hal/kernel/inc/gc_hal_dump.h  |   4 +-
+ .../hal/kernel/inc/gc_hal_eglplatform.h       |  29 +--
+ .../hal/kernel/inc/gc_hal_eglplatform_type.h  |   4 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_engine.h    |   4 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_engine_vg.h |   4 +-
+ .../mxc/gpu-viv/hal/kernel/inc/gc_hal_enum.h  |  38 +---
+ .../hal/kernel/inc/gc_hal_kernel_buffer.h     |   4 +-
+ .../mxc/gpu-viv/hal/kernel/inc/gc_hal_mem.h   |   4 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_options.h   |  28 +--
+ .../gpu-viv/hal/kernel/inc/gc_hal_profiler.h  |   4 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_raster.h    |  18 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_rename.h    |   4 +-
+ .../kernel/inc/gc_hal_security_interface.h    |  10 +-
+ .../hal/kernel/inc/gc_hal_statistics.h        |   4 +-
+ .../mxc/gpu-viv/hal/kernel/inc/gc_hal_types.h |   4 +-
+ .../gpu-viv/hal/kernel/inc/gc_hal_version.h   |   8 +-
+ .../mxc/gpu-viv/hal/kernel/inc/gc_hal_vg.h    |   4 +-
+ .../default/gc_hal_kernel_allocator_array.h   |   4 +-
+ .../default/gc_hal_kernel_allocator_dmabuf.c  |   4 +-
+ .../freescale/gc_hal_kernel_allocator_array.h |   4 +-
+ .../freescale/gc_hal_kernel_allocator_cma.c   |   8 +-
+ .../os/linux/kernel/gc_hal_kernel_allocator.c |  16 +-
+ .../os/linux/kernel/gc_hal_kernel_allocator.h |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_debug.h |   4 +-
+ .../os/linux/kernel/gc_hal_kernel_debugfs.c   |  53 ++++--
+ .../os/linux/kernel/gc_hal_kernel_debugfs.h   |   4 +-
+ .../os/linux/kernel/gc_hal_kernel_device.c    |  58 ++++--
+ .../os/linux/kernel/gc_hal_kernel_device.h    |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_iommu.c |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_linux.c |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_linux.h |  11 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_math.c  |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_mutex.h |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_os.c    | 137 ++++++--------
+ .../hal/os/linux/kernel/gc_hal_kernel_os.h    |   4 +-
+ .../os/linux/kernel/gc_hal_kernel_platform.h  |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_probe.c |   4 +-
+ .../kernel/gc_hal_kernel_security_channel.c   |   4 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_sync.c  |  18 +-
+ .../hal/os/linux/kernel/gc_hal_kernel_sync.h  |   4 +-
+ .../gc_hal_kernel_platform_imx6q14.c          |  40 ++---
+ .../gc_hal_kernel_platform_imx6q14.config     |   5 +-
+ 72 files changed, 420 insertions(+), 702 deletions(-)
+
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.c b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.c
+index 6607487b9c20..4effad67b3de 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -1143,14 +1143,17 @@ _InitializeContextBuffer(
+     /* Composition states. */
+     index += _State(Context, index, 0x03008 >> 2, 0x00000000, 1, gcvFALSE, gcvFALSE);
+ 
+-	index += _State(Context, index, (0x01460 >> 2) + (0 << 3), 0x00000000, Context->hardware->identity.pixelPipes, gcvFALSE, gcvTRUE);
+-
+     if (Context->hardware->identity.pixelPipes == 1)
+     {
++        index += _State(Context, index, 0x01460 >> 2, 0x00000000, 8, gcvFALSE, gcvTRUE);
++
+         index += _State(Context, index, 0x01430 >> 2, 0x00000000, 1, gcvFALSE, gcvTRUE);
+         index += _State(Context, index, 0x01410 >> 2, 0x00000000, 1, gcvFALSE, gcvTRUE);
+     }
+-
++    else
++    {
++        index += _State(Context, index, (0x01460 >> 2) + (0 << 3), 0x00000000, Context->hardware->identity.pixelPipes, gcvFALSE, gcvTRUE);
++    }
+ 
+     if (Context->hardware->identity.pixelPipes > 1 || halti0)
+     {
+@@ -1995,7 +1998,7 @@ gckCONTEXT_Update(
+             gcmkOS_SAFE_FREE(Context->os, Context->recordArrayMap);
+             Context->recordArrayMap = gcvNULL;
+ 
+-            gcmkONERROR(status);
++            gcmONERROR(status);
+         }
+     }
+ #else
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.h b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.h
+index d6b43a8e0090..b02878b82339 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_context.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.c b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.c
+index 7ced643a33ff..d672d859e2bd 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -348,7 +348,6 @@ _IdentifyHardware(
+                                            || (Identity->chipRevision == 0x5039)
+                                            || (Identity->chipRevision >= 0x5040)))
+     || ((Identity->chipModel == gcv800) && (Identity->chipRevision == 0x4612))
+-	|| ((Identity->chipModel == gcv880) && (Identity->chipRevision == 0x5124))
+     || ((Identity->chipModel == gcv600) && (Identity->chipRevision >= 0x4650))
+     || ((Identity->chipModel == gcv860) && (Identity->chipRevision == 0x4647))
+     || ((Identity->chipModel == gcv400) && (Identity->chipRevision >= 0x4633)))
+@@ -1155,7 +1154,8 @@ gckHARDWARE_Construct(
+             ? 0x0100
+             : 0x0000;
+ 
+-    if (!(_IsHardwareMatch(hardware, gcv3000, 0x5450) && (hardware->identity.chipFlags & gcvCHIP_FLAG_GC2000_R2)))
++    /* VIV: Don't do sftware reset here for 0x2000, 0xfff5450 to workaround #12789. */
++    if (!(_IsHardwareMatch(hardware, gcv3000, 0x5450)))
+     {
+         /* _ResetGPU need powerBaseAddress. */
+         status = _ResetGPU(hardware, Os, Core);
+@@ -7018,9 +7018,6 @@ gckHARDWARE_Reset(
+         gcmkONERROR(_ResetGPU(Hardware, Hardware->os, Hardware->core));
+     }
+ 
+-    /* Force the command queue to reload the next context. */
+-    Hardware->kernel->command->currContext = gcvNULL;
+-
+     /* Initialize hardware. */
+     gcmkONERROR(gckHARDWARE_InitializeHardware(Hardware));
+ 
+@@ -7339,20 +7336,8 @@ gckHARDWARE_IsFeatureAvailable(
+         break;
+ 
+     case gcvFEATURE_MMU:
+-        available = ((((gctUINT32) (Hardware->identity.chipMinorFeatures1)) >> (0 ? 28:28) & ((gctUINT32) ((((1 ? 28:28) - (0 ? 28:28) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 28:28) - (0 ? 28:28) + 1)))))) == (0x1 & ((gctUINT32) ((((1 ? 28:28) - (0 ? 28:28) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 28:28) - (0 ? 28:28) + 1)))))));
+-        break;
+-
+-    case gcvFEATURE_FE_NEED_DUMMYDRAW:
+-        if ((Hardware->identity.chipModel == gcv400) &&
+-            (Hardware->identity.chipRevision == 0x4645))
+-        {
+-            available = gcvTRUE;
+-        }
+-        else
+-        {
+-            available = gcvFALSE;
+-        }
+-        break;
++        available= ((((gctUINT32) (Hardware->identity.chipMinorFeatures1)) >> (0 ? 28:28) & ((gctUINT32) ((((1 ? 28:28) - (0 ? 28:28) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 28:28) - (0 ? 28:28) + 1)))))) == (0x1 & ((gctUINT32) ((((1 ? 28:28) - (0 ? 28:28) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 28:28) - (0 ? 28:28) + 1)))))));
++	break;
+ 
+     default:
+         gcmkFATAL("Invalid feature has been requested.");
+@@ -8467,146 +8452,3 @@ gckHARDWARE_QueryStateTimer(
+     return gcvSTATUS_OK;
+ }
+ 
+-gceSTATUS
+-gckHARDWARE_DummyDraw(
+-    IN gckHARDWARE Hardware,
+-    IN gctPOINTER Logical,
+-    IN gctUINT32 Address,
+-    IN OUT gctUINT32 * Bytes
+-    )
+-{
+-    gctUINT32 dummyDraw[] = {
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0193) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0x000000,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0194) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0180) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 3:0) - (0 ? 3:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 3:0) - (0 ? 3:0) + 1))))))) << (0 ? 3:0))) | (((gctUINT32) (0x8 & ((gctUINT32) ((((1 ? 3:0) - (0 ? 3:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 3:0) - (0 ? 3:0) + 1))))))) << (0 ? 3:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 13:12) - (0 ? 13:12) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 13:12) - (0 ? 13:12) + 1))))))) << (0 ? 13:12))) | (((gctUINT32) ((gctUINT32) (4) & ((gctUINT32) ((((1 ? 13:12) - (0 ? 13:12) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 13:12) - (0 ? 13:12) + 1))))))) << (0 ? 13:12)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 23:16) - (0 ? 23:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 23:16) - (0 ? 23:16) + 1))))))) << (0 ? 23:16))) | (((gctUINT32) ((gctUINT32) (0) & ((gctUINT32) ((((1 ? 23:16) - (0 ? 23:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 23:16) - (0 ? 23:16) + 1))))))) << (0 ? 23:16)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:24) - (0 ? 31:24) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:24) - (0 ? 31:24) + 1))))))) << (0 ? 31:24))) | (((gctUINT32) ((gctUINT32) (4 * gcmSIZEOF(float)) & ((gctUINT32) ((((1 ? 31:24) - (0 ? 31:24) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:24) - (0 ? 31:24) + 1))))))) << (0 ? 31:24)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 7:7) - (0 ? 7:7) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 7:7) - (0 ? 7:7) + 1))))))) << (0 ? 7:7))) | (((gctUINT32) (0x1 & ((gctUINT32) ((((1 ? 7:7) - (0 ? 7:7) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 7:7) - (0 ? 7:7) + 1))))))) << (0 ? 7:7))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0E05) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 1:0) - (0 ? 1:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 1:0) - (0 ? 1:0) + 1))))))) << (0 ? 1:0))) | (((gctUINT32) (0x1 & ((gctUINT32) ((((1 ? 1:0) - (0 ? 1:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 1:0) - (0 ? 1:0) + 1))))))) << (0 ? 1:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0202) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0208) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))) | (((gctUINT32) ((gctUINT32) (0) & ((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0201) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0204) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))) | (((gctUINT32) ((gctUINT32) (0) & ((gctUINT32) ((((1 ? 5:0) - (0 ? 5:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 5:0) - (0 ? 5:0) + 1))))))) << (0 ? 5:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x1000) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (4) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0x0, 0x0, 0x0, 0x0,
+-        0xDEADDEAD,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0203) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 6:0) - (0 ? 6:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 6:0) - (0 ? 6:0) + 1))))))) << (0 ? 6:0))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 6:0) - (0 ? 6:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 6:0) - (0 ? 6:0) + 1))))))) << (0 ? 6:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x020E) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0200) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        1,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x020C) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0x000F003F,
+-
+-		((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x028C) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 11:8) - (0 ? 11:8) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 11:8) - (0 ? 11:8) + 1))))))) << (0 ? 11:8))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 11:8) - (0 ? 11:8) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 11:8) - (0 ? 11:8) + 1))))))) << (0 ? 11:8))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0500) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 1:0) - (0 ? 1:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 1:0) - (0 ? 1:0) + 1))))))) << (0 ? 1:0))) | (((gctUINT32) (0x0 & ((gctUINT32) ((((1 ? 1:0) - (0 ? 1:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 1:0) - (0 ? 1:0) + 1))))))) << (0 ? 1:0))),
+-
+-		((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x028D) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 13:12) - (0 ? 13:12) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 13:12) - (0 ? 13:12) + 1))))))) << (0 ? 13:12))) | (((gctUINT32) (0x2 & ((gctUINT32) ((((1 ? 13:12) - (0 ? 13:12) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 13:12) - (0 ? 13:12) + 1))))))) << (0 ? 13:12)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 9:8) - (0 ? 9:8) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 9:8) - (0 ? 9:8) + 1))))))) << (0 ? 9:8))) | (((gctUINT32) (0x0 & ((gctUINT32) ((((1 ? 9:8) - (0 ? 9:8) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 9:8) - (0 ? 9:8) + 1))))))) << (0 ? 9:8)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 17:16) - (0 ? 17:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 17:16) - (0 ? 17:16) + 1))))))) << (0 ? 17:16))) | (((gctUINT32) (0x1 & ((gctUINT32) ((((1 ? 17:16) - (0 ? 17:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 17:16) - (0 ? 17:16) + 1))))))) << (0 ? 17:16))),
+-
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0300) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0301) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0302) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0303) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        0,
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x01 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0))) | (((gctUINT32) ((gctUINT32) (0x0289) & ((gctUINT32) ((((1 ? 15:0) - (0 ? 15:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 15:0) - (0 ? 15:0) + 1))))))) << (0 ? 15:0)))
+-        | ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 25:16) - (0 ? 25:16) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 25:16) - (0 ? 25:16) + 1))))))) << (0 ? 25:16))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 3:0) - (0 ? 3:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 3:0) - (0 ? 3:0) + 1))))))) << (0 ? 3:0))) | (((gctUINT32) (0x1 & ((gctUINT32) ((((1 ? 3:0) - (0 ? 3:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 3:0) - (0 ? 3:0) + 1))))))) << (0 ? 3:0))),
+-
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))) | (((gctUINT32) (0x05 & ((gctUINT32) ((((1 ? 31:27) - (0 ? 31:27) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 31:27) - (0 ? 31:27) + 1))))))) << (0 ? 31:27))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 3:0) - (0 ? 3:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 3:0) - (0 ? 3:0) + 1))))))) << (0 ? 3:0))) | (((gctUINT32) (0x1 & ((gctUINT32) ((((1 ? 3:0) - (0 ? 3:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 3:0) - (0 ? 3:0) + 1))))))) << (0 ? 3:0))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 23:0) - (0 ? 23:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 23:0) - (0 ? 23:0) + 1))))))) << (0 ? 23:0))) | (((gctUINT32) ((gctUINT32) (0) & ((gctUINT32) ((((1 ? 23:0) - (0 ? 23:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 23:0) - (0 ? 23:0) + 1))))))) << (0 ? 23:0))),
+-        ((((gctUINT32) (0)) & ~(((gctUINT32) (((gctUINT32) ((((1 ? 23:0) - (0 ? 23:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 23:0) - (0 ? 23:0) + 1))))))) << (0 ? 23:0))) | (((gctUINT32) ((gctUINT32) (1) & ((gctUINT32) ((((1 ? 23:0) - (0 ? 23:0) + 1) == 32) ? ~0 : (~(~0 << ((1 ? 23:0) - (0 ? 23:0) + 1))))))) << (0 ? 23:0))),
+-        };
+-
+-    dummyDraw[1] = Address;
+-
+-    if (Logical != gcvNULL)
+-    {
+-        gckOS_MemCopy(Logical, dummyDraw, gcmSIZEOF(dummyDraw));
+-    }
+-
+-    *Bytes = gcmSIZEOF(dummyDraw);
+-
+-    return gcvSTATUS_OK;
+-}
+-
+-
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.h b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.h
+index 1c8b1ba89e56..3a5187058e7f 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_hardware.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -68,7 +68,6 @@ typedef enum {
+     gcvHARDWARE_FUNCTION_MMU,
+     gcvHARDWARE_FUNCTION_FLUSH,
+ 
+-    gcvHARDWARE_FUNCTION_DUMMY_DRAW,
+     gcvHARDWARE_FUNCTION_NUM,
+ }
+ gceHARDWARE_FUNCTION;
+@@ -207,14 +206,6 @@ gckHARDWARE_GetFrameInfo(
+     OUT gcsHAL_FRAME_INFO * FrameInfo
+     );
+ 
+-gceSTATUS
+-gckHARDWARE_DummyDraw(
+-    IN gckHARDWARE Hardware,
+-    IN gctPOINTER Logical,
+-    IN gctUINT32 Address,
+-    IN OUT gctUINT32 * Bytes
+-    );
+-
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_recorder.c b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_recorder.c
+index 092bbccfd3d1..540d9e83b9b7 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_recorder.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/arch/gc_hal_kernel_recorder.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.c b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.c
+index 7d525120b027..c111f98c8442 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.h b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.h
+index 75ed1e47e82c..8f1185584340 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_command_vg.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.c b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.c
+index 7515dde5ba0d..d50c471c2ec5 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.h b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.h
+index 53d7a2eebdce..1ab69db22b1d 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/archvg/gc_hal_kernel_hardware_vg.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.c
+index 6258f1f01ea4..8309e4159c74 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -70,7 +70,7 @@ const char * _VERSION = "\n\0$VERSION$"
+                         gcmTXT2STR(gcvVERSION_MAJOR) "."
+                         gcmTXT2STR(gcvVERSION_MINOR) "."
+                         gcmTXT2STR(gcvVERSION_PATCH) ":"
+-                        gcmTXT2STR(gcvVERSION_BUILD) "$\n";
++                        gcmTXT2STR(gcvVERSION_BUILD) "+fslc$\n";
+ 
+ /******************************************************************************\
+ ******************************* gckKERNEL API Code ******************************
+@@ -285,7 +285,7 @@ _DumpDriverConfigure(
+     gcmkPRINT_N(0, "***   GPU DRV CONFIG   ***\n");
+     gcmkPRINT_N(0, "**************************\n");
+ 
+-    gcmkPRINT("Galcore version %d.%d.%d.%d\n",
++    gcmkPRINT("Galcore version %d.%d.%d.%d+fslc\n",
+               gcvVERSION_MAJOR, gcvVERSION_MINOR, gcvVERSION_PATCH, gcvVERSION_BUILD);
+ 
+     gckOS_DumpParam();
+@@ -1611,6 +1611,7 @@ gckKERNEL_Dispatch(
+ #endif
+     gckVIRTUAL_COMMAND_BUFFER_PTR buffer;
+ 
++    gckVIDMEM_NODE nodeObject;
+     gctBOOL powerMutexAcquired = gcvFALSE;
+ 
+     gcmkHEADER_ARG("Kernel=0x%x FromUser=%d Interface=0x%x",
+@@ -2416,6 +2417,25 @@ gckKERNEL_Dispatch(
+     case gcvHAL_CACHE:
+ 
+         logical = gcmUINT64_TO_PTR(Interface->u.Cache.logical);
++
++        if (Interface->u.Cache.node)
++        {
++            gcmkONERROR(gckVIDMEM_HANDLE_Lookup(
++                Kernel,
++                processID,
++                Interface->u.Cache.node,
++                &nodeObject));
++
++            if (nodeObject->node->VidMem.memory->object.type == gcvOBJ_VIDMEM
++             || nodeObject->node->Virtual.contiguous
++            )
++            {
++                /* If memory is contiguous, get physical address. */
++                gcmkONERROR(gckOS_UserLogicalToPhysical(
++                    Kernel->os, logical, &paddr));
++            }
++        }
++
+         bytes = (gctSIZE_T) Interface->u.Cache.bytes;
+         switch(Interface->u.Cache.operation)
+         {
+@@ -2503,7 +2523,7 @@ gckKERNEL_Dispatch(
+         Interface->u.Version.build = gcvVERSION_BUILD;
+ #if gcmIS_DEBUG(gcdDEBUG_TRACE)
+         gcmkTRACE_ZONE(gcvLEVEL_INFO, gcvZONE_KERNEL,
+-                       "KERNEL version %d.%d.%d build %u",
++                       "KERNEL version %d.%d.%d build %u (fslc)",
+                        gcvVERSION_MAJOR, gcvVERSION_MINOR,
+                        gcvVERSION_PATCH, gcvVERSION_BUILD);
+ #endif
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.h b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.h
+index 1b4f66134c18..c04f1f849b6c 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command.c
+index b43143b04519..2c322d153305 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -447,42 +447,6 @@ OnError:
+ #endif
+ }
+ 
+-static gceSTATUS
+-_DummyDraw(
+-    IN gckCOMMAND Command
+-    )
+-{
+-#if gcdSECURITY
+-    return gcvSTATUS_OK;
+-#else
+-    gceSTATUS status;
+-    gckHARDWARE hardware = Command->kernel->hardware;
+-
+-    gctUINT8_PTR pointer;
+-    gctUINT32 bufferSize;
+-
+-    gctUINT32 dummyDrawBytes;
+-
+-    gckHARDWARE_DummyDraw(hardware, gcvNULL, Command->queues[0].address, &dummyDrawBytes);
+-
+-    /* Reserve space. */
+-    gcmkONERROR(gckCOMMAND_Reserve(
+-        Command,
+-        dummyDrawBytes,
+-        (gctPOINTER *)&pointer,
+-        &bufferSize
+-        ));
+-
+-    gckHARDWARE_DummyDraw(hardware, pointer, Command->queues[0].address, &dummyDrawBytes);
+-
+-    gcmkONERROR(gckCOMMAND_Execute(Command, dummyDrawBytes));
+-
+-    return gcvSTATUS_OK;
+-OnError:
+-    return status;
+-#endif
+-}
+-
+ static void
+ _DumpBuffer(
+     IN gctPOINTER Buffer,
+@@ -1516,11 +1480,6 @@ gckCOMMAND_Commit(
+ 
+     gcmkONERROR(_FlushMMU(Command));
+ 
+-    if (gckHARDWARE_IsFeatureAvailable(hardware, gcvFEATURE_FE_NEED_DUMMYDRAW) && Command->currContext == gcvNULL)
+-    {
+-        gcmkONERROR(_DummyDraw(Command));
+-    }
+-
+     /* Get the current offset. */
+     offset = Command->offset;
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command_vg.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command_vg.c
+index ed209a329cd8..1ae1c62de2d3 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command_vg.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_command_vg.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_db.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_db.c
+index 1c3eaa63a7e5..be42946e5a2a 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_db.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_db.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_debug.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_debug.c
+index 971ee9240906..7bd0c57c8e55 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_debug.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_debug.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_event.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_event.c
+index 7d28d2be910b..b69e156cd847 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_event.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_event.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -1775,14 +1775,6 @@ gckEVENT_Submit(
+             gcmkVERIFY_OK(_QueryFlush(Event, Event->queues[id].head, &flush));
+ 
+ #if gcdNULL_DRIVER
+-#if gcdINTERRUPT_STATISTIC
+-            gcmkVERIFY_OK(gckOS_AtomIncrement(
+-                Event->os,
+-                Event->interruptCount,
+-                &oldValue
+-                ));
+-#endif
+-
+             /* Notify immediately on infinite hardware. */
+             gcmkONERROR(gckEVENT_Interrupt(Event, 1 << id));
+ 
+@@ -1870,14 +1862,6 @@ gckEVENT_Submit(
+                 ));
+ #endif
+ 
+-#if gcdINTERRUPT_STATISTIC
+-            gcmkVERIFY_OK(gckOS_AtomIncrement(
+-                Event->os,
+-                Event->interruptCount,
+-                &oldValue
+-                ));
+-#endif
+-
+ #if gcdSECURITY
+             gckKERNEL_SecurityExecute(
+                 Event->kernel,
+@@ -1889,6 +1873,14 @@ gckEVENT_Submit(
+             gcmkONERROR(gckCOMMAND_Execute(command, executeBytes));
+ #endif
+ #endif
++#if gcdINTERRUPT_STATISTIC
++            gcmkVERIFY_OK(gckOS_AtomIncrement(
++                Event->os,
++                Event->interruptCount,
++                &oldValue
++                ));
++#endif
++
+         }
+ 
+         /* Release the command queue. */
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_heap.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_heap.c
+index cc20b6cba741..3d7da980b84b 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_heap.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_heap.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_interrupt_vg.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_interrupt_vg.c
+index 9389f61068d3..3fed5af91bbd 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_interrupt_vg.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_interrupt_vg.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu.c
+index b93923a8b674..b6baf0aa0257 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -126,13 +126,11 @@ typedef struct _gcsMirrorPageTable
+ 
+     /* Number of cores use this shared pagetable. */
+     gctUINT32       reference;
+-
+-    /* Mutex. */
+-    gctPOINTER      mutex;
+ }
+ gcsMirrorPageTable;
+ 
+ static gcsMirrorPageTable_PTR mirrorPageTable = gcvNULL;
++static gctPOINTER mirrorPageTableMutex = gcvNULL;
+ #endif
+ 
+ typedef struct _gcsDynamicSpaceNode * gcsDynamicSpaceNode_PTR;
+@@ -1362,7 +1360,7 @@ OnError:
+                     sizeof(struct _gcsMirrorPageTable)));
+ 
+         gcmkONERROR(
+-            gckOS_CreateMutex(Kernel->os, &mirrorPageTable->mutex));
++            gckOS_CreateMutex(Kernel->os, &mirrorPageTableMutex));
+     }
+ 
+     gcmkONERROR(_Construct(Kernel, MmuSize, Mmu));
+@@ -1415,8 +1413,8 @@ gckMMU_Destroy(
+ 
+     if (mirrorPageTable->reference == 0)
+     {
+-        gcmkVERIFY_OK(gcmkOS_SAFE_FREE(Mmu->os, mirrorPageTable->mutex));
+         gcmkVERIFY_OK(gcmkOS_SAFE_FREE(Mmu->os, mirrorPageTable));
++        gcmkVERIFY_OK(gcmkOS_SAFE_FREE(Mmu->os, mirrorPageTableMutex));
+     }
+ 
+     return _Destroy(Mmu);
+@@ -1763,35 +1761,57 @@ gckMMU_AllocatePagesEx(
+ {
+ #if gcdMIRROR_PAGETABLE
+     gceSTATUS status;
++    gctPOINTER pageTable;
++    gctUINT32 address;
++    gctINT i;
+     gckMMU mmu;
+     gctBOOL acquired = gcvFALSE;
++    gctBOOL allocated = gcvFALSE;
+ 
+-    gcmkHEADER();
+-
+-    gckOS_AcquireMutex(Mmu->os, mirrorPageTable->mutex, gcvINFINITE);
++    gckOS_AcquireMutex(Mmu->os, mirrorPageTableMutex, gcvINFINITE);
+     acquired = gcvTRUE;
+ 
+-    /* Get first mmu. */
+-    mmu = mirrorPageTable->mmus[0];
++    /* Allocate page table for current MMU. */
++    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
++    {
++        if (Mmu == mirrorPageTable->mmus[i])
++        {
++            gcmkONERROR(_AllocatePages(Mmu, PageCount, Type, PageTable, Address));
++            allocated = gcvTRUE;
++        }
++    }
+ 
+-    gcmkVERIFY_OBJECT(mmu, gcvOBJ_MMU);
++    /* Allocate page table for other MMUs. */
++    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
++    {
++        mmu = mirrorPageTable->mmus[i];
+ 
+-    /* Allocate page table from first mmu. */
+-    gcmkONERROR(_AllocatePages(mmu, PageCount, Type, PageTable, Address));
++        if (Mmu != mmu)
++        {
++            gcmkONERROR(_AllocatePages(mmu, PageCount, Type, &pageTable, &address));
++            gcmkASSERT(address == *Address);
++        }
++    }
+ 
+-    gckOS_ReleaseMutex(Mmu->os, mirrorPageTable->mutex);
++    gckOS_ReleaseMutex(Mmu->os, mirrorPageTableMutex);
+     acquired = gcvFALSE;
+ 
+-    gcmkFOOTER_NO();
+     return gcvSTATUS_OK;
+-
+ OnError:
++
++    if (allocated)
++    {
++        /* Page tables for multiple GPU always keep the same. So it is impossible
++         * the fist one allocates successfully but others fail.
++         */
++        gcmkASSERT(0);
++    }
++
+     if (acquired)
+     {
+-        gckOS_ReleaseMutex(Mmu->os, mirrorPageTable->mutex);
++        gckOS_ReleaseMutex(Mmu->os, mirrorPageTableMutex);
+     }
+ 
+-    gcmkFOOTER();
+     return status;
+ #else
+     return _AllocatePages(Mmu, PageCount, Type, PageTable, Address);
+@@ -1808,22 +1828,25 @@ gckMMU_FreePages(
+ #if gcdMIRROR_PAGETABLE
+     gctINT i;
+     gctUINT32 offset;
+-    gckMMU mmu = mirrorPageTable->mmus[0];
++    gckMMU mmu;
+ 
+-    gckOS_AcquireMutex(Mmu->os, mirrorPageTable->mutex, gcvINFINITE);
++    gckOS_AcquireMutex(Mmu->os, mirrorPageTableMutex, gcvINFINITE);
+ 
+-    gcmkVERIFY_OK(_FreePages(mmu, PageTable, PageCount));
++    gcmkVERIFY_OK(_FreePages(Mmu, PageTable, PageCount));
+ 
+-    offset = (gctUINT32)PageTable - (gctUINT32)mmu->pageTableLogical;
++    offset = (gctUINT32)PageTable - (gctUINT32)Mmu->pageTableLogical;
+ 
+-    for (i = 1; i < (gctINT)mirrorPageTable->reference; i++)
++    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
+     {
+         mmu = mirrorPageTable->mmus[i];
+ 
+-        gcmkVERIFY_OK(_FreePages(mmu, mmu->pageTableLogical + offset/4, PageCount));
++        if (mmu != Mmu)
++        {
++            gcmkVERIFY_OK(_FreePages(mmu, mmu->pageTableLogical + offset/4, PageCount));
++        }
+     }
+ 
+-    gckOS_ReleaseMutex(Mmu->os, mirrorPageTable->mutex);
++    gckOS_ReleaseMutex(Mmu->os, mirrorPageTableMutex);
+ 
+     return gcvSTATUS_OK;
+ #else
+@@ -1841,8 +1864,8 @@ gckMMU_SetPage(
+ #if gcdMIRROR_PAGETABLE
+     gctUINT32_PTR pageEntry;
+     gctINT i;
+-    gckMMU mmu = mirrorPageTable->mmus[0];
+-    gctUINT32 offset = (gctUINT32)PageEntry - (gctUINT32)mmu->pageTableLogical;
++    gckMMU mmu;
++    gctUINT32 offset = (gctUINT32)PageEntry - (gctUINT32)Mmu->pageTableLogical;
+ #endif
+     gctUINT32 addressExt;
+     gctUINT32 address;
+@@ -1859,11 +1882,6 @@ gckMMU_SetPage(
+     /* [39:32]. */
+     addressExt = (gctUINT32)((PageAddress >> 32) & 0xFF);
+ 
+-#if gcdMIRROR_PAGETABLE
+-    /* Set first mmu. */
+-    Mmu = mmu;
+-#endif
+-
+     if (Mmu->hardware->mmuVersion == 0)
+     {
+         _WritePageEntry(PageEntry, address);
+@@ -1874,20 +1892,24 @@ gckMMU_SetPage(
+     }
+ 
+ #if gcdMIRROR_PAGETABLE
+-    for (i = 1; i < (gctINT)mirrorPageTable->reference; i++)
++    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
+     {
+         mmu = mirrorPageTable->mmus[i];
+ 
+-        pageEntry = mmu->pageTableLogical + offset / 4;
+-
+-        if (mmu->hardware->mmuVersion == 0)
++        if (mmu != Mmu)
+         {
+-            _WritePageEntry(pageEntry, address);
+-        }
+-        else
+-        {
+-            _WritePageEntry(pageEntry, _SetPage(address, addressExt));
++            pageEntry = mmu->pageTableLogical + offset / 4;
++
++            if (mmu->hardware->mmuVersion == 0)
++            {
++                _WritePageEntry(pageEntry, address);
++            }
++            else
++            {
++                _WritePageEntry(pageEntry, _SetPage(address, addressExt));
++            }
+         }
++
+     }
+ #endif
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu_vg.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu_vg.c
+index 4a85b00dbcae..62f5c8a50499 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu_vg.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_mmu_vg.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_power.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_power.c
+index 89263a80854e..5246cfcab02c 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_power.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_power.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_precomp.h b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_precomp.h
+index fcb026332312..a2b5e771a15d 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_precomp.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_precomp.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_security.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_security.c
+index 16d8916a64dc..8f738f166ef6 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_security.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_security.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.c
+index b78fb65e2246..f992faabe9ce 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -137,7 +137,7 @@ gceSTATUS gckVGKERNEL_Construct(
+ 
+         /* Construct the gckVGMMU object. */
+         gcmkERR_BREAK(gckVGMMU_Construct(
+-            kernel, gcmKB2BYTES(gcdGC355_VGMMU_MEMORY_SIZE_KB), &kernel->mmu
++            kernel, gcmMB2BYTES(1), &kernel->mmu
+             ));
+ 
+         /* Return pointer to the gckKERNEL object. */
+@@ -563,22 +563,18 @@ gceSTATUS gckVGKERNEL_Dispatch(
+             Kernel, processID,
+             (gctUINT32)kernelInterface->u.ReleaseVideoMemory.node
+             ));
+-    {
+-        gckVIDMEM_NODE nodeObject;
+-
+-        /* Remove record from process db. */
+-        gcmkERR_BREAK(
+-            gckKERNEL_RemoveProcessDB(Kernel, processID,
+-                                      gcvDB_VIDEO_MEMORY_LOCKED,
+-                                      (gctPOINTER)kernelInterface->u.ReleaseVideoMemory.node));
++        {
++            gckVIDMEM_NODE nodeObject;
+ 
+-        gcmkERR_BREAK(
+-            gckVIDMEM_HANDLE_Lookup(Kernel, processID,
+-                                    (gctUINT32)kernelInterface->u.ReleaseVideoMemory.node, &nodeObject));
++            /* Remove record from process db. */
++            gcmkERR_BREAK(
++                gckKERNEL_RemoveProcessDB(Kernel, processID, gcvDB_VIDEO_MEMORY_LOCKED, (gctPOINTER)kernelInterface->u.ReleaseVideoMemory.node));
+ 
+-        gckVIDMEM_NODE_Dereference(Kernel, nodeObject);
+-    }
++            gcmkERR_BREAK(
++                gckVIDMEM_HANDLE_Lookup(Kernel, processID, (gctUINT32)kernelInterface->u.ReleaseVideoMemory.node, &nodeObject));
+ 
++            gckVIDMEM_NODE_Dereference(Kernel, nodeObject);
++        }
+ 
+         break;
+ 
+@@ -857,9 +853,6 @@ gceSTATUS gckVGKERNEL_Dispatch(
+ #endif
+         break;
+ 
+-    case gcvHAL_EVENT_COMMIT:
+-        gcmkERR_BREAK(gcvSTATUS_NOT_SUPPORTED);
+-        break;
+ 
+     default:
+         /* Invalid command. */
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.h b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.h
+index 9ecae79c6862..2ad509e442c0 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_vg.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_video_memory.c b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_video_memory.c
+index b6694c7f978a..16fd872b312b 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_video_memory.c
++++ b/drivers/mxc/gpu-viv/hal/kernel/gc_hal_kernel_video_memory.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal.h
+index 4d8d5101b5da..5fcc4ae612b7 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_base.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_base.h
+index 5e453b0527f8..14654b947217 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_base.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_base.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -53,6 +53,7 @@
+ *****************************************************************************/
+ 
+ 
++
+ #ifndef __gc_hal_base_h_
+ #define __gc_hal_base_h_
+ 
+@@ -2462,14 +2463,6 @@ gcoSURF_Lock(
+     IN OUT gctPOINTER * Memory
+     );
+ 
+-gceSTATUS
+-gcoSURF_LockEx(
+-    IN gcoSURF Surface,
+-    OPTIONAL OUT gctUINT32 * Address,
+-    OPTIONAL OUT gctPOINTER * Memory,
+-    OPTIONAL OUT gctPHYS_ADDR_T *BusAddress
+-    );
+-
+ /* Unlock the surface. */
+ gceSTATUS
+ gcoSURF_Unlock(
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver.h
+index 2641abee402c..8a4be08b8404 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver_vg.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver_vg.h
+index 8a2d50b93b0a..f23139ced20f 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver_vg.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_driver_vg.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_dump.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_dump.h
+index 977d3dc7af43..b203f8f7e309 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_dump.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_dump.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform.h
+index ed41b7c892d9..5fdc54aa4e60 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -93,15 +93,9 @@ typedef struct _DFBPixmap *  HALNativePixmapType;
+ 
+ /* Wayland platform. */
+ #include <wayland-egl.h>
+-#include <pthread.h>
+-
+ 
+ #define WL_COMPOSITOR_SIGNATURE (0x31415926)
+ 
+-#define WL_CLIENT_SIGNATURE     (0x27182818)
+-
+-#define WL_LOCAL_DISPLAY_SIGNATURE      (0x27182991)
+-
+ typedef struct _gcsWL_VIV_BUFFER
+ {
+    struct wl_resource *wl_buffer;
+@@ -120,12 +114,6 @@ typedef struct _gcsWL_EGL_DISPLAY
+    gctINT file;
+ } gcsWL_EGL_DISPLAY;
+ 
+-typedef struct _gcsWL_LOCAL_DISPLAY
+-{
+-   gctUINT wl_signature;
+-   gctPOINTER localInfo;
+-} gcsWL_LOCAL_DISPLAY;
+-
+ typedef struct _gcsWL_EGL_BUFFER_INFO
+ {
+    gctINT32 width;
+@@ -137,17 +125,16 @@ typedef struct _gcsWL_EGL_BUFFER_INFO
+    gcePOOL pool;
+    gctUINT bytes;
+    gcoSURF surface;
++   gcoSURF attached_surface;
+    gctINT32 invalidate;
+    gctBOOL locked;
+ } gcsWL_EGL_BUFFER_INFO;
+ 
+ typedef struct _gcsWL_EGL_BUFFER
+ {
+-   gctUINT wl_signature;
+-   gcsWL_EGL_BUFFER_INFO info;
+    struct wl_buffer* wl_buffer;
++   gcsWL_EGL_BUFFER_INFO info;
+    struct wl_callback* frame_callback;
+-   struct wl_list link;
+ } gcsWL_EGL_BUFFER;
+ 
+ typedef struct _gcsWL_EGL_WINDOW_INFO
+@@ -164,17 +151,13 @@ typedef struct _gcsWL_EGL_WINDOW_INFO
+ 
+ struct wl_egl_window
+ {
+-   gctUINT wl_signature;
+    gcsWL_EGL_DISPLAY* display;
+    gcsWL_EGL_BUFFER **backbuffers;
+    gcsWL_EGL_WINDOW_INFO* info;
+    gctINT  noResolve;
+    gctINT32 attached_width;
+    gctINT32 attached_height;
+-   gcsATOM_PTR reference;
+-   pthread_mutex_t window_mutex;
+    struct wl_surface* surface;
+-   struct wl_list link;
+ };
+ 
+ typedef void*   HALNativeDisplayType;
+@@ -694,8 +677,8 @@ gcoOS_ResizeWindow(
+     IN gctPOINTER localDisplay,
+     IN HALNativeWindowType Drawable,
+     IN gctUINT Width,
+-    IN gctUINT Height
+-    );
++    IN gctUINT Height)
++    ;
+ 
+ #ifdef USE_FREESCALE_EGL_ACCEL
+ gceSTATUS
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform_type.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform_type.h
+index 00120072d1af..3a79ae4eb713 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform_type.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_eglplatform_type.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine.h
+index 31c6bdf97730..220601a54d90 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine_vg.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine_vg.h
+index 30434341200c..0c23be36cd5b 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine_vg.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_engine_vg.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_enum.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_enum.h
+index 85700c5c26dc..a6062dfb6db7 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_enum.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_enum.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -237,14 +237,10 @@ typedef enum _gceFEATURE
+     gcvFEATURE_2D_OPF_YUV_OUTPUT,
+     gcvFEATURE_2D_FILTERBLIT_A8_ALPHA,
+     gcvFEATURE_2D_MULTI_SRC_BLT_TO_UNIFIED_DST_RECT,
+-    gcvFEATURE_2D_MULTI_SRC_BLT_BILINEAR_FILTER,
+     gcvFEATURE_V2_COMPRESSION_Z16_FIX,
+ 
+     gcvFEATURE_VERTEX_INST_ID_AS_INTEGER,
+     gcvFEATURE_2D_YUV_MODE,
+-    gcvFEATURE_2D_CACHE_128B256BPERLINE,
+-    gcvFEATURE_2D_MAJOR_SUPER_TILE,
+-    gcvFEATURE_2D_V4COMPRESSION,
+     gcvFEATURE_ACE,
+     gcvFEATURE_COLOR_COMPRESSION,
+ 
+@@ -319,13 +315,6 @@ typedef enum _gceFEATURE
+     gcvFEATURE_MSAA_FRAGMENT_OPERATION,
+     gcvFEATURE_ZERO_ATTRIB_SUPPORT,
+     gcvFEATURE_TEX_CACHE_FLUSH_FIX,
+-    gcvFEATURE_PE_DITHER_FIX2,
+-    gcvFEATURE_LOD_FIX_FOR_BASELEVEL,
+-
+-    gcvFEATURE_MSAA_OQ_FIX,
+-
+-    gcvFEATURE_PE_ENHANCEMENTS2,
+-    gcvFEATURE_FE_NEED_DUMMYDRAW,
+ 
+     /* Insert features above this comment only. */
+     gcvFEATURE_COUNT                /* Not a feature. */
+@@ -346,7 +335,7 @@ gceSWWA;
+ 
+ 
+ /* Option Set*/
+-typedef enum _gceOPTION
++typedef enum _gceOPITON
+ {
+     /* HW setting we take PREFER */
+     gcvOPTION_PREFER_MULTIPIPE_RS = 0,
+@@ -1104,19 +1093,6 @@ typedef enum _gce2D_YUV_COLOR_MODE
+ }
+ gce2D_YUV_COLOR_MODE;
+ 
+-/* Nature rotation rules. */
+-typedef enum _gce2D_NATURE_ROTATION
+-{
+-    gcvNR_0_DEGREE = 0,
+-    gcvNR_LEFT_90_DEGREE,
+-    gcvNR_RIGHT_90_DEGREE,
+-    gcvNR_180_DEGREE,
+-    gcvNR_FLIP_X,
+-    gcvNR_FLIP_Y,
+-    gcvNR_TOTAL_RULE,
+-}
+-gce2D_NATURE_ROTATION;
+-
+ typedef enum _gce2D_COMMAND
+ {
+     gcv2D_CLEAR = 0,
+@@ -1143,9 +1119,6 @@ typedef enum _gce2D_TILE_STATUS_CONFIG
+     gcv2D_TSC_DEC_TPC        = 0x00000040,
+     gcv2D_TSC_DEC_TPC_COMPRESSED = 0x00000080,
+ 
+-    gcv2D_TSC_V4_COMPRESSED      = 0x00000100,
+-    gcv2D_TSC_V4_COMPRESSED_256B = 0x00000200 | gcv2D_TSC_V4_COMPRESSED,
+-
+     gcv2D_TSC_DEC_TPC_TILED  = gcv2D_TSC_DEC_COMPRESSED | gcv2D_TSC_DEC_TPC,
+     gcv2D_TSC_DEC_TPC_TILED_COMPRESSED = gcv2D_TSC_DEC_TPC_TILED | gcv2D_TSC_DEC_TPC_COMPRESSED,
+ }
+@@ -1175,7 +1148,6 @@ typedef enum _gce2D_STATE
+     gcv2D_STATE_EN_GAMMA,
+     gcv2D_STATE_DE_GAMMA,
+     gcv2D_STATE_MULTI_SRC_BLIT_UNIFIED_DST_RECT,
+-    gcv2D_STATE_MULTI_SRC_BLIT_BILINEAR_FILTER,
+     gcv2D_STATE_PROFILE_ENABLE,
+     gcv2D_STATE_XRGB_ENABLE,
+ 
+@@ -1287,7 +1259,6 @@ typedef enum _gceTILING
+ 
+     /* Tiling special layouts. */
+     gcvTILING_SPLIT_BUFFER = 0x100,
+-    gcvTILING_Y_MAJOR      = 0x200,
+ 
+     /* Tiling combination layouts. */
+     gcvMULTI_TILED      = gcvTILED
+@@ -1295,9 +1266,6 @@ typedef enum _gceTILING
+ 
+     gcvMULTI_SUPERTILED = gcvSUPERTILED
+                         | gcvTILING_SPLIT_BUFFER,
+-
+-    gcvYMAJOR_SUPERTILED = gcvSUPERTILED
+-                        | gcvTILING_Y_MAJOR,
+ }
+ gceTILING;
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_kernel_buffer.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_kernel_buffer.h
+index 9da71df83cbc..8b71fc13e5cd 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_kernel_buffer.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_kernel_buffer.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_mem.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_mem.h
+index b71f94c1f879..ec6d0f3bf501 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_mem.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_mem.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_options.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_options.h
+index a63f5c6b3494..a653d7d7042f 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_options.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_options.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -435,10 +435,6 @@
+ #endif
+ #endif
+ 
+-#ifndef gcdGC355_VGMMU_MEMORY_SIZE_KB
+-#   define gcdGC355_VGMMU_MEMORY_SIZE_KB   32
+-#endif
+-
+ /*
+     gcdSECURE_USER
+ 
+@@ -536,29 +532,13 @@
+ #ifndef gcdGPU_TIMEOUT
+ #if gcdFPGA_BUILD
+ #       define gcdGPU_TIMEOUT                   0
+-#   else
+-#       define gcdGPU_TIMEOUT                   20000
+-#   endif
+-#endif
+-
+-/*
+-    gcdGPU_2D_TIMEOUT
+-
+-        This define specified the number of milliseconds the system will wait
+-        before it broadcasts the 2D GPU is stuck.  In other words, it will define
+-        the timeout of any operation that needs to wait for the GPU.
+-
+-        If the value is 0, no timeout will be checked for.
+-*/
+-#ifndef gcdGPU_2D_TIMEOUT
+-#if gcdFPGA_BUILD
+ #       define gcdGPU_2D_TIMEOUT                0
+ #   else
+-#       define gcdGPU_2D_TIMEOUT                4000
++#       define gcdGPU_TIMEOUT                   20000
++#       define gcdGPU_2D_TIMEOUT                20000
+ #   endif
+ #endif
+ 
+-
+ /*
+     gcdGPU_ADVANCETIMER
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_profiler.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_profiler.h
+index b8c449c4df15..fee3c31b10c0 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_profiler.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_profiler.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_raster.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_raster.h
+index c7b03fd51154..03d170f509fd 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_raster.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_raster.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -1071,20 +1071,6 @@ gco2D_Commit(
+     IN gctBOOL Stall
+     );
+ 
+-gceSTATUS
+-gco2D_NatureRotateTranslation(
+-    IN gctBOOL IsSrcRot,
+-    IN gce2D_NATURE_ROTATION NatureRotation,
+-    IN gctINT32 SrcSurfaceWidth,
+-    IN gctINT32 SrcSurfaceHeight,
+-    IN gctINT32 DstSurfaceWidth,
+-    IN gctINT32 DstSurfaceHeight,
+-    IN OUT gcsRECT_PTR SrcRect,
+-    IN OUT gcsRECT_PTR DstRect,
+-    OUT gceSURF_ROTATION * SrcRotation,
+-    OUT gceSURF_ROTATION * DstRotation
+-    );
+-
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_rename.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_rename.h
+index 5c45ddbb922d..75c26589946e 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_rename.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_rename.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_security_interface.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_security_interface.h
+index 335e8da4c5d8..27f91f0aec3a 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_security_interface.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_security_interface.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -71,6 +71,12 @@ typedef enum kernel_packet_command {
+     KERNEL_EXECUTE,                       /* Execute a command buffer. */
+ } kernel_packet_command_t;
+ 
++/*!
++ @brief gckCOMMAND Object requests TrustZone to start FE.
++ @discussion
++ DMA enabled register can only be written in TrustZone to avoid GPU from jumping to a hacked code.
++ Kernel module need use these command to ask TrustZone start command parser.
++ */
+ struct kernel_start_command {
+     kernel_packet_command_t command;      /*! The command (always needs to be the first entry in a structure). */
+     gctUINT8       gpu;                    /*! Which GPU. */
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_statistics.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_statistics.h
+index ec705bf5a4bf..5611a8bc214a 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_statistics.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_statistics.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_types.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_types.h
+index baf43e14c45c..f79f9ad57bde 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_types.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_types.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_version.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_version.h
+index e15b0b577c2d..ed77d1aa8cde 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_version.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_version.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -62,8 +62,8 @@
+ 
+ #define gcvVERSION_PATCH        11
+ 
+-#define gcvVERSION_BUILD     41671
++#define gcvVERSION_BUILD     33433
+ 
+-#define gcvVERSION_STRING    "5.0.11.p8.41671"
++#define gcvVERSION_STRING    "5.0.11.p7.33433"
+ 
+ #endif /* __gc_hal_version_h_ */
+diff --git a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_vg.h b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_vg.h
+index d3e7aa960eef..e33d895d1ce2 100644
+--- a/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_vg.h
++++ b/drivers/mxc/gpu-viv/hal/kernel/inc/gc_hal_vg.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_array.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_array.h
+index e15d2204c12f..b1df099e7a34 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_array.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_array.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_dmabuf.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_dmabuf.c
+index 43203f7bc6e4..023ca2e696ac 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_dmabuf.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/default/gc_hal_kernel_allocator_dmabuf.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_array.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_array.h
+index 086a49343986..94ab3fa10b37 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_array.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_array.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_cma.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_cma.c
+index a0d784090346..ddb24c0ab84c 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_cma.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/allocator/freescale/gc_hal_kernel_allocator_cma.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -381,8 +381,8 @@ _CMAPhysical(
+     )
+ {
+     struct mdl_cma_priv *mdl_priv=(struct mdl_cma_priv *)Mdl->priv;
+-
+-    *Physical = mdl_priv->physical + Offset * PAGE_SIZE;
++     gcmkASSERT(!Offset);
++    *Physical = mdl_priv->physical;
+ 
+     return gcvSTATUS_OK;
+ }
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.c
+index 93d6fa82958e..11c7add772c4 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -725,16 +725,8 @@ _DefaultPhysical(
+     OUT gctPHYS_ADDR_T * Physical
+     )
+ {
+-    gcmkASSERT(Mdl->pagedMem);
+-
+-    if (Mdl->contiguous)
+-    {
+-        *Physical = page_to_phys(nth_page(Mdl->u.contiguousPages, Offset));
+-    }
+-    else
+-    {
+-        *Physical = _NonContiguousToPhys(Mdl->u.nonContiguousPages, Offset);
+-    }
++    gcmkASSERT(Mdl->pagedMem && !Mdl->contiguous);
++    *Physical = _NonContiguousToPhys(Mdl->u.nonContiguousPages, Offset);
+ 
+     return gcvSTATUS_OK;
+ }
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.h
+index 402f5e817ff4..72f7c40598d6 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_allocator.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debug.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debug.h
+index 9c83a3a439c8..54782fd8ccc8 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debug.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debug.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.c
+index fa542753e48b..ffcaf2fe1a0d 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -518,15 +518,28 @@ _DebugFSPrint (
+  **                     LINUX SYSTEM FUNCTIONS (START)
+  **
+  *******************************************************************************/
+-static int
+-_DebugFSOpen (
+-    struct inode* inode,
+-    struct file* filp
+-    )
++
++/*******************************************************************************
++ **
++ **  find the vivlog structure associated with an inode.
++ **      returns a    pointer to the structure if found, NULL if not found
++ **
++ *******************************************************************************/
++static gcsDEBUGFS_Node*
++_GetNodeInfo (
++               IN struct inode *Inode
++               )
+ {
+-    filp->private_data = inode->i_private;
++    gcsDEBUGFS_Node* node ;
+ 
+-    return 0;
++    if ( Inode == NULL )
++        return NULL ;
++
++    for ( node = gc_dbgfs.linkedlist ; node != NULL ; node = node->next )
++        if ( node->filen->d_inode->i_ino == Inode->i_ino )
++            return node ;
++
++    return NULL ;
+ }
+ 
+ /*******************************************************************************
+@@ -544,9 +557,13 @@ _DebugFSRead (
+ {
+     int retval ;
+     caddr_t data_to_return ;
+-    gcsDEBUGFS_Node* node = file->private_data;
+-
+-    if (node == NULL)
++    gcsDEBUGFS_Node* node ;
++    /* get the metadata about this emlog */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++    if ( ( node = _GetNodeInfo ( file->f_dentry->d_inode ) ) == NULL )
++#else
++    if ( ( node = _GetNodeInfo ( file_inode(file) ) ) == NULL )
++#endif
+     {
+         printk ( "debugfs_read: record not found\n" ) ;
+         return - EIO ;
+@@ -610,10 +627,14 @@ _DebugFSWrite (
+ {
+     caddr_t message = NULL ;
+     int n ;
+-    gcsDEBUGFS_Node* node = file->private_data;
++    gcsDEBUGFS_Node*node ;
+ 
+     /* get the metadata about this log */
+-    if (node == NULL)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++    if ( ( node = _GetNodeInfo ( file->f_dentry->d_inode ) ) == NULL )
++#else
++    if ( ( node = _GetNodeInfo ( file_inode(file) ) ) == NULL )
++#endif    
+     {
+         return - EIO ;
+     }
+@@ -881,7 +902,6 @@ vidmem_write(
+  *******************************************************************************/
+ static const struct file_operations debugfs_operations = {
+                                                           .owner = THIS_MODULE ,
+-                                                          .open = _DebugFSOpen ,
+                                                           .read = _DebugFSRead ,
+                                                           .write = _DebugFSWrite ,
+ } ;
+@@ -892,7 +912,6 @@ static const struct file_operations vidmem_operations = {
+     .read = seq_read,
+     .write = vidmem_write,
+     .llseek = seq_lseek,
+-    .release = single_release,
+ } ;
+ 
+ /*******************************************************************************
+@@ -1032,7 +1051,7 @@ gckDEBUGFS_CreateNode (
+         node->temp = NULL;
+ 
+         /*creating the file*/
+-        node->filen = debugfs_create_file(NodeName, S_IRUGO|S_IWUSR, node->parent, node,
++        node->filen = debugfs_create_file(NodeName, S_IRUGO|S_IWUSR, node->parent, NULL,
+                                           &debugfs_operations);
+     }
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.h
+index 4e9658498756..9a15d77747b8 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_debugfs.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.c
+index 92e7ebcec228..5155674bd680 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -382,7 +382,7 @@ gc_version_show(struct seq_file *m, void *data)
+     gcsPLATFORM * platform = device->platform;
+     gctCONST_STRING name;
+ 
+-    seq_printf(m, "%s built at %s\n",  gcvVERSION_STRING, HOST);
++    seq_printf(m, "%s+fslc built at %s\n",  gcvVERSION_STRING, HOST);
+ 
+     if (platform->ops->name)
+     {
+@@ -2114,8 +2114,12 @@ gckGALDEVICE_Setup_ISR(
+ #else
+ #if gcdMULTI_GPU
+     ret = request_irq(
+-        Device->irqLine3D[gcvCORE_3D_0_ID], isrRoutine3D0, gcdIRQF_FLAG,
+-        "galcore_3d_0", Device
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLine3D[gcvCORE_3D_0_ID], isrRoutine3D0, IRQF_DISABLED,
++#else
++        Device->irqLine3D[gcvCORE_3D_0_ID], isrRoutine3D0, 0x0,
++#endif
++     	"galcore_3d_0", Device
+         );
+ 
+     if (ret != 0)
+@@ -2135,7 +2139,11 @@ gckGALDEVICE_Setup_ISR(
+ 
+ #if gcdMULTI_GPU > 1
+     ret = request_irq(
+-        Device->irqLine3D[gcvCORE_3D_1_ID], isrRoutine3D1, gcdIRQF_FLAG,
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLine3D[gcvCORE_3D_1_ID], isrRoutine3D1, IRQF_DISABLED,
++#else
++        Device->irqLine3D[gcvCORE_3D_1_ID], isrRoutine3D1, 0x0,
++#endif
+         "galcore_3d_1", Device
+         );
+ 
+@@ -2156,8 +2164,12 @@ gckGALDEVICE_Setup_ISR(
+ #endif
+ #elif gcdMULTI_GPU_AFFINITY
+     ret = request_irq(
+-        Device->irqLines[gcvCORE_MAJOR], isrRoutine3D0, gcdIRQF_FLAG,
+-        "galcore_3d_0", Device
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLines[gcvCORE_MAJOR], isrRoutine3D0, IRQF_DISABLED,
++#else
++        Device->irqLines[gcvCORE_MAJOR], isrRoutine3D0, 0x0,
++#endif
++	"galcore_3d_0", Device
+         );
+ 
+     if (ret != 0)
+@@ -2176,7 +2188,11 @@ gckGALDEVICE_Setup_ISR(
+     Device->isrInitializeds[gcvCORE_MAJOR] = gcvTRUE;
+ 
+     ret = request_irq(
+-        Device->irqLines[gcvCORE_OCL], isrRoutine3D1, gcdIRQF_FLAG,
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLines[gcvCORE_OCL], isrRoutine3D1, IRQF_DISABLED,
++#else
++	Device->irqLines[gcvCORE_OCL], isrRoutine3D1, 0x0,
++#endif
+         "galcore_3d_1", Device
+         );
+ 
+@@ -2196,8 +2212,12 @@ gckGALDEVICE_Setup_ISR(
+     Device->isrInitializeds[gcvCORE_OCL] = gcvTRUE;
+ #else
+     ret = request_irq(
+-        Device->irqLines[gcvCORE_MAJOR], isrRoutine, gcdIRQF_FLAG,
+-        "galcore interrupt service", Device
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLines[gcvCORE_MAJOR], isrRoutine, IRQF_DISABLED,
++#else
++	Device->irqLines[gcvCORE_MAJOR], isrRoutine, 0x0,
++#endif
++    	"galcore interrupt service", Device
+         );
+ 
+     if (ret != 0)
+@@ -2255,8 +2275,12 @@ gckGALDEVICE_Setup_ISR_2D(
+         );
+ #else
+     ret = request_irq(
+-        Device->irqLines[gcvCORE_2D], isrRoutine2D, gcdIRQF_FLAG,
+-        "galcore interrupt service for 2D", Device
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLines[gcvCORE_2D], isrRoutine2D, IRQF_DISABLED,
++#else
++        Device->irqLines[gcvCORE_2D], isrRoutine2D, 0x0,
++#endif
++	"galcore interrupt service for 2D", Device
+         );
+ #endif
+ 
+@@ -2313,8 +2337,12 @@ gckGALDEVICE_Setup_ISR_VG(
+         );
+ #else
+     ret = request_irq(
+-        Device->irqLines[gcvCORE_VG], isrRoutineVG, gcdIRQF_FLAG,
+-        "galcore interrupt service for 2D", Device
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
++        Device->irqLines[gcvCORE_VG], isrRoutineVG, IRQF_DISABLED,
++#else
++        Device->irqLines[gcvCORE_VG], isrRoutineVG, 0x0,
++#endif
++	"galcore interrupt service for 2D", Device
+         );
+ #endif
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.h
+index 38482d91939e..84c97048e85d 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_device.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_iommu.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_iommu.c
+index d6c641702d55..843b7e14f0d9 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_iommu.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_iommu.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.c
+index ba35eac6f668..ad053af14a67 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.h
+index 8bea8e11da2c..b863784f6c0a 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_linux.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -145,12 +145,6 @@
+ #define gcdNOWARN 0
+ #endif
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION (4, 1, 0)
+-#define gcdIRQF_FLAG   (0)
+-#else
+-#define gcdIRQF_FLAG   (IRQF_DISABLED)
+-#endif
+-
+ /******************************************************************************\
+ ********************************** Structures **********************************
+ \******************************************************************************/
+@@ -302,7 +296,6 @@ typedef struct _gcsPageInfo
+ #if gcdPROCESS_ADDRESS_SPACE
+     gckMMU mmu;
+ #endif
+-    gctBOOL *ref;
+ }
+ gcsPageInfo;
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_math.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_math.c
+index b28e34c1f4db..ae3c8a79a946 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_math.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_math.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_mutex.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_mutex.h
+index 19aa736b4d63..7027d464e11b 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_mutex.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_mutex.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.c
+index c3f91701d115..4092ca1da26c 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -3993,9 +3993,6 @@ gckOS_MapPagesEx(
+ 
+     allocator = mdl->allocator;
+ 
+-    /* Only support pagedMem, and pagedMem always has its allocator. */
+-    gcmkASSERT(allocator != gcvNULL);
+-
+     gcmkTRACE_ZONE(
+         gcvLEVEL_INFO, gcvZONE_OS,
+         "%s(%d): Physical->0x%X PageCount->0x%X PagedMemory->?%d",
+@@ -4027,7 +4024,23 @@ gckOS_MapPagesEx(
+         gctUINT i;
+         gctPHYS_ADDR_T phys = ~0U;
+ 
+-        allocator->ops->Physical(allocator, mdl, offset, &phys);
++        if (mdl->pagedMem && !mdl->contiguous)
++        {
++            allocator->ops->Physical(allocator, mdl, offset, &phys);
++        }
++        else
++        {
++            if (!mdl->pagedMem)
++            {
++                gcmkTRACE_ZONE(
++                    gcvLEVEL_INFO, gcvZONE_OS,
++                    "%s(%d): we should not get this call for Non Paged Memory!",
++                    __FUNCTION__, __LINE__
++                    );
++            }
++
++            phys = page_to_phys(nth_page(mdl->u.contiguousPages, offset));
++        }
+ 
+         gcmkVERIFY_OK(gckOS_CPUPhysicalToGPUPhysical(Os, phys, &phys));
+ 
+@@ -4868,7 +4881,6 @@ OnError:
+ 
+     gcsPageInfo_PTR info = gcvNULL;
+     struct page **pages = gcvNULL;
+-    gctBOOL *ref = gcvNULL;
+ 
+     /* Verify the arguments. */
+     gcmkVERIFY_OBJECT(Os, gcvOBJ_OS);
+@@ -4932,14 +4944,6 @@ OnError:
+             break;
+         }
+ 
+-        ref = (gctBOOL *)kzalloc((pageCount + extraPage) * sizeof(gctBOOL), GFP_KERNEL | gcdNOWARN);
+-
+-        if (ref == gcvNULL)
+-        {
+-            status = gcvSTATUS_OUT_OF_MEMORY;
+-            break;
+-        }
+-
+         if (Physical != ~0U)
+         {
+             for (i = 0; i < pageCount; i++)
+@@ -4948,7 +4952,7 @@ OnError:
+ 
+                 if (pfn_valid(page_to_pfn(pages[i])))
+                 {
+-                    ref[i] = get_page_unless_zero(pages[i]);
++                    get_page(pages[i]);
+                 }
+             }
+         }
+@@ -5078,18 +5082,10 @@ OnError:
+                 {
+                     if (pfn_valid(page_to_pfn(pages[i])))
+                     {
+-                        ref[i] = get_page_unless_zero(pages[i]);
++                        get_page(pages[i]);
+                     }
+                 }
+             }
+-            else
+-            {
+-                /* Mark feference when pages from get_user_pages. */
+-                for (i = 0; i < pageCount; i++)
+-                {
+-                    ref[i] = gcvTRUE;
+-                }
+-            }
+         }
+ 
+         for (i = 0; i < pageCount; i++)
+@@ -5277,7 +5273,6 @@ OnError:
+         /* Save pointer to page table. */
+         info->pageTable = pageTable;
+         info->pages = pages;
+-        info->ref   = ref;
+ 
+         *Info = (gctPOINTER) info;
+ 
+@@ -5352,13 +5347,6 @@ OnError:
+             info->pages = gcvNULL;
+         }
+ 
+-        if (info!= gcvNULL && ref != gcvNULL)
+-        {
+-            /* Free the ref table. */
+-            kfree(ref);
+-            info->ref = gcvNULL;
+-        }
+-
+         /* Release page info struct. */
+         if (info != gcvNULL)
+         {
+@@ -5446,7 +5434,6 @@ OnError:
+     gcsPageInfo_PTR info;
+     gctSIZE_T pageCount, i;
+     struct page **pages;
+-    gctBOOL *ref;
+ 
+     /* Verify the arguments. */
+     gcmkVERIFY_OBJECT(Os, gcvOBJ_OS);
+@@ -5460,8 +5447,6 @@ OnError:
+ 
+         pages = info->pages;
+ 
+-        ref = info->ref;
+-
+         gcmkTRACE_ZONE(
+             gcvLEVEL_INFO, gcvZONE_OS,
+             "%s(%d): info=0x%X, pages=0x%X.",
+@@ -5579,7 +5564,7 @@ OnError:
+                      SetPageDirty(pages[i]);
+                 }
+ 
+-                if (pfn_valid(page_to_pfn(pages[i])) && ref[i])
++                if (pfn_valid(page_to_pfn(pages[i])))
+                 {
+                     page_cache_release(pages[i]);
+                 }
+@@ -5599,11 +5584,6 @@ OnError:
+             kfree(info->pages);
+         }
+ 
+-        if (info->ref != gcvNULL)
+-        {
+-            kfree(info->ref);
+-        }
+-
+         kfree(info);
+     }
+ 
+@@ -6886,16 +6866,15 @@ gckOS_QueryProfileTickRate(
+     OUT gctUINT64_PTR TickRate
+     )
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,2,0)
++    *TickRate = hrtimer_resolution;
++#else
+     struct timespec res;
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
+-    res.tv_sec = 0;
+-    res.tv_nsec = hrtimer_resolution;
+-#else
+     hrtimer_get_res(CLOCK_MONOTONIC, &res);
+-#endif
+ 
+     *TickRate = res.tv_nsec + res.tv_sec * 1000000000ULL;
++#endif
+ 
+     return gcvSTATUS_OK;
+ }
+@@ -8503,7 +8482,7 @@ gckOS_CreateNativeFence(
+     /* Cast timeline. */
+     timeline = (struct viv_sync_timeline *) Timeline;
+ 
+-    fd = get_unused_fd_flags(O_CLOEXEC);
++    fd = get_unused_fd();
+ 
+     if (fd < 0)
+     {
+@@ -8565,6 +8544,7 @@ gckOS_WaitNativeFence(
+     )
+ {
+     struct sync_timeline * timeline;
++    struct list_head *pos;
+     struct sync_fence * fence;
+     gctBOOL wait = gcvFALSE;
+     gceSTATUS status = gcvSTATUS_OK;
+@@ -8583,40 +8563,18 @@ gckOS_WaitNativeFence(
+         gcmkONERROR(gcvSTATUS_INVALID_ARGUMENT);
+     }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
++    list_for_each(pos, &fence->pt_list_head)
+     {
+-        int i;
++        struct sync_pt * pt =
++        container_of(pos, struct sync_pt, pt_list);
+ 
+-        for (i = 0; i < fence->num_fences; i++)
++        /* Do not need to wait on same timeline. */
++        if (pt->parent != timeline)
+         {
+-            struct fence *f = fence->cbs[i].sync_pt;
+-            struct sync_pt *pt = container_of(f, struct sync_pt, base);
+-
+-            /* Do not need to wait on same timeline. */
+-            if ((sync_pt_parent(pt) != timeline) && !fence_is_signaled(f))
+-            {
+-                wait = gcvTRUE;
+-                break;
+-            }
++            wait = gcvTRUE;
++            break;
+         }
+     }
+-#else
+-    {
+-        struct list_head *pos;
+-        list_for_each(pos, &fence->pt_list_head)
+-        {
+-            struct sync_pt * pt =
+-            container_of(pos, struct sync_pt, pt_list);
+-
+-            /* Do not need to wait on same timeline. */
+-            if (pt->parent != timeline)
+-            {
+-                wait = gcvTRUE;
+-                break;
+-            }
+-        }
+-    }
+-#endif
+ 
+     if (wait)
+     {
+@@ -8696,11 +8654,28 @@ gckOS_AllocatePageArray(
+     {
+         unsigned long phys = ~0;
+ 
+-        gctPHYS_ADDR_T phys_addr;
+-
+-        allocator->ops->Physical(allocator, mdl, offset, &phys_addr);
++        if (mdl->pagedMem && !mdl->contiguous)
++        {
++            if (allocator)
++            {
++                gctPHYS_ADDR_T phys_addr;
++                allocator->ops->Physical(allocator, mdl, offset, &phys_addr);
++                phys = (unsigned long)phys_addr;
++            }
++        }
++        else
++        {
++            if (!mdl->pagedMem)
++            {
++                gcmkTRACE_ZONE(
++                    gcvLEVEL_INFO, gcvZONE_OS,
++                    "%s(%d): we should not get this call for Non Paged Memory!",
++                    __FUNCTION__, __LINE__
++                    );
++            }
+ 
+-        phys = (unsigned long)phys_addr;
++            phys = page_to_phys(nth_page(mdl->u.contiguousPages, offset));
++        }
+ 
+         table[offset] = phys;
+ 
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.h
+index 407b1e8fca22..79ff67619d05 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_os.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_platform.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_platform.h
+index bee9a8fa407b..bf19409129ff 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_platform.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_platform.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_probe.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_probe.c
+index 93a19d51303c..4a29f0e776e2 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_probe.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_probe.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_security_channel.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_security_channel.c
+index 33be5bdd5847..9dfb755c0519 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_security_channel.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_security_channel.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.c
+index 21f4f69be18b..3a0feac03b69 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -79,11 +79,7 @@ viv_sync_pt_dup(
+     struct viv_sync_timeline *obj;
+ 
+     src = (struct viv_sync_pt *) sync_pt;
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
+-    obj = (struct viv_sync_timeline *) sync_pt_parent(sync_pt);
+-#else
+     obj = (struct viv_sync_timeline *) sync_pt->parent;
+-#endif
+ 
+     /* Create the new sync_pt. */
+     pt = (struct viv_sync_pt *)
+@@ -115,11 +111,7 @@ viv_sync_pt_has_signaled(
+     struct viv_sync_timeline * obj;
+ 
+     pt  = (struct viv_sync_pt *)sync_pt;
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
+-    obj = (struct viv_sync_timeline *) sync_pt_parent(sync_pt);
+-#else
+     obj = (struct viv_sync_timeline *)sync_pt->parent;
+-#endif
+ 
+     status = gckOS_QuerySyncPoint(obj->os, pt->sync, &state);
+ 
+@@ -158,11 +150,7 @@ viv_sync_pt_free(
+     struct viv_sync_timeline * obj;
+ 
+     pt  = (struct viv_sync_pt *) sync_pt;
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
+-    obj = (struct viv_sync_timeline *) sync_pt_parent(sync_pt);
+-#else
+-    obj = (struct viv_sync_timeline *)sync_pt->parent;
+-#endif
++    obj = (struct viv_sync_timeline *) sync_pt->parent;
+ 
+     gckOS_DestroySyncPoint(obj->os, pt->sync);
+ }
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.h b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.h
+index c3dc0c05ce2e..658b205ecd54 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.h
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/gc_hal_kernel_sync.h
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c
+index e436ada6844c..a5473bb926a2 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c
+@@ -2,7 +2,7 @@
+ *
+ *    The MIT License (MIT)
+ *
+-*    Copyright (c) 2014 - 2016 Vivante Corporation
++*    Copyright (c) 2014 Vivante Corporation
+ *
+ *    Permission is hereby granted, free of charge, to any person obtaining a
+ *    copy of this software and associated documentation files (the "Software"),
+@@ -26,7 +26,7 @@
+ *
+ *    The GPL License (GPL)
+ *
+-*    Copyright (C) 2014 - 2016 Vivante Corporation
++*    Copyright (C) 2014  Vivante Corporation
+ *
+ *    This program is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License
+@@ -92,22 +92,21 @@
+ 
+ #include <linux/regulator/consumer.h>
+ 
+-#ifdef CONFIG_DEVICE_THERMAL
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0)
++#ifdef CONFIG_DEVICE_THERMAL
+ #include <linux/device_cooling.h>
+ #define REG_THERMAL_NOTIFIER(a) register_devfreq_cooling_notifier(a);
+ #define UNREG_THERMAL_NOTIFIER(a) unregister_devfreq_cooling_notifier(a);
+ #else
++#define REG_THERMAL_NOTIFIER(a) (void)a;
++#define UNREG_THERMAL_NOTIFIER(a) (void)a;
++#endif
++#else
+ extern int register_thermal_notifier(struct notifier_block *nb);
+ extern int unregister_thermal_notifier(struct notifier_block *nb);
+ #define REG_THERMAL_NOTIFIER(a) register_thermal_notifier(a);
+ #define UNREG_THERMAL_NOTIFIER(a) unregister_thermal_notifier(a);
+ #endif
+-#endif
+-
+-#ifndef gcdFSL_CONTIGUOUS_SIZE
+-#define gcdFSL_CONTIGUOUS_SIZE (4 << 20)
+-#endif
+ 
+ static int initgpu3DMinClock = 1;
+ module_param(initgpu3DMinClock, int, 0644);
+@@ -213,7 +212,7 @@ static int force_contiguous_lowmem_shrink(IN gckKERNEL Kernel)
+ 		selected_tasksize = tasksize;
+ 		selected_oom_adj = oom_adj;
+ 	}
+-    if (selected && selected_oom_adj > 0) {
++	if (selected && selected_oom_adj > 0) {
+ 		gckOS_Print("<gpu> send sigkill to %d (%s), adj %d, size %d\n",
+ 			     selected->pid, selected->comm,
+ 			     selected_oom_adj, selected_tasksize);
+@@ -261,7 +260,7 @@ _ShrinkMemory(
+ }
+ #endif
+ 
+-#if gcdENABLE_FSCALE_VAL_ADJUST && defined(CONFIG_DEVICE_THERMAL)
++#if gcdENABLE_FSCALE_VAL_ADJUST
+ static int thermal_hot_pm_notify(struct notifier_block *nb, unsigned long event,
+        void *dummy)
+ {
+@@ -443,16 +442,7 @@ gckPLATFORM_AdjustParam(
+         Args->registerMemSizeVG = res->end - res->start + 1;
+     }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0)
+-    res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "contiguous_mem");
+-    if (res)
+-    {
+-        if( Args->contiguousBase == 0 )
+-           Args->contiguousBase = res->start;
+-        if( Args->contiguousSize == ~0U )
+-           Args->contiguousSize = res->end - res->start + 1;
+-    }
+-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,0)
+        Args->contiguousBase = 0;
+ #elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+        prop = of_get_property(dn, "contiguousbase", NULL);
+@@ -466,12 +456,8 @@ gckPLATFORM_AdjustParam(
+        Args->contiguousSize = pdata->reserved_mem_size;
+      }
+ #endif
+-    if (Args->contiguousSize == ~0U)
+-    {
++    if (Args->contiguousSize == 0)
+        gckOS_Print("Warning: No contiguous memory is reserverd for gpu.!\n ");
+-       gckOS_Print("Warning: Will use default value(%d) for the reserved memory!\n ",gcdFSL_CONTIGUOUS_SIZE);
+-       Args->contiguousSize = gcdFSL_CONTIGUOUS_SIZE;
+-    }
+ 
+     Args->gpu3DMinClock = initgpu3DMinClock;
+ 
+@@ -869,6 +855,7 @@ _SetClock(
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+ #ifdef CONFIG_PM
++#ifdef CONFIG_PM_RUNTIME
+ static int gpu_runtime_suspend(struct device *dev)
+ {
+     release_bus_freq(BUS_FREQ_HIGH);
+@@ -880,6 +867,7 @@ static int gpu_runtime_resume(struct device *dev)
+     request_bus_freq(BUS_FREQ_HIGH);
+     return 0;
+ }
++#endif
+ 
+ static struct dev_pm_ops gpu_pm_ops;
+ #endif
+@@ -904,7 +892,7 @@ _AdjustDriver(
+     memcpy(&gpu_pm_ops, driver->driver.pm, sizeof(struct dev_pm_ops));
+ 
+     /* Add runtime PM callback. */
+-#ifdef CONFIG_PM
++#ifdef CONFIG_PM_RUNTIME
+     gpu_pm_ops.runtime_suspend = gpu_runtime_suspend;
+     gpu_pm_ops.runtime_resume = gpu_runtime_resume;
+     gpu_pm_ops.runtime_idle = NULL;
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.config b/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.config
+index 0b2cb43027f2..5ba25b5de676 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.config
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.config
+@@ -1,5 +1,4 @@
+-EXTRA_CFLAGS += -DgcdDEFAULT_CONTIGUOUS_SIZE=~0U
+-EXTRA_CFLAGS += -DgcdFSL_CONTIGUOUS_SIZE=134217728
++EXTRA_CFLAGS += -DgcdDEFAULT_CONTIGUOUS_SIZE=134217728
+ 
+ ifneq ($(CONFIG_ANDROID),)
+ # build for android
+@@ -17,7 +16,5 @@ CUSTOMER_ALLOCATOR_OBJS := $(ALLOCATOR_ARRAY_H_LOCATION)/gc_hal_kernel_allocator
+ 
+ EXTRA_CFLAGS += -DCLASS_NAME=\"gpu_class\"
+ 
+-EXTRA_CFLAGS += -DgcdGPU_2D_TIMEOUT=20000
+-
+ EXTRA_CFLAGS += -DDISABLE_RECORD_ARRAY_SIZE_OPTIMIZATION
+ 
+-- 
+2.17.1
+

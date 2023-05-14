@@ -1,0 +1,88 @@
+From 727d1aceacd443ba8d914850917ff8999d05f831 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 2 Nov 2016 15:46:13 +0200
+Subject: [PATCH] Revert "MLK-12395: mtd: gpmi: add debugfs flag to indicate
+ NAND driver use new raw access mode"
+
+This reverts commit 57b1be6777378c91d983be4eb1de58dfe6028510.
+---
+ drivers/mtd/nand/gpmi-nand/gpmi-lib.c  | 12 ++----------
+ drivers/mtd/nand/gpmi-nand/gpmi-nand.c |  2 +-
+ drivers/mtd/nand/gpmi-nand/gpmi-nand.h |  4 ++--
+ 3 files changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/mtd/nand/gpmi-nand/gpmi-lib.c b/drivers/mtd/nand/gpmi-nand/gpmi-lib.c
+index c2503942acda..67d35c0e1a7e 100644
+--- a/drivers/mtd/nand/gpmi-nand/gpmi-lib.c
++++ b/drivers/mtd/nand/gpmi-nand/gpmi-lib.c
+@@ -1,7 +1,7 @@
+ /*
+  * Freescale GPMI NAND Flash Driver
+  *
+- * Copyright (C) 2008-2016 Freescale Semiconductor, Inc.
++ * Copyright (C) 2008-2015 Freescale Semiconductor, Inc.
+  * Copyright (C) 2008 Embedded Alley Solutions, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify
+@@ -255,7 +255,7 @@ void gpmi_dump_info(struct gpmi_nand_data *this)
+ 		geo->block_mark_bit_offset);
+ }
+ 
+-int bch_create_debugfs(struct gpmi_nand_data *this)
++int bch_save_geometry(struct gpmi_nand_data *this)
+ {
+ 	struct bch_geometry *bch_geo = &this->bch_geometry;
+ 	struct dentry *dbg_root;
+@@ -273,14 +273,6 @@ int bch_create_debugfs(struct gpmi_nand_data *this)
+ 		dev_err(this->dev, "failed to create debug bch geometry\n");
+ 		return -EINVAL;
+ 	}
+-
+-	/* create raw mode flag */
+-	if (!debugfs_create_file("raw_mode", S_IRUGO,
+-				dbg_root, NULL, NULL)) {
+-		dev_err(this->dev, "failed to create raw mode flag\n");
+-		return -EINVAL;
+-	}
+-
+ 	return 0;
+ }
+ 
+diff --git a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+index b72e5f68ac7a..58c17c9e1c7d 100644
+--- a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
++++ b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+@@ -2190,7 +2190,7 @@ static int gpmi_init_last(struct gpmi_nand_data *this)
+ 		return ret;
+ 
+ 	/* Save the geometry to debugfs*/
+-	ret = bch_create_debugfs(this);
++	ret = bch_save_geometry(this);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/drivers/mtd/nand/gpmi-nand/gpmi-nand.h b/drivers/mtd/nand/gpmi-nand/gpmi-nand.h
+index c3a51f1bb143..e426a0d93afb 100644
+--- a/drivers/mtd/nand/gpmi-nand/gpmi-nand.h
++++ b/drivers/mtd/nand/gpmi-nand/gpmi-nand.h
+@@ -1,7 +1,7 @@
+ /*
+  * Freescale GPMI NAND Flash Driver
+  *
+- * Copyright (C) 2010-2016 Freescale Semiconductor, Inc.
++ * Copyright (C) 2010-2015 Freescale Semiconductor, Inc.
+  * Copyright (C) 2008 Embedded Alley Solutions, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify
+@@ -288,7 +288,7 @@ extern int gpmi_init(struct gpmi_nand_data *);
+ extern int gpmi_extra_init(struct gpmi_nand_data *);
+ extern void gpmi_clear_bch(struct gpmi_nand_data *);
+ extern void gpmi_dump_info(struct gpmi_nand_data *);
+-extern int bch_create_debugfs(struct gpmi_nand_data *);
++extern int bch_save_geometry(struct gpmi_nand_data *);
+ extern int bch_set_geometry(struct gpmi_nand_data *);
+ extern int gpmi_is_ready(struct gpmi_nand_data *, unsigned chip);
+ extern int gpmi_send_command(struct gpmi_nand_data *);
+-- 
+2.17.1
+

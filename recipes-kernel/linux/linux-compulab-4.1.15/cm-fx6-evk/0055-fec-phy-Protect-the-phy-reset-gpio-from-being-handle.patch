@@ -1,0 +1,43 @@
+From 7644d11589b04052e40ea13d542428bb5ed8a8e5 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Sat, 4 Jun 2022 12:39:46 +0300
+Subject: [PATCH] fec: phy: Protect the phy-reset gpio from being handled by
+ kernel
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi
+index 2468c14206ca..7cabf2d1f7ec 100644
+--- a/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi
+@@ -80,6 +80,16 @@
+ 			regulator-max-microvolt = <3300000>;
+ 		};
+ 
++		phy_nreset: regulator-phy-nreset {
++			compatible = "regulator-fixed";
++			regulator-name = "regulator-phy-nreset"
++			regulator-min-microvolt = <3300000>;
++			regulator-max-microvolt = <3300000>;
++			gpio = <&gpio2 8 0>;
++			enable-active-high;
++			regulator-boot-on;
++			regulator-always-on;
++		};
+ 	};
+ 
+ 	pu_dummy: pudummy_reg {
+@@ -588,7 +598,6 @@
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_enet>;
+ 	phy-mode = "rgmii";
+-	phy-reset-gpios = <&gpio2 8 0>;
+ 	status = "okay";
+ };
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,143 @@
+From 63675ad23b982931b47f1ba6dc515514cf46563e Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 14 Dec 2016 14:36:02 +0200
+Subject: [PATCH] ARM: i.MX6: dts: add ov564x mipi camera support
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi | 10 ++++---
+ arch/arm/boot/dts/imx6qdl-sb-fx6.dtsi | 41 +++++++++++++++++++++++++++
+ arch/arm/mach-imx/mach-cm_fx6.c       | 14 +++++++++
+ 3 files changed, 61 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi
+index 426e3c217bf8..0a9a2feffc20 100644
+--- a/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-cm-fx6.dtsi
+@@ -228,6 +228,12 @@
+ 				MX6QDL_PAD_ENET_TXD1__GPIO1_IO29 0x80000000
+ 				/* PHY_RST */
+ 				MX6QDL_PAD_SD4_DAT0__GPIO2_IO08	0x80000000
++				/* mipi camera rst pwn clko*/
++				MX6QDL_PAD_DI0_PIN4__GPIO4_IO20 0x80000000
++				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25 0x80000000
++				/* Aristo GPIO */
++				MX6QDL_PAD_SD4_DAT5__GPIO2_IO13	0x80000000
++				MX6QDL_PAD_SD4_DAT6__GPIO2_IO14	0x80000000
+ 			>;
+ 		};
+ 	};
+@@ -260,7 +266,6 @@
+ 				MX6QDL_PAD_DI0_PIN15__IPU1_DI0_PIN15       0x38
+ 				MX6QDL_PAD_DI0_PIN2__IPU1_DI0_PIN02        0x38
+ 				MX6QDL_PAD_DI0_PIN3__IPU1_DI0_PIN03        0x38
+-				MX6QDL_PAD_DI0_PIN4__IPU1_DI0_PIN04        0x80000028
+ 				MX6QDL_PAD_DISP0_DAT0__IPU1_DISP0_DATA00   0x38
+ 				MX6QDL_PAD_DISP0_DAT1__IPU1_DISP0_DATA01   0x38
+ 				MX6QDL_PAD_DISP0_DAT2__IPU1_DISP0_DATA02   0x38
+@@ -357,11 +362,8 @@
+ 			fsl,pins = <
+ 				MX6QDL_PAD_GPIO_7__UART2_TX_DATA  0x1b0b1
+ 				MX6QDL_PAD_GPIO_8__UART2_RX_DATA  0x1b0b1
+-				MX6QDL_PAD_SD4_DAT5__UART2_RTS_B  0x1b0b1
+-				MX6QDL_PAD_SD4_DAT6__UART2_CTS_B  0x1b0b1
+ 			>;
+ 		};
+-
+ 		/* pins for ttymxc2 */
+ 		pinctrl_uart3: uar3grp {
+ 			fsl,pins = <
+diff --git a/arch/arm/boot/dts/imx6qdl-sb-fx6.dtsi b/arch/arm/boot/dts/imx6qdl-sb-fx6.dtsi
+index 22585fcf2c99..e98e8195bcd9 100644
+--- a/arch/arm/boot/dts/imx6qdl-sb-fx6.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-sb-fx6.dtsi
+@@ -53,6 +53,24 @@
+ 				pagesize = <16>;
+ 			};
+ 
++			ov564x_mipi: ov564x_mipi@3c {
++				compatible = "ovti,ov564x_mipi";
++				reg = <0x3c>;
++				clocks = <&clks IMX6QDL_CLK_CKO>;
++				clock-names = "csi_mclk";
++
++				DOVDD-supply = <&vgen4_reg>;
++				AVDD-supply = <&vgen3_reg>;
++				DVDD-supply = <&vgen2_reg>;
++
++				pwn-gpios = <&gpio1 25 1>;
++				rst-gpios = <&gpio4 20 0>;
++
++				csi_id = <0>;
++				mclk = <24000000>;
++				mclk_source = <0>;
++			};
++
+ 			adv5150: adv5150@5c {
+ 				compatible = "ti,tvp5150";
+ 				reg = <0x5c>;
+@@ -95,6 +113,22 @@
+ 		#reset-cells = <0>;
+ 	};
+ 
++	vgen2_reg: vgen2 {
++		regulator-min-microvolt = <800000>;
++		regulator-max-microvolt = <1550000>;
++	};
++
++	vgen3_reg: vgen3 {
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	vgen4_reg: vgen4 {
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on;
++	};
++
+ 	pcie_power_on_gpio: regulator-pcie-power-on-gpio {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "regulator-pcie-power-on-gpio";
+@@ -196,3 +230,10 @@
+ 	status = "okay";
+ };
+ 
++&mipi_csi {
++	status = "okay";
++	ipu_id = <0>;
++	csi_id = <0>;
++	v_channel = <0>;
++	lanes = <2>;
++};
+diff --git a/arch/arm/mach-imx/mach-cm_fx6.c b/arch/arm/mach-imx/mach-cm_fx6.c
+index 45d24cc24ba5..6b540f6c2d24 100644
+--- a/arch/arm/mach-imx/mach-cm_fx6.c
++++ b/arch/arm/mach-imx/mach-cm_fx6.c
+@@ -77,9 +77,23 @@ static void __init cm_fx6_csi_mux_init(void)
+ 	 * Set GPR13 bit 0-2 to 0x4.
+ 	 */
+ 	struct regmap *gpr;
++	struct device_node *np;
++	const char *status;
++	int ret;
++
++	/* Read mipi-csi status and set IPU1 CSI0 accordingly */
++	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-mipi-csi2");
++	if (np) {
++		ret = of_property_read_string(np, "status", &status);
++		if (!ret && (!strcasecmp(status, "okay"))) {
++			pr_info("IPU1 CSI0 is in mipi mode\n");
++			return;
++		}
++	}
+ 
+ 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+ 	if (!IS_ERR(gpr)) {
++		pr_info("IPU1 CSI0 is in parallel mode\n");
+ 		if (of_machine_is_compatible("fsl,imx6q"))
+ 			regmap_update_bits(gpr, IOMUXC_GPR1, 1 << 19, 1 << 19);
+ 		else if (of_machine_is_compatible("fsl,imx6dl"))
+-- 
+2.17.1
+

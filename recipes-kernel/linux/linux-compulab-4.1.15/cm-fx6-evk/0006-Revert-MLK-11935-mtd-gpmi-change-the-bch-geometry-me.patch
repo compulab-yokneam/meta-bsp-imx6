@@ -1,0 +1,36 @@
+From 4e0b0674a5a7a89c4a493a9c24b8badf73dc385e Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Wed, 2 Nov 2016 15:46:17 +0200
+Subject: [PATCH] Revert "MLK-11935: mtd: gpmi: change the bch geometry member
+ name"
+
+This reverts commit bc9f4cbe4cac8e7db0cbba5148acc064579b993b.
+---
+ drivers/mtd/nand/gpmi-nand/gpmi-nand.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+index 04cfe64edce5..b784b3929f33 100644
+--- a/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
++++ b/drivers/mtd/nand/gpmi-nand/gpmi-nand.c
+@@ -1676,7 +1676,7 @@ static int gpmi_ecc_read_page_raw(struct mtd_info *mtd,
+ {
+ 	struct gpmi_nand_data *this = chip->priv;
+ 	struct bch_geometry *nfc_geo = &this->bch_geometry;
+-	int eccsize = nfc_geo->ecc_chunkn_size;
++	int eccsize = nfc_geo->ecc_chunk_size;
+ 	int eccbits = nfc_geo->ecc_strength * nfc_geo->gf_len;
+ 	u8 *tmp_buf = this->raw_buffer;
+ 	size_t src_bit_off;
+@@ -1765,7 +1765,7 @@ static int gpmi_ecc_write_page_raw(struct mtd_info *mtd,
+ {
+ 	struct gpmi_nand_data *this = chip->priv;
+ 	struct bch_geometry *nfc_geo = &this->bch_geometry;
+-	int eccsize = nfc_geo->ecc_chunkn_size;
++	int eccsize = nfc_geo->ecc_chunk_size;
+ 	int eccbits = nfc_geo->ecc_strength * nfc_geo->gf_len;
+ 	u8 *tmp_buf = this->raw_buffer;
+ 	uint8_t *oob = chip->oob_poi;
+-- 
+2.17.1
+

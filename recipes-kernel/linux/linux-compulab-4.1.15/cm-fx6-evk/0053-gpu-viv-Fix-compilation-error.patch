@@ -1,0 +1,29 @@
+From adf96a285a4c8fadc26909425247d4ebd156efff Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 12 Aug 2021 11:24:39 +0300
+Subject: [PATCH] gpu-viv: Fix compilation error
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ .../platform/freescale/gc_hal_kernel_platform_imx6q14.c      | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c b/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c
+index a5473bb926a2..05ce72ae0b96 100644
+--- a/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c
++++ b/drivers/mxc/gpu-viv/hal/os/linux/kernel/platform/freescale/gc_hal_kernel_platform_imx6q14.c
+@@ -461,8 +461,9 @@ gckPLATFORM_AdjustParam(
+ 
+     Args->gpu3DMinClock = initgpu3DMinClock;
+ 
+-  if(Args->physSize == 0)
+-    Args->physSize = 0x80000000;
++    if(Args->physSize == 0) {
++        Args->physSize = 0x80000000;
++    }
+ 
+     return gcvSTATUS_OK;
+ }
+-- 
+2.17.1
+
