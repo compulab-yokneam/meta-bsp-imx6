@@ -1,0 +1,36 @@
+From b8f5d5050b143cf6e224fa1f093a2c250aae0060 Mon Sep 17 00:00:00 2001
+From: Valentin Raevsky <valentin@compulab.co.il>
+Date: Thu, 18 May 2023 07:32:28 +0300
+Subject: [PATCH] cm-fx6: dts: Fix operation points voltage to 1v25
+
+Signed-off-by: Valentin Raevsky <valentin@compulab.co.il>
+---
+ arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+index 80dcd82384fa..171b10bb3523 100644
+--- a/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
++++ b/arch/arm/boot/dts/compulab/imx6qdl-cm-fx6.dtsi
+@@ -779,3 +779,18 @@
+ 		>;
+ 	};
+ };
++
++&cpu0 {
++	operating-points = <
++		/* kHz    uV */
++		996000  1250000
++		792000  1250000
++		396000  1250000
++	>;
++	fsl,soc-operating-points = <
++		/* ARM kHz  SOC-PU uV */
++		996000	1250000
++		792000	1250000
++		396000	1250000
++	>;
++};
+-- 
+2.17.1
+

@@ -61,4 +61,5 @@ SRC_URI_append_cm-fx6-evk = " \
 	file://0059-cm-fx6-dts-Add-imx6q-sbc-fx6-multi.dts.patch \
 	file://0060-cm-fx6-dts-Move-to-compulab-folder.patch \
 	file://0061-cm-fx6-dts-Fix-imx6q-sbc-fx6-multi.dts.patch \
+	file://0062-cm-fx6-dts-Fix-operation-points-voltage-to-1v25.patch \
 "
